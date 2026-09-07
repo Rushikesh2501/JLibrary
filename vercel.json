@@ -1,0 +1,11 @@
+{
+  "buildCommand": "cd JLIB_FE/jlib_ui && npm install && npm run build",
+  "outputDirectory": "JLIB_FE/jlib_ui/build",
+  "framework": "create-react-app",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
