@@ -1,0 +1,34 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "JLIB_FE/jlib_ui/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "build"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/static/(.*)",
+      "dest": "/JLIB_FE/jlib_ui/static/$1"
+    },
+    {
+      "src": "/favicon.ico",
+      "dest": "/JLIB_FE/jlib_ui/favicon.ico"
+    },
+    {
+      "src": "/manifest.json",
+      "dest": "/JLIB_FE/jlib_ui/manifest.json"
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "/JLIB_FE/jlib_ui/assets/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/JLIB_FE/jlib_ui/index.html"
+    }
+  ]
+}
