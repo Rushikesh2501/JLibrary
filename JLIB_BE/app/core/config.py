@@ -6,6 +6,8 @@ class Settings(BaseSettings):
     DATABASE_URL: str = ""
     SUPABASE_URL: str = ""
     SUPABASE_KEY: str = ""
+    REACT_APP_SUPABASE_URL: str = ""
+    REACT_APP_SUPABASE_PUBLISHABLE_KEY: str = ""
 
     model_config = SettingsConfigDict(
         env_file=".env",
