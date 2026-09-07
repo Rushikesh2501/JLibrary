@@ -11,7 +11,6 @@ import {
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import PeopleIcon from '@mui/icons-material/People';
-import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import appIcon from '../../assets/icon.png';
 import styles from './Sidebar.module.css';
 
