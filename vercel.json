@@ -1,11 +1,41 @@
 {
-  "buildCommand": "cd JLIB_FE/jlib_ui && npm install && npm run build",
-  "outputDirectory": "JLIB_FE/jlib_ui/build",
-  "framework": "create-react-app",
-  "rewrites": [
+  "builds": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "api/index.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "JLIB_FE/jlib_ui/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "build"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "api/index.py"
+    },
+    {
+      "src": "/books(.*)",
+      "dest": "api/index.py"
+    },
+    {
+      "src": "/users(.*)",
+      "dest": "api/index.py"
+    },
+    {
+      "src": "/health(.*)",
+      "dest": "api/index.py"
+    },
+    {
+      "src": "/static/(.*)",
+      "dest": "/JLIB_FE/jlib_ui/build/static/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/JLIB_FE/jlib_ui/build/$1"
     }
   ]
 }
