@@ -1,0 +1,109 @@
+.container {
+  background-color: var(--bg-sidebar) !important;
+  color: var(--text-on-dark) !important;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border-dark);
+  overflow-y: auto;
+}
+
+.brandBox {
+  padding: 24px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--border-dark);
+  background-color: rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+}
+
+.brandLogo {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  overflow: hidden;
+  padding: 2px;
+}
+
+.brandLogoImg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.brandTitle {
+  font-family: var(--font-serif) !important;
+  color: #f7f3eb !important;
+  font-weight: 700 !important;
+  font-size: 1.35rem !important;
+  letter-spacing: 0.03em !important;
+  line-height: 1.2 !important;
+}
+
+.brandSubtitle {
+  color: #a3b8aa !important;
+  font-size: 0.72rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.06em !important;
+  font-weight: 600 !important;
+}
+
+.navSection {
+  padding: 20px 12px;
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.navItem {
+  border-radius: 8px !important;
+  margin-bottom: 6px !important;
+  color: #d2ded5 !important;
+  transition: all 0.2s ease !important;
+}
+
+.navItem:hover {
+  background-color: var(--bg-sidebar-hover, #263e33) !important;
+  color: #ffffff !important;
+}
+
+.navItemActive {
+  background-color: var(--primary-forest-light, #2d5a27) !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  box-shadow: inset 3px 0 0 var(--accent-gold);
+}
+
+.navIcon {
+  color: inherit !important;
+  min-width: 38px !important;
+}
+
+.navText {
+  font-size: 0.92rem !important;
+  font-weight: 500;
+}
+
+.badge {
+  font-size: 0.65rem !important;
+  background-color: rgba(201, 162, 39, 0.2) !important;
+  color: var(--accent-gold-soft) !important;
+  border: 1px solid rgba(201, 162, 39, 0.4) !important;
+  height: 20px !important;
+}
+
+.footer {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border-dark);
+  font-size: 0.75rem;
+  color: #7b9484;
+  flex-shrink: 0;
+}

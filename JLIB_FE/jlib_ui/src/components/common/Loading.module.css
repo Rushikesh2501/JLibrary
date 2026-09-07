@@ -1,0 +1,41 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  width: 100%;
+}
+
+.iconBox {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background-color: #eaf2eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  color: var(--primary-forest);
+  border: 1px dashed var(--primary-forest-light);
+}
+
+.title {
+  font-family: var(--font-serif) !important;
+  color: var(--primary-forest) !important;
+  font-weight: 700 !important;
+  margin-bottom: 8px !important;
+}
+
+.subtitle {
+  color: var(--text-secondary) !important;
+  margin-bottom: 32px !important;
+}
+
+.skeletonCard {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-parchment);
+  border-radius: 12px;
+  padding: 16px;
+}

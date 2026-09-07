@@ -1,0 +1,64 @@
+.card {
+  background-color: var(--bg-card) !important;
+  border: 1px solid var(--border-parchment) !important;
+  border-radius: 14px !important;
+  padding: 24px 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  height: 100% !important;
+  min-height: 125px !important;
+  box-shadow: 0 4px 14px rgba(43, 36, 31, 0.05) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  position: relative;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(43, 36, 31, 0.09) !important;
+}
+
+.contentBox {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.label {
+  color: var(--text-secondary) !important;
+  font-size: 0.82rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px !important;
+}
+
+.value {
+  font-family: var(--font-serif) !important;
+  color: var(--primary-forest) !important;
+  font-size: 2.2rem !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+}
+
+.iconWrapper {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background-color: #f7f2e7;
+  color: var(--accent-walnut);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e8ded0;
+  flex-shrink: 0;
+}
+
+.badge {
+  font-size: 0.7rem !important;
+  background-color: #f7f2e7 !important;
+  color: var(--accent-walnut) !important;
+  border: 1px solid var(--border-parchment) !important;
+  margin-top: 8px !important;
+  align-self: flex-start;
+}

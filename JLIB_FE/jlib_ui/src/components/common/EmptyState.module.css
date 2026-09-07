@@ -1,0 +1,38 @@
+.paper {
+  background-color: var(--bg-card) !important;
+  border: 1px dashed var(--border-parchment) !important;
+  border-radius: 16px !important;
+  padding: 60px 24px;
+  text-align: center;
+  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconBox {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: #f7f2e7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  color: var(--accent-walnut-light);
+  border: 1px solid #e8ded0;
+}
+
+.title {
+  font-family: var(--font-serif) !important;
+  color: var(--primary-forest) !important;
+  font-weight: 700 !important;
+  margin-bottom: 8px !important;
+}
+
+.subtitle {
+  color: var(--text-secondary) !important;
+  max-width: 420px;
+  font-size: 0.9rem !important;
+}

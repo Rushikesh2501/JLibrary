@@ -1,0 +1,17 @@
+.fabButton {
+  position: fixed !important;
+  bottom: 32px !important;
+  right: 32px !important;
+  background-color: var(--primary-forest) !important;
+  color: #ffffff !important;
+  box-shadow: 0 6px 20px rgba(27, 67, 50, 0.3) !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  z-index: 1200 !important;
+  border: 1px solid var(--accent-gold) !important;
+}
+
+.fabButton:hover {
+  background-color: var(--primary-forest-dark) !important;
+  transform: translateY(-4px);
+  box-shadow: 0 10px 28px rgba(27, 67, 50, 0.4) !important;
+}

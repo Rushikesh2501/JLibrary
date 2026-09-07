@@ -1,0 +1,83 @@
+.recentPaper {
+  background-color: var(--bg-card) !important;
+  border: 1px solid var(--border-parchment) !important;
+  border-radius: 16px !important;
+  padding: 28px 24px !important;
+}
+
+.chartCanvas {
+  position: relative;
+  height: 220px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  padding: 20px 12px 0px 12px;
+  border-bottom: 2px solid var(--border-parchment);
+}
+
+.barColumn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  z-index: 2;
+  flex: 1;
+  max-width: 64px;
+  margin: 0 6px;
+}
+
+.barValuePill {
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--primary-forest-dark);
+  background: #ffffff;
+  border: 1px solid var(--border-parchment);
+  padding: 3px 9px;
+  border-radius: 12px;
+  margin-bottom: 6px;
+  box-shadow: 0 2px 6px rgba(43, 36, 31, 0.08);
+}
+
+.barTrack {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.verticalBar {
+  width: 100%;
+  border-radius: 8px 8px 0 0;
+  transition: height 0.4s ease, transform 0.2s ease, filter 0.2s ease;
+  box-shadow: 0 4px 12px rgba(27, 67, 50, 0.15);
+  cursor: pointer;
+}
+
+.verticalBar:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.12);
+}
+
+.xAxisLabels {
+  display: flex;
+  justify-content: space-around;
+  padding: 12px 12px 0 12px;
+}
+
+.xAxisCol {
+  flex: 1;
+  max-width: 64px;
+  text-align: center;
+  margin: 0 6px;
+}
+
+.xLabelText {
+  font-size: 0.88rem !important;
+  font-weight: 700 !important;
+  color: var(--primary-forest) !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

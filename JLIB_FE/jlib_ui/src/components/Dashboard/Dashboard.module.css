@@ -1,0 +1,66 @@
+.container {
+  padding: 32px 28px;
+}
+
+.welcomeCard {
+  background: linear-gradient(135deg, #1b4332 0%, #122e22 100%) !important;
+  color: #ffffff !important;
+  border-radius: 18px !important;
+  padding: 28px 24px !important;
+  margin-bottom: 0 !important;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(27, 67, 50, 0.2) !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.welcomeTitle {
+  font-family: var(--font-serif) !important;
+  color: #f7f3eb !important;
+  font-weight: 700 !important;
+  font-size: 1.6rem !important;
+  margin-bottom: 10px !important;
+}
+
+.welcomeSubtitle {
+  color: #a3b8aa !important;
+  font-size: 0.95rem !important;
+  line-height: 1.5 !important;
+}
+
+.bookshelfDecoration {
+  position: absolute;
+  right: -10px;
+  bottom: -20px;
+  opacity: 0.12;
+  pointer-events: none;
+  color: #ffffff;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 40px;
+  margin-bottom: 20px;
+}
+
+.sectionTitle {
+  font-family: var(--font-serif) !important;
+  color: var(--primary-forest) !important;
+  font-weight: 700 !important;
+  font-size: 1.35rem !important;
+}
+
+.actionButton {
+  background-color: var(--primary-forest) !important;
+  color: #ffffff !important;
+  text-transform: none !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+}
+
+
+

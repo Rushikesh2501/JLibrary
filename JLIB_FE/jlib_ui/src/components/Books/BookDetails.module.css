@@ -1,0 +1,93 @@
+.dialogPaper {
+  background-color: var(--bg-card) !important;
+  border-radius: 18px !important;
+  border: 1px solid var(--border-parchment) !important;
+  max-width: 540px !important;
+  width: 100% !important;
+  overflow: hidden !important;
+}
+
+.headerBanner {
+  background: linear-gradient(135deg, #1b4332 0%, #122e22 100%);
+  color: #ffffff;
+  padding: 28px 24px;
+  position: relative;
+}
+
+.closeButton {
+  position: absolute !important;
+  right: 16px !important;
+  top: 16px !important;
+  color: #ffffff !important;
+  opacity: 0.8;
+}
+
+.closeButton:hover {
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.catalogBadge {
+  background-color: var(--accent-gold) !important;
+  color: var(--primary-forest-dark) !important;
+  font-family: monospace !important;
+  font-weight: 700 !important;
+  font-size: 0.88rem !important;
+  margin-bottom: 10px !important;
+  padding: 4px 10px !important;
+}
+
+.bookTitle {
+  font-family: var(--font-serif) !important;
+  color: #ffffff !important;
+  font-size: 1.85rem !important;
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
+}
+
+.dialogContent {
+  padding: 30px 26px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.detailRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 14px;
+  border-bottom: 1px dashed var(--border-parchment);
+}
+
+.detailLabel {
+  color: var(--text-muted) !important;
+  font-size: 0.98rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.detailValue {
+  color: var(--text-primary) !important;
+  font-weight: 700 !important;
+  font-size: 1.15rem !important;
+}
+
+.statusInLib {
+  background-color: #e8f5e9 !important;
+  color: #2e7d32 !important;
+  border: 1px solid #c8e6c9 !important;
+  font-size: 0.88rem !important;
+  font-weight: 700 !important;
+  padding: 6px 12px !important;
+}
+
+.statusBorrowed {
+  background-color: #fff3e0 !important;
+  color: #e65100 !important;
+  border: 1px solid #ffe0b2 !important;
+  font-size: 0.88rem !important;
+  font-weight: 700 !important;
+  padding: 6px 12px !important;
+}

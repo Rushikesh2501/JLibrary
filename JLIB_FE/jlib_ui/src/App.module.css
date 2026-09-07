@@ -1,0 +1,24 @@
+.appLayout {
+  min-height: 100vh;
+  background-color: var(--bg-app);
+}
+
+.sidebarColumn {
+  display: block;
+}
+
+.mainColumn {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.contentBox {
+  flex-grow: 1;
+}
+
+.drawerPaper {
+  width: 260px !important;
+  background-color: var(--bg-sidebar) !important;
+  color: var(--text-on-dark) !important;
+}

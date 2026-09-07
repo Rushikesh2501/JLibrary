@@ -1,0 +1,80 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Patrick+Hand&family=Architects+Daughter&display=swap');
+
+:root {
+  --primary-forest: #1b4332;
+  --primary-forest-dark: #122e22;
+  --primary-forest-light: #2d5a27;
+
+  --accent-walnut: #3d2b1f;
+  --accent-walnut-light: #594132;
+  --accent-gold: #c9a227;
+  --accent-gold-soft: #f4ea7a;
+
+  --bg-app: #f7f3ec;
+  --bg-sidebar: #1b2e25;
+  --bg-card: #ffffff;
+  --bg-paper: #f7f2e7;
+
+  --border-parchment: #e8ded0;
+  --border-dark: #2c4236;
+
+  --text-primary: #2b241f;
+  --text-secondary: #6e645a;
+  --text-muted: #948a7e;
+  --text-on-dark: #f7f3eb;
+
+  --font-serif: 'Patrick Hand', 'Architects Daughter', cursive;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* MUI font override defaults */
+.MuiTypography-root,
+.MuiButton-root,
+.MuiInputBase-root,
+.MuiChip-root,
+.MuiMenuItem-root {
+  font-family: var(--font-sans) !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.serif-heading {
+  font-family: var(--font-serif) !important;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-app);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d8ceaa;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #b5a894;
+}
