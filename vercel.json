@@ -12,23 +12,23 @@
   "routes": [
     {
       "src": "/static/(.*)",
-      "dest": "/JLIB_FE/jlib_ui/static/$1"
+      "dest": "/JLIB_FE/jlib_ui/build/static/$1"
     },
     {
       "src": "/favicon.ico",
-      "dest": "/JLIB_FE/jlib_ui/favicon.ico"
+      "dest": "/JLIB_FE/jlib_ui/build/favicon.ico"
     },
     {
       "src": "/manifest.json",
-      "dest": "/JLIB_FE/jlib_ui/manifest.json"
+      "dest": "/JLIB_FE/jlib_ui/build/manifest.json"
     },
     {
       "src": "/assets/(.*)",
-      "dest": "/JLIB_FE/jlib_ui/assets/$1"
+      "dest": "/JLIB_FE/jlib_ui/build/assets/$1"
     },
     {
       "src": "/(.*)",
-      "dest": "/JLIB_FE/jlib_ui/index.html"
+      "dest": "/JLIB_FE/jlib_ui/build/index.html"
     }
   ]
 }
