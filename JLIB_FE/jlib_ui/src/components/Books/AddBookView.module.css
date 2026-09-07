@@ -1,0 +1,348 @@
+.container {
+  width: 100%;
+  padding: 24px 28px 36px 28px;
+  box-sizing: border-box;
+}
+
+.headerRow {
+  margin-bottom: 20px;
+}
+
+.backButton {
+  background-color: #ffffff !important;
+  border: 1px solid var(--border-parchment, #e8ded0) !important;
+  color: var(--primary-forest, #1b4332) !important;
+  text-transform: none !important;
+  font-weight: 700 !important;
+  font-size: 0.9rem !important;
+  border-radius: 12px !important;
+  padding: 8px 18px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+  transition: all 0.2s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.backButton:hover {
+  background-color: var(--primary-forest, #1b4332) !important;
+  color: #ffffff !important;
+  border-color: var(--primary-forest, #1b4332) !important;
+  transform: translateX(-3px);
+  box-shadow: 0 4px 14px rgba(27, 67, 50, 0.2) !important;
+}
+
+.topHeaderCard {
+  background-color: #ffffff;
+  border: 1px solid var(--border-parchment, #e8ded0);
+  border-radius: 18px;
+  padding: 24px;
+  margin-bottom: 28px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+.headerSection {
+  margin-bottom: 20px;
+}
+
+.headerTitle {
+  font-family: var(--font-serif) !important;
+  font-weight: 700 !important;
+  color: var(--primary-forest) !important;
+  font-size: 2rem !important;
+  margin-bottom: 4px !important;
+}
+
+.headerSubtitle {
+  color: var(--text-secondary) !important;
+  font-size: 0.95rem !important;
+}
+
+/* Two Pill Tabs Container matching BookDetailsView */
+.tabsRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 28px;
+  width: 100%;
+  max-width: 100%;
+  background-color: #f5efe6;
+  padding: 4px;
+  border-radius: 9999px;
+  border: 1px solid var(--border-parchment, #e8ded0);
+  box-sizing: border-box;
+}
+
+.tabBtn {
+  flex: 1;
+  text-transform: none !important;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+  font-size: 0.88rem !important;
+  font-weight: 700 !important;
+  padding: 7px 16px !important;
+  border-radius: 9999px !important;
+  color: var(--text-secondary) !important;
+  background-color: transparent !important;
+  border: 1.5px solid transparent !important;
+  min-width: auto !important;
+  transition: all 0.2s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+}
+
+.tabBtn:hover {
+  color: var(--text-primary) !important;
+  background-color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.tabBtnActive {
+  background-color: #ffffff !important;
+  color: var(--text-primary) !important;
+  border: 1.5px solid var(--primary-forest) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Photo Box Card */
+.photoBoxCard {
+  background-color: #ffffff;
+  border: 1px solid var(--border-parchment);
+  border-radius: 18px;
+  padding: 24px;
+  margin-bottom: 28px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+.photoBoxNotice {
+  color: var(--text-secondary) !important;
+  font-size: 0.92rem !important;
+  margin-bottom: 18px !important;
+}
+
+.photoButtonRow {
+  display: flex;
+  gap: 14px;
+}
+
+/* Desktop Drag & Drop Box */
+.dragDropArea {
+  border: 2px dashed #c9c3b8;
+  background-color: #faf7f2;
+  border-radius: 14px;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25 ease;
+  position: relative;
+}
+
+.dragDropArea:hover, .dragActive {
+  border-color: var(--primary-forest) !important;
+  background-color: #f3efe6 !important;
+}
+
+.uploadCloudIcon {
+  color: var(--primary-forest) !important;
+  font-size: 2.4rem !important;
+  margin-bottom: 10px;
+}
+
+.dragDropText {
+  color: var(--text-primary) !important;
+  font-weight: 600 !important;
+  font-size: 0.95rem !important;
+  margin-bottom: 4px !important;
+}
+
+.browseLink {
+  color: var(--primary-forest);
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.fileMetaText {
+  color: var(--text-secondary) !important;
+  font-size: 0.8rem !important;
+  margin-top: 6px !important;
+}
+
+/* ISBN Box Card */
+.isbnBoxCard {
+  background-color: #ffffff;
+  border: 1px solid var(--border-parchment);
+  border-radius: 18px;
+  padding: 24px;
+  margin-bottom: 28px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+.scanBarcodeBtn {
+  background-color: #123d2b !important;
+  color: #ffffff !important;
+  text-transform: none !important;
+  border-radius: 10px !important;
+  padding: 10px 20px !important;
+  font-weight: 700 !important;
+  font-size: 0.9rem !important;
+  margin-bottom: 24px !important;
+  box-shadow: none !important;
+  display: inline-flex !important;
+}
+
+.scanBarcodeBtn:hover {
+  background-color: #0b291c !important;
+}
+
+.lookupRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lookupBtn {
+  background-color: var(--primary-forest) !important;
+  color: #ffffff !important;
+  text-transform: none !important;
+  border-radius: 10px !important;
+  padding: 8px 24px !important;
+  font-weight: 700 !important;
+  font-size: 0.9rem !important;
+  box-shadow: 0 2px 6px rgba(27, 67, 50, 0.15) !important;
+  height: 40px !important;
+  white-space: nowrap !important;
+  transition: all 0.2s ease !important;
+}
+
+.lookupBtn:hover:not(:disabled) {
+  background-color: #2d5a27 !important;
+  box-shadow: 0 4px 12px rgba(27, 67, 50, 0.25) !important;
+}
+
+.lookupBtn:disabled {
+  background-color: #8ab09a !important;
+  opacity: 0.55 !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+}
+
+.takePhotoButton {
+  background-color: var(--primary-forest) !important;
+  color: #ffffff !important;
+  text-transform: none !important;
+  border-radius: 12px !important;
+  padding: 10px 22px !important;
+  font-weight: 700 !important;
+  box-shadow: none !important;
+}
+
+.takePhotoButton:hover {
+  background-color: #2d5a27 !important;
+}
+
+.uploadImageButton {
+  border: 1px solid var(--border-parchment) !important;
+  color: var(--text-primary) !important;
+  text-transform: none !important;
+  border-radius: 12px !important;
+  padding: 10px 22px !important;
+  font-weight: 600 !important;
+  background-color: #ffffff !important;
+}
+
+/* Form Section */
+.formSection {
+  background-color: #ffffff;
+  border: 1px solid var(--border-parchment);
+  border-radius: 18px;
+  padding: 28px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+.sectionHeading {
+  font-family: var(--font-serif) !important;
+  font-weight: 700 !important;
+  color: var(--primary-forest) !important;
+  margin-bottom: 24px !important;
+  font-size: 1.35rem !important;
+}
+
+.fieldGroup {
+  margin-bottom: 18px;
+}
+
+.fieldLabel {
+  font-size: 0.88rem !important;
+  font-weight: 600 !important;
+  color: var(--text-primary) !important;
+  margin-bottom: 6px !important;
+}
+
+.inputField fieldset {
+  border-color: var(--border-parchment) !important;
+  border-radius: 10px !important;
+}
+
+.inputField:hover fieldset {
+  border-color: var(--primary-forest) !important;
+}
+
+.moreDetailsLink {
+  color: var(--primary-forest) !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  cursor: pointer;
+  margin-top: 14px !important;
+  margin-bottom: 24px !important;
+}
+
+.moreDetailsLink:hover {
+  text-decoration: underline;
+}
+
+/* Action Buttons Row */
+.actionButtonsRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.submitButton {
+  background-color: #8ab09a !important;
+  color: #ffffff !important;
+  text-transform: none !important;
+  border-radius: 12px !important;
+  padding: 10px 26px !important;
+  font-weight: 700 !important;
+  font-size: 0.95rem !important;
+  box-shadow: none !important;
+}
+
+.submitButton:hover {
+  background-color: var(--primary-forest) !important;
+}
+
+/* Red Cancel Button with White Background & Red Border */
+.cancelButton {
+  background-color: #ffffff !important;
+  color: #d32f2f !important;
+  border: 1.5px solid #d32f2f !important;
+  text-transform: none !important;
+  border-radius: 12px !important;
+  padding: 10px 26px !important;
+  font-weight: 700 !important;
+  font-size: 0.95rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.cancelButton:hover {
+  background-color: #ffebee !important;
+  border-color: #c62828 !important;
+  color: #c62828 !important;
+}

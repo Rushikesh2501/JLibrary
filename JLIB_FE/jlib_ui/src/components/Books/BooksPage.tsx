@@ -1,11 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import { Box, Typography, Paper, Button } from '@mui/material';
 import FilterAltOffIcon from '@mui/icons-material/FilterAltOff';
+import AddIcon from '@mui/icons-material/Add';
 import { IBook as Book } from 'interfaces/book-interface/ibook';
 import { BookSearch } from './BookSearch';
 import { BookFilters } from './BookFilters';
 import { BookGrid } from './BookGrid';
 import { BookDetailsView } from './BookDetailsView';
+import { AddBookView } from './AddBookView';
 import { EmptyState } from '../common/EmptyState';
 import styles from './BooksPage.module.css';
 
@@ -13,12 +15,19 @@ interface BooksPageProps {
   books: Book[];
 }
 
-export const BooksPage: React.FC<BooksPageProps> = ({ books }) => {
+export const BooksPage: React.FC<BooksPageProps> = ({ books: initialBooks }) => {
+  const [booksList, setBooksList] = useState<Book[]>(initialBooks);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedGenre, setSelectedGenre] = useState('ALL');
   const [selectedSection, setSelectedSection] = useState('ALL');
   const [selectedAvailability, setSelectedAvailability] = useState('ALL');
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const [isAddBookViewActive, setIsAddBookViewActive] = useState(false);
+
+  // Sync state if prop changes
+  React.useEffect(() => {
+    setBooksList(initialBooks);
+  }, [initialBooks]);
 
   // Helper to determine availability
   const isBookAvailable = (b: Book): boolean => {
@@ -39,46 +48,42 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books }) => {
   // Extract unique genres dynamically
   const genres = useMemo(() => {
     const set = new Set<string>();
-    books.forEach((b) => {
+    booksList.forEach((b) => {
       if (b.genre && b.genre.trim()) {
         set.add(b.genre.trim());
       }
     });
     return Array.from(set).sort();
-  }, [books]);
+  }, [booksList]);
 
   // Extract unique sections dynamically
   const sections = useMemo(() => {
     const set = new Set<string>();
-    books.forEach((b) => {
+    booksList.forEach((b) => {
       if (b.section && b.section.trim()) {
         set.add(b.section.trim());
       }
     });
     return Array.from(set).sort();
-  }, [books]);
+  }, [booksList]);
 
   // Filter books locally in real-time
   const filteredBooks = useMemo(() => {
-    return books.filter((book) => {
-      // Availability filter check
+    return booksList.filter((book) => {
       if (selectedAvailability !== 'ALL') {
         const avail = isBookAvailable(book);
         if (selectedAvailability === 'Available' && !avail) return false;
         if (selectedAvailability === 'Borrowed' && avail) return false;
       }
 
-      // Genre filter check
       if (selectedGenre !== 'ALL' && book.genre !== selectedGenre) {
         return false;
       }
 
-      // Section filter check
       if (selectedSection !== 'ALL' && book.section !== selectedSection) {
         return false;
       }
 
-      // Search term check
       if (searchTerm.trim()) {
         const query = searchTerm.toLowerCase().trim();
         const matchesName = book.book_name?.toLowerCase().includes(query);
@@ -92,7 +97,7 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books }) => {
 
       return true;
     });
-  }, [books, searchTerm, selectedGenre, selectedSection, selectedAvailability]);
+  }, [booksList, searchTerm, selectedGenre, selectedSection, selectedAvailability]);
 
   const isFilterActive =
     selectedGenre !== 'ALL' ||
@@ -107,7 +112,25 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books }) => {
     setSearchTerm('');
   };
 
-  // If a book is selected, render the In-Page Details View (just like Members profile view)
+  const handleAddNewBook = (newBookData: any) => {
+    const createdBook: Book = {
+      book_id: `JL-B-${Date.now()}`,
+      ...newBookData,
+    };
+    setBooksList((prev) => [createdBook, ...prev]);
+  };
+
+  // If Add Book view is active, render full-page AddBookView (in-page, no popup)
+  if (isAddBookViewActive) {
+    return (
+      <AddBookView
+        onBack={() => setIsAddBookViewActive(false)}
+        onAddBook={handleAddNewBook}
+      />
+    );
+  }
+
+  // If a book is selected, render the In-Page Details View
   if (selectedBook) {
     return (
       <BookDetailsView
@@ -120,15 +143,25 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books }) => {
   return (
     <Box className={styles.container}>
       <Box className={styles.headerSection}>
-        <Typography variant="h4" className={styles.title}>
-          Library Collection
-        </Typography>
-        <Typography variant="body1" className={styles.subtitle}>
-          Browse and discover books in your collection.
-        </Typography>
+        <Box>
+          <Typography variant="h4" className={styles.title}>
+            Library Collection
+          </Typography>
+          <Typography variant="body1" className={styles.subtitle}>
+            Browse and discover books in your collection.
+          </Typography>
+        </Box>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() => setIsAddBookViewActive(true)}
+          className={styles.addBookTopButton}
+        >
+          Add Book
+        </Button>
       </Box>
 
-      {/* Toolbar Row: White Search/Filter Box + Separate Outer Clear Filters Button */}
+      {/* Toolbar Row */}
       <Box className={styles.toolbarRow}>
         <Paper className={styles.toolbarPaper} elevation={0}>
           <Box sx={{ width: '100%', flex: { lg: 1 } }}>
@@ -149,7 +182,6 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books }) => {
           </Box>
         </Paper>
 
-        {/* Separate Outer Clear Filters Button */}
         <Button
           variant="outlined"
           disabled={!isFilterActive}
@@ -167,10 +199,10 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books }) => {
       ) : (
         <EmptyState
           title={
-            books.length === 0 ? 'No books in your library yet.' : 'No matching books found'
+            booksList.length === 0 ? 'No books in your library yet.' : 'No matching books found'
           }
           subtitle={
-            books.length === 0
+            booksList.length === 0
               ? 'The collection is empty.'
               : 'Try clearing your search query or adjusting your filters.'
           }
@@ -179,4 +211,3 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books }) => {
     </Box>
   );
 };
-

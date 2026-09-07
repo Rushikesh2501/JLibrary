@@ -1,0 +1,24 @@
+.backButton {
+  background-color: var(--bg-card, #ffffff) !important;
+  border: 1px solid var(--border-parchment, #e8ded0) !important;
+  color: var(--primary-forest, #1b4332) !important;
+  text-transform: none !important;
+  font-weight: 700 !important;
+  font-size: 0.9rem !important;
+  border-radius: 12px !important;
+  padding: 8px 18px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+  transition: all 0.2s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+}
+
+.backButton:hover {
+  background-color: var(--primary-forest, #1b4332) !important;
+  color: #ffffff !important;
+  border-color: var(--primary-forest, #1b4332) !important;
+  transform: translateX(-3px);
+  box-shadow: 0 4px 14px rgba(27, 67, 50, 0.2) !important;
+}

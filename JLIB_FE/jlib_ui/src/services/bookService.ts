@@ -1,6 +1,6 @@
 import { IBook as Book } from '../interfaces/book-interface/ibook';
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '';
+const API_BASE_URL = process.env.REACT_APP_LOCAL_API_BASE_URL || '';
 
 export async function getBooks(): Promise<Book[]> {
   try {
