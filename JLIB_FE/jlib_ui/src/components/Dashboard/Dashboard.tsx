@@ -81,8 +81,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ books, onNavigateToBooks }
           </Card>
         </Grid>
 
-        {/* 60% Bar Graph */}
-        <Grid size={{ xs: 12, md: 7, lg: 7.2 }}>
+        {/* 60% Bar Graph (Hidden on mobile view) */}
+        <Grid size={{ xs: 12, md: 7, lg: 7.2 }} sx={{ display: { xs: 'none', md: 'block' } }}>
           <TopBorrowedGenresChart
             topGenres={topGenres}
             borrowedBooksCount={borrowedBooks.length}
