@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str = ""
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=(".env", "JLIB_BE/.env", "../JLIB_BE/.env", "../.env"),
         env_file_encoding="utf-8",
         extra="ignore"
     )

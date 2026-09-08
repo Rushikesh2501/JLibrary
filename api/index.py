@@ -25,11 +25,21 @@ try:
         version="1.0.0"
     )
 
+    origins = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://192.168.0.140:3000",
+        "http://192.168.0.140:5173",
+        "https://j-library-brown.vercel.app"
+    ]
+
     # Enable CORS for frontend clients (local, LAN, and production)
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=False,
+        allow_origins=origins,
+        allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
