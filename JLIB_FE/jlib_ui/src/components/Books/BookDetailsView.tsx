@@ -123,13 +123,17 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack }
   };
 
   const yearMatch = book.publication?.match(/\b(19\d\d|20\d\d)\b/);
-  const publishedYear = book.published_year || (yearMatch ? yearMatch[0] : (1995 + (numericId * 7) % 28));
+  const publishedYear = (book.published_year && String(book.published_year).trim())
+    ? String(book.published_year).trim()
+    : (yearMatch ? yearMatch[0] : 'NA');
   const coverUrl = getBookCoverUrl(book, numericId);
   const summaryData = getBookSummaryData(book);
 
   const displayIsbn = book.isbn || `978${1984816000 + (numericId * 13) % 9999}`;
   const displayPages = book.pages || (200 + (numericId * 17) % 250);
-  const displayEdition = book.edition || '—';
+  const displayEdition = (book.edition && book.edition.trim() && book.edition.trim() !== '—' && book.edition.trim().toLowerCase() !== 'null')
+    ? book.edition.trim()
+    : 'NA';
 
   return (
     <div className={styles.profileContainer}>

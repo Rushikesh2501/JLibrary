@@ -59,7 +59,9 @@ export const BookCard: React.FC<BookCardProps> = ({
     : (parseInt(strId.replace(/\D/g, ''), 10) || 1);
 
   const yearMatch = book.publication?.match(/\b(19\d\d|20\d\d)\b/);
-  const publishedYear = book.published_year || (yearMatch ? yearMatch[0] : (1995 + (numericId * 7) % 28));
+  const publishedYear = (book.published_year && String(book.published_year).trim())
+    ? String(book.published_year).trim()
+    : (yearMatch ? yearMatch[0] : 'NA');
 
   const coverUrl = getBookCoverUrl(book, numericId);
 
