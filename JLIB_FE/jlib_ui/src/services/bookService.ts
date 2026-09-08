@@ -1,6 +1,5 @@
 import { IBook as Book } from '../interfaces/book-interface/ibook';
-
-const API_BASE_URL = process.env.REACT_APP_LOCAL_API_BASE_URL || 'http://192.168.0.140:8000';
+import { API_BASE_URL } from '../config/api';
 
 export async function getBooks(): Promise<Book[]> {
   try {

@@ -3,10 +3,19 @@ from fastapi.middleware.cors import CORSMiddleware
 import sys
 import os
 
-# Add JLIB_BE to python path so app modules import cleanly
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'JLIB_BE'))
+# Add relevant directories to python path for local dev and Vercel serverless lambda
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.abspath(os.path.join(current_dir, '..'))
+be_dir = os.path.join(parent_dir, 'JLIB_BE')
 
-from app.routers import books, users
+for p in [current_dir, be_dir, parent_dir]:
+    if p not in sys.path and os.path.exists(p):
+        sys.path.insert(0, p)
+
+try:
+    from app.routers import books, users
+except ImportError:
+    from JLIB_BE.app.routers import books, users
 
 app = FastAPI(
     title="JLibrary API",
@@ -14,17 +23,11 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Enable CORS
-origins = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "https://j-library-brown.vercel.app"
-]
-
+# Enable CORS for frontend clients (local, LAN, and production)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )

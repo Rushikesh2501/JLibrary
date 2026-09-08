@@ -1,6 +1,7 @@
 import React from 'react';
 import { Paper, Box, Typography, Button } from '@mui/material';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import { API_BASE_URL } from '../../config/api';
 import styles from './ErrorState.module.css';
 
 interface ErrorStateProps {
@@ -19,7 +20,14 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
         {message}
       </Typography>
       <Typography variant="body2" className={styles.subtitle}>
-        Please ensure the FastAPI service is running at <code>http://127.0.0.1:8000</code> and accessible.
+        Please ensure the FastAPI service is running and accessible
+        {API_BASE_URL ? (
+          <>
+            {' '}at <code>{API_BASE_URL}</code>
+          </>
+        ) : (
+          '.'
+        )}
       </Typography>
       <Button
         variant="contained"
