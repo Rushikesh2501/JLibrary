@@ -1,0 +1,130 @@
+import React, { useEffect, useRef, useState } from 'react';
+import { Box, Typography, Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import VideocamIcon from '@mui/icons-material/Videocam';
+import { BrowserMultiFormatReader } from '@zxing/browser';
+import styles from './BarcodeScannerModal.module.css';
+
+interface BarcodeScannerModalProps {
+  open: boolean;
+  onClose: () => void;
+  onScanSuccess: (scannedIsbn: string) => void;
+}
+
+export const BarcodeScannerModal: React.FC<BarcodeScannerModalProps> = ({
+  open,
+  onClose,
+  onScanSuccess,
+}) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const codeReaderRef = useRef<BrowserMultiFormatReader | null>(null);
+
+  useEffect(() => {
+    if (!open) {
+      if (codeReaderRef.current) {
+        codeReaderRef.current = null;
+      }
+      setErrorMsg(null);
+      return;
+    }
+
+    let isMounted = true;
+    const codeReader = new BrowserMultiFormatReader();
+    codeReaderRef.current = codeReader;
+    setErrorMsg(null);
+
+    const startScanner = async () => {
+      try {
+        const videoInputDevices = await BrowserMultiFormatReader.listVideoInputDevices();
+        if (!isMounted) return;
+
+        if (!videoInputDevices || videoInputDevices.length === 0) {
+          setErrorMsg('No camera devices found. Please ensure your camera is connected and permitted.');
+          return;
+        }
+
+        // Prefer back camera if on mobile
+        const backCamera = videoInputDevices.find(device =>
+          device.label.toLowerCase().includes('back') || device.label.toLowerCase().includes('rear') || device.label.toLowerCase().includes('environment')
+        );
+        const selectedDeviceId = backCamera ? backCamera.deviceId : videoInputDevices[0].deviceId;
+
+        if (videoRef.current) {
+          await codeReader.decodeFromVideoDevice(
+            selectedDeviceId,
+            videoRef.current,
+            (result, err) => {
+              if (result && isMounted) {
+                const text = result.getText().trim();
+                // Clean non-digits/X
+                const cleaned = text.replace(/[^0-9X]/gi, '');
+                if (cleaned.length >= 8) {
+                  onScanSuccess(cleaned);
+                  onClose();
+                }
+              }
+            }
+          );
+        }
+      } catch (err: any) {
+        if (isMounted) {
+          console.error('Camera Scanner Error:', err);
+          setErrorMsg(err.message || 'Unable to access camera. Please check camera permissions.');
+        }
+      }
+    };
+
+    // Small timeout to ensure video element is rendered inside dialog DOM
+    const timer = setTimeout(() => {
+      startScanner();
+    }, 200);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+      if (codeReaderRef.current) {
+        try {
+          // Controls are reset automatically on unmount
+        } catch (e) {
+          // Ignore unmount cleanup error
+        }
+      }
+    };
+  }, [open, onClose, onScanSuccess]);
+
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth slotProps={{ paper: { style: { borderRadius: 16 } } }}>
+      <DialogTitle className={styles.dialogTitle}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <VideocamIcon style={{ color: '#1b4332' }} />
+          <Typography variant="h6" className={styles.titleText}>Scan ISBN Barcode</Typography>
+        </Box>
+        <IconButton onClick={onClose} size="small">
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
+
+      <DialogContent className={styles.dialogContent}>
+        <Box className={styles.videoContainer}>
+          <video ref={videoRef} className={styles.videoElement} />
+          <Box className={styles.scanOverlay}>
+            <Box className={styles.targetFrame}>
+              <Box className={styles.scanLine} />
+            </Box>
+          </Box>
+        </Box>
+
+        <Typography className={styles.instructions}>
+          Position the book barcode (ISBN-10 or ISBN-13) within the frame to scan automatically.
+        </Typography>
+
+        {errorMsg && (
+          <Typography className={styles.errorText}>
+            {errorMsg}
+          </Typography>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+};

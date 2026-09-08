@@ -1,0 +1,100 @@
+.dialogTitle {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 16px 20px 12px 20px !important;
+  border-bottom: 1px solid #e8ded0;
+}
+
+.titleText {
+  font-family: var(--font-serif, serif) !important;
+  font-weight: 700 !important;
+  color: #1b4332 !important;
+  font-size: 1.15rem !important;
+}
+
+.dialogContent {
+  padding: 20px !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.videoContainer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background-color: #000000;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+
+.videoElement {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.scanOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.targetFrame {
+  width: 75%;
+  height: 45%;
+  border: 2px dashed #ffffff;
+  border-radius: 8px;
+  position: relative;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+.scanLine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #2e7d32, #4caf50, #2e7d32, transparent);
+  box-shadow: 0 0 8px #4caf50;
+  animation: scanAnim 2s infinite ease-in-out;
+}
+
+@keyframes scanAnim {
+  0% {
+    top: 0%;
+  }
+  50% {
+    top: 95%;
+  }
+  100% {
+    top: 0%;
+  }
+}
+
+.instructions {
+  font-size: 0.85rem !important;
+  color: #666666 !important;
+  text-align: center !important;
+}
+
+.errorText {
+  color: #d32f2f !important;
+  font-size: 0.85rem !important;
+  text-align: center !important;
+  background-color: #ffebee;
+  padding: 8px 14px;
+  border-radius: 8px;
+  width: 100%;
+}

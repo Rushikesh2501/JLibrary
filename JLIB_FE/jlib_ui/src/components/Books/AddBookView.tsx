@@ -17,6 +17,7 @@ import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import CollectionsIcon from '@mui/icons-material/Collections';
 import { BackButton } from '../common/BackButton';
 import { fetchBookDetailsByIsbn } from '../../services/bookService';
+import { BarcodeScannerModal } from './BarcodeScannerModal';
 import styles from './AddBookView.module.css';
 
 interface AddBookViewProps {
@@ -36,6 +37,7 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
   const [lookupError, setLookupError] = useState<string | null>(null);
   const [hasIsbnFound, setHasIsbnFound] = useState(false);
   const [isFormEditable, setIsFormEditable] = useState(false);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
 
   // Theme & Responsive Media Query (Mobile & Tablet: Take Photo / Upload Image buttons; Desktop: Drag & Drop)
   const theme = useTheme();
@@ -56,13 +58,13 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
   const [tags, setTags] = useState('');
   const [description, setDescription] = useState('');
 
-  const handleIsbnLookup = async () => {
-    if (!isbn.trim()) return;
+  const executeLookupForIsbn = async (targetIsbn: string) => {
+    if (!targetIsbn.trim()) return;
     setIsLookingUp(true);
     setLookupError(null);
 
     try {
-      const details = await fetchBookDetailsByIsbn(isbn);
+      const details = await fetchBookDetailsByIsbn(targetIsbn);
       if (details && (details.title || details.authors)) {
         if (details.title) setTitle(details.title);
         if (details.nativeTitle) setNativeTitle(details.nativeTitle);
@@ -79,16 +81,24 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
       } else {
         setHasIsbnFound(false);
         setIsFormEditable(false);
-        setLookupError('No book details found.');
+        setLookupError('No book details found for this ISBN.');
       }
     } catch (err) {
-      console.error('ISBN lookup error:', err);
       setHasIsbnFound(false);
       setIsFormEditable(false);
       setLookupError('Failed to fetch details.');
     } finally {
       setIsLookingUp(false);
     }
+  };
+
+  const handleIsbnLookup = () => {
+    executeLookupForIsbn(isbn);
+  };
+
+  const handleScanSuccess = (scannedIsbn: string) => {
+    setIsbn(scannedIsbn);
+    executeLookupForIsbn(scannedIsbn);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -191,6 +201,7 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
           <Button
             variant="contained"
             startIcon={<PhotoCameraIcon />}
+            onClick={() => setIsScannerOpen(true)}
             className={styles.scanBarcodeBtn}
           >
             Scan barcode with camera
@@ -516,6 +527,13 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
           </Box>
         </form>
       )}
+
+      {/* Barcode Scanner Modal */}
+      <BarcodeScannerModal
+        open={isScannerOpen}
+        onClose={() => setIsScannerOpen(false)}
+        onScanSuccess={handleScanSuccess}
+      />
     </Box>
   );
 };
