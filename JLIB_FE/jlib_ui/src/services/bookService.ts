@@ -92,18 +92,81 @@ export async function fetchBookDetailsByIsbn(isbn: string): Promise<GoogleBookDe
   return null;
 }
 
+async function compressImageForUpload(file: File): Promise<File> {
+  // If file is already smaller than 800KB, send directly
+  if (file.size <= 800 * 1024) {
+    return file;
+  }
+
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const maxDimension = 1600;
+        let { width, height } = img;
+        if (width > maxDimension || height > maxDimension) {
+          if (width > height) {
+            height = Math.round((height * maxDimension) / width);
+            width = maxDimension;
+          } else {
+            width = Math.round((width * maxDimension) / height);
+            height = maxDimension;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          resolve(file);
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) {
+              resolve(file);
+              return;
+            }
+            const cleanName = file.name.replace(/\.[^.]+$/, '.jpg');
+            const compressed = new File([blob], cleanName, {
+              type: 'image/jpeg',
+              lastModified: Date.now(),
+            });
+            resolve(compressed);
+          },
+          'image/jpeg',
+          0.82
+        );
+      };
+      img.onerror = () => resolve(file);
+      img.src = e.target?.result as string;
+    };
+    reader.onerror = () => resolve(file);
+    reader.readAsDataURL(file);
+  });
+}
+
 export async function fetchBookDetailsByPhoto(
   frontFile: File | null,
   backFile: File | null
 ): Promise<GoogleBookDetails | null> {
   if (!frontFile && !backFile) return null;
 
+  const [processedFront, processedBack] = await Promise.all([
+    frontFile ? compressImageForUpload(frontFile) : null,
+    backFile ? compressImageForUpload(backFile) : null,
+  ]);
+
   const formData = new FormData();
-  if (frontFile) {
-    formData.append('front_cover', frontFile, frontFile.name);
+  if (processedFront) {
+    formData.append('front_cover', processedFront, processedFront.name);
   }
-  if (backFile) {
-    formData.append('back_cover', backFile, backFile.name);
+  if (processedBack) {
+    formData.append('back_cover', processedBack, processedBack.name);
   }
 
   try {
