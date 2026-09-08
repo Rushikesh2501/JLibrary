@@ -127,8 +127,9 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack }
   const coverUrl = getBookCoverUrl(book, numericId);
   const summaryData = getBookSummaryData(book);
 
-  const isbn = `978${1984816000 + (numericId * 13) % 9999}`;
-  const pagesCount = 200 + (numericId * 17) % 250;
+  const displayIsbn = book.isbn || `978${1984816000 + (numericId * 13) % 9999}`;
+  const displayPages = book.pages || (200 + (numericId * 17) % 250);
+  const displayEdition = book.edition || '—';
 
   return (
     <div className={styles.profileContainer}>
@@ -159,9 +160,14 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack }
           </div>
 
           <div className={styles.headerMainContent}>
-            {/* Title inside Green Banner Area */}
+            {/* Title & Native Title inside Green Banner Area */}
             <div className={styles.greenTitleRow}>
-              <span className={styles.bookTitleGreen}>{book.book_name}</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                <span className={styles.bookTitleGreen}>{book.book_name}</span>
+                {book.native_title && (
+                  <span className={styles.nativeTitleGreen}>{book.native_title}</span>
+                )}
+              </div>
             </div>
 
             {/* Metadata inside White Area */}
@@ -235,7 +241,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack }
 
               <div className={styles.tableRow}>
                 <span className={styles.tableLabel}>ISBN</span>
-                <span className={styles.tableValue}>{isbn}</span>
+                <span className={styles.tableValue}>{displayIsbn}</span>
               </div>
 
               <div className={styles.tableRow}>
@@ -250,7 +256,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack }
 
               <div className={styles.tableRow}>
                 <span className={styles.tableLabel}>Edition</span>
-                <span className={styles.tableValue}>—</span>
+                <span className={styles.tableValue}>{displayEdition}</span>
               </div>
 
               <div className={styles.tableRow}>
@@ -260,7 +266,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack }
 
               <div className={styles.tableRow}>
                 <span className={styles.tableLabel}>Pages</span>
-                <span className={styles.tableValue}>{pagesCount}</span>
+                <span className={styles.tableValue}>{displayPages}</span>
               </div>
 
               <div className={styles.tableRow}>

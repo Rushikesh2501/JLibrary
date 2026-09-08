@@ -87,12 +87,14 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books: initialBooks }) => 
       if (searchTerm.trim()) {
         const query = searchTerm.toLowerCase().trim();
         const matchesName = book.book_name?.toLowerCase().includes(query);
+        const matchesNativeTitle = book.native_title?.toLowerCase().includes(query);
         const matchesAuthor = book.author?.toLowerCase().includes(query);
         const matchesGenre = book.genre?.toLowerCase().includes(query);
         const matchesPub = book.publication?.toLowerCase().includes(query);
         const matchesSection = book.section?.toLowerCase().includes(query);
+        const matchesIsbn = book.isbn?.toLowerCase().includes(query);
 
-        return matchesName || matchesAuthor || matchesGenre || matchesPub || matchesSection;
+        return matchesName || matchesNativeTitle || matchesAuthor || matchesGenre || matchesPub || matchesSection || matchesIsbn;
       }
 
       return true;

@@ -106,6 +106,11 @@ export const BookCard: React.FC<BookCardProps> = ({
           <Typography variant="h6" className={styles.bookTitle} title={book.book_name}>
             {book.book_name}
           </Typography>
+          {book.native_title && (
+            <Typography variant="body2" className={styles.nativeTitleCard} title={book.native_title}>
+              {book.native_title}
+            </Typography>
+          )}
           <Typography variant="body2" className={styles.authorYear}>
             {book.author}{publishedYear ? ` · ${publishedYear}` : ''}
           </Typography>

@@ -12,6 +12,12 @@ export interface Book {
   cover_url?: string;
   published_year?: number | string;
   language?: string;
+  isbn?: string;
+  edition?: string;
+  pages?: number | string;
+  reading_status?: string;
+  description?: string;
+  native_title?: string;
 }
 
 export type IBook = Book;

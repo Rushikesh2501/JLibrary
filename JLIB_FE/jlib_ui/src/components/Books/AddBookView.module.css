@@ -265,12 +265,36 @@
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
 }
 
+.sectionHeaderRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
 .sectionHeading {
   font-family: var(--font-serif) !important;
   font-weight: 700 !important;
   color: var(--primary-forest) !important;
-  margin-bottom: 24px !important;
+  margin: 0 !important;
   font-size: 1.35rem !important;
+}
+
+.editDetailsBtn {
+  border: 1px solid var(--border-parchment) !important;
+  color: var(--primary-forest) !important;
+  background-color: #faf7f2 !important;
+  text-transform: none !important;
+  border-radius: 10px !important;
+  padding: 6px 16px !important;
+  font-weight: 700 !important;
+  font-size: 0.85rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.editDetailsBtn:hover {
+  background-color: var(--primary-forest) !important;
+  color: #ffffff !important;
 }
 
 .fieldGroup {
@@ -291,6 +315,23 @@
 
 .inputField:hover fieldset {
   border-color: var(--primary-forest) !important;
+}
+
+/* Disabled input field styling: Solid subtle background, distinct border, but rich dark readable text */
+.inputField :global(.Mui-disabled) {
+  -webkit-text-fill-color: #2c3e35 !important;
+  color: #2c3e35 !important;
+  font-weight: 500 !important;
+}
+
+.inputField :global(.MuiInputBase-root.Mui-disabled) {
+  background-color: #f4efe6 !important;
+  border-radius: 10px !important;
+}
+
+.inputField :global(.MuiOutlinedInput-root.Mui-disabled fieldset) {
+  border-color: #d8cdbe !important;
+  border-width: 1px !important;
 }
 
 .moreDetailsLink {
@@ -314,18 +355,29 @@
 }
 
 .submitButton {
-  background-color: #8ab09a !important;
+  background-color: var(--primary-forest, #1b4332) !important;
   color: #ffffff !important;
   text-transform: none !important;
   border-radius: 12px !important;
   padding: 10px 26px !important;
   font-weight: 700 !important;
   font-size: 0.95rem !important;
-  box-shadow: none !important;
+  box-shadow: 0 2px 8px rgba(27, 67, 50, 0.2) !important;
+  transition: all 0.2s ease !important;
 }
 
-.submitButton:hover {
-  background-color: var(--primary-forest) !important;
+.submitButton:hover:not(:disabled) {
+  background-color: #2d5a27 !important;
+  box-shadow: 0 4px 12px rgba(27, 67, 50, 0.3) !important;
+  transform: translateY(-1px);
+}
+
+.submitButton:disabled {
+  background-color: #8ab09a !important;
+  opacity: 0.55 !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
 }
 
 /* Red Cancel Button with White Background & Red Border */

@@ -16,6 +16,7 @@ import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
 import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import CollectionsIcon from '@mui/icons-material/Collections';
 import { BackButton } from '../common/BackButton';
+import { fetchBookDetailsByIsbn } from '../../services/bookService';
 import styles from './AddBookView.module.css';
 
 interface AddBookViewProps {
@@ -31,6 +32,10 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<TabType>('photo');
   const [isDragActive, setIsDragActive] = useState(false);
+  const [isLookingUp, setIsLookingUp] = useState(false);
+  const [lookupError, setLookupError] = useState<string | null>(null);
+  const [hasIsbnFound, setHasIsbnFound] = useState(false);
+  const [isFormEditable, setIsFormEditable] = useState(false);
 
   // Theme & Responsive Media Query (Mobile & Tablet: Take Photo / Upload Image buttons; Desktop: Drag & Drop)
   const theme = useTheme();
@@ -38,6 +43,7 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
 
   // Form State
   const [title, setTitle] = useState('');
+  const [nativeTitle, setNativeTitle] = useState('');
   const [authors, setAuthors] = useState('');
   const [isbn, setIsbn] = useState('');
   const [publisher, setPublisher] = useState('');
@@ -48,7 +54,42 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
   const [status, setStatus] = useState('Owned');
   const [readingStatus, setReadingStatus] = useState('To read');
   const [tags, setTags] = useState('');
-  const [shelves, setShelves] = useState('');
+  const [description, setDescription] = useState('');
+
+  const handleIsbnLookup = async () => {
+    if (!isbn.trim()) return;
+    setIsLookingUp(true);
+    setLookupError(null);
+
+    try {
+      const details = await fetchBookDetailsByIsbn(isbn);
+      if (details && (details.title || details.authors)) {
+        if (details.title) setTitle(details.title);
+        if (details.nativeTitle) setNativeTitle(details.nativeTitle);
+        if (details.authors) setAuthors(details.authors);
+        if (details.publisher) setPublisher(details.publisher);
+        if (details.publishedDate) setYear(details.publishedDate);
+        if (details.pageCount) setPages(details.pageCount);
+        if (details.language) setLanguage(details.language);
+        if (details.edition) setEdition(details.edition);
+        if (details.categories) setTags(details.categories);
+        if (details.description) setDescription(details.description);
+        setHasIsbnFound(true);
+        setIsFormEditable(false);
+      } else {
+        setHasIsbnFound(false);
+        setIsFormEditable(false);
+        setLookupError('No book details found.');
+      }
+    } catch (err) {
+      console.error('ISBN lookup error:', err);
+      setHasIsbnFound(false);
+      setIsFormEditable(false);
+      setLookupError('Failed to fetch details.');
+    } finally {
+      setIsLookingUp(false);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,10 +97,12 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
 
     const newBookData = {
       book_name: title,
+      native_title: nativeTitle,
       author: authors || 'Unknown Author',
       genre: tags ? tags.split(',')[0].trim() : 'General',
       publication: publisher || 'Self Published',
-      section: shelves ? shelves.split(',')[0].trim() : 'General',
+      section: 'General',
+      description: description,
       is_available: status === 'Owned',
       status: status,
       isbn,
@@ -167,12 +210,18 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
               />
               <Button
                 variant="contained"
-                disabled={isbn.trim().length < 2}
+                disabled={isbn.trim().length < 2 || isLookingUp}
+                onClick={handleIsbnLookup}
                 className={styles.lookupBtn}
               >
-                Look up
+                {isLookingUp ? 'Searching...' : 'Look up'}
               </Button>
             </Box>
+            {lookupError && (
+              <Typography style={{ color: '#d32f2f', fontSize: '0.85rem', marginTop: 8 }}>
+                {lookupError}
+              </Typography>
+            )}
           </Box>
         </Box>
       )}
@@ -232,209 +281,241 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
         </Box>
       )}
 
-      {/* Form Section */}
-      <form id="add-book-form" onSubmit={handleSubmit} className={styles.formSection}>
-        <Typography variant="h6" className={styles.sectionHeading}>
-          Review and save
-        </Typography>
+      {/* Form Section - Shown for photo/manual tabs OR when ISBN lookup successfully finds book details */}
+      {(activeTab !== 'isbn' || hasIsbnFound) && (
+        <form id="add-book-form" onSubmit={handleSubmit} className={styles.formSection}>
+          <Box className={styles.sectionHeaderRow}>
+            <Typography variant="h6" className={styles.sectionHeading}>
+              Review and save
+            </Typography>
 
-        {/* Title */}
-        <Box className={styles.fieldGroup}>
-          <Typography className={styles.fieldLabel}>Title *</Typography>
-          <TextField
-            fullWidth
-            size="small"
-            variant="outlined"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-            className={styles.inputField}
-          />
-        </Box>
-
-        {/* Authors */}
-        <Box className={styles.fieldGroup}>
-          <Typography className={styles.fieldLabel}>Authors (comma separated)</Typography>
-          <TextField
-            fullWidth
-            size="small"
-            variant="outlined"
-            placeholder="Jane Doe, John Roe"
-            value={authors}
-            onChange={(e) => setAuthors(e.target.value)}
-            className={styles.inputField}
-          />
-        </Box>
-
-        {/* Grid 2 Columns */}
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <Box className={styles.fieldGroup}>
-              <Typography className={styles.fieldLabel}>ISBN</Typography>
-              <TextField
-                fullWidth
-                size="small"
+            {hasIsbnFound && activeTab === 'isbn' && (
+              <Button
+                type="button"
                 variant="outlined"
-                value={isbn}
-                onChange={(e) => setIsbn(e.target.value)}
-                className={styles.inputField}
-              />
-            </Box>
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <Box className={styles.fieldGroup}>
-              <Typography className={styles.fieldLabel}>Publisher</Typography>
-              <TextField
-                fullWidth
-                size="small"
-                variant="outlined"
-                value={publisher}
-                onChange={(e) => setPublisher(e.target.value)}
-                className={styles.inputField}
-              />
-            </Box>
-          </Grid>
-
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <Box className={styles.fieldGroup}>
-              <Typography className={styles.fieldLabel}>Year</Typography>
-              <TextField
-                fullWidth
-                size="small"
-                variant="outlined"
-                value={year}
-                onChange={(e) => setYear(e.target.value)}
-                className={styles.inputField}
-              />
-            </Box>
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <Box className={styles.fieldGroup}>
-              <Typography className={styles.fieldLabel}>Pages</Typography>
-              <TextField
-                fullWidth
-                size="small"
-                variant="outlined"
-                value={pages}
-                onChange={(e) => setPages(e.target.value)}
-                className={styles.inputField}
-              />
-            </Box>
-          </Grid>
-
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <Box className={styles.fieldGroup}>
-              <Typography className={styles.fieldLabel}>Language</Typography>
-              <TextField
-                fullWidth
-                size="small"
-                variant="outlined"
-                value={language}
-                onChange={(e) => setLanguage(e.target.value)}
-                className={styles.inputField}
-              />
-            </Box>
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <Box className={styles.fieldGroup}>
-              <Typography className={styles.fieldLabel}>Edition</Typography>
-              <TextField
-                fullWidth
-                size="small"
-                variant="outlined"
-                value={edition}
-                onChange={(e) => setEdition(e.target.value)}
-                className={styles.inputField}
-              />
-            </Box>
-          </Grid>
-
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <Box className={styles.fieldGroup}>
-              <Typography className={styles.fieldLabel}>Status</Typography>
-              <TextField
-                select
-                fullWidth
-                size="small"
-                variant="outlined"
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-                className={styles.inputField}
+                onClick={() => setIsFormEditable((prev) => !prev)}
+                className={styles.editDetailsBtn}
               >
-                <MenuItem value="Owned">Owned</MenuItem>
-                <MenuItem value="Wishlist">Wishlist</MenuItem>
-                <MenuItem value="Borrowed">Borrowed</MenuItem>
-              </TextField>
-            </Box>
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <Box className={styles.fieldGroup}>
-              <Typography className={styles.fieldLabel}>Reading status</Typography>
-              <TextField
-                select
-                fullWidth
-                size="small"
-                variant="outlined"
-                value={readingStatus}
-                onChange={(e) => setReadingStatus(e.target.value)}
-                className={styles.inputField}
-              >
-                <MenuItem value="To read">To read</MenuItem>
-                <MenuItem value="Currently reading">Currently reading</MenuItem>
-                <MenuItem value="Read">Read</MenuItem>
-              </TextField>
-            </Box>
+                {isFormEditable ? 'Lock details' : 'Edit details'}
+              </Button>
+            )}
+          </Box>
+
+          {/* Title */}
+          <Box className={styles.fieldGroup}>
+            <Typography className={styles.fieldLabel}>Title *</Typography>
+            <TextField
+              fullWidth
+              size="small"
+              variant="outlined"
+              value={title}
+              disabled={hasIsbnFound && !isFormEditable}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+              className={styles.inputField}
+            />
+          </Box>
+
+          {/* Native Title (e.g. Marathi / Regional Script) */}
+          <Box className={styles.fieldGroup}>
+            <Typography className={styles.fieldLabel}>
+              Title in native language
+            </Typography>
+            <TextField
+              fullWidth
+              size="small"
+              variant="outlined"
+              placeholder="e.g. सॉल्स्टिस ॲट पानिपत"
+              value={nativeTitle}
+              disabled={hasIsbnFound && !isFormEditable}
+              onChange={(e) => setNativeTitle(e.target.value)}
+              className={styles.inputField}
+            />
+          </Box>
+
+          {/* Authors */}
+          <Box className={styles.fieldGroup}>
+            <Typography className={styles.fieldLabel}>Authors (comma separated)</Typography>
+            <TextField
+              fullWidth
+              size="small"
+              variant="outlined"
+              placeholder="Jane Doe, John Roe"
+              value={authors}
+              disabled={hasIsbnFound && !isFormEditable}
+              onChange={(e) => setAuthors(e.target.value)}
+              className={styles.inputField}
+            />
+          </Box>
+
+          {/* Grid 2 Columns */}
+          <Grid container spacing={2}>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Box className={styles.fieldGroup}>
+                <Typography className={styles.fieldLabel}>ISBN</Typography>
+                <TextField
+                  fullWidth
+                  size="small"
+                  variant="outlined"
+                  value={isbn}
+                  disabled={hasIsbnFound && !isFormEditable}
+                  onChange={(e) => setIsbn(e.target.value)}
+                  className={styles.inputField}
+                />
+              </Box>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Box className={styles.fieldGroup}>
+                <Typography className={styles.fieldLabel}>Publisher</Typography>
+                <TextField
+                  fullWidth
+                  size="small"
+                  variant="outlined"
+                  value={publisher}
+                  disabled={hasIsbnFound && !isFormEditable}
+                  onChange={(e) => setPublisher(e.target.value)}
+                  className={styles.inputField}
+                />
+              </Box>
+            </Grid>
+
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Box className={styles.fieldGroup}>
+                <Typography className={styles.fieldLabel}>Year</Typography>
+                <TextField
+                  fullWidth
+                  size="small"
+                  variant="outlined"
+                  value={year}
+                  disabled={hasIsbnFound && !isFormEditable}
+                  onChange={(e) => setYear(e.target.value)}
+                  className={styles.inputField}
+                />
+              </Box>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Box className={styles.fieldGroup}>
+                <Typography className={styles.fieldLabel}>Pages</Typography>
+                <TextField
+                  fullWidth
+                  size="small"
+                  variant="outlined"
+                  value={pages}
+                  disabled={hasIsbnFound && !isFormEditable}
+                  onChange={(e) => setPages(e.target.value)}
+                  className={styles.inputField}
+                />
+              </Box>
+            </Grid>
+
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Box className={styles.fieldGroup}>
+                <Typography className={styles.fieldLabel}>Language</Typography>
+                <TextField
+                  fullWidth
+                  size="small"
+                  variant="outlined"
+                  value={language}
+                  disabled={hasIsbnFound && !isFormEditable}
+                  onChange={(e) => setLanguage(e.target.value)}
+                  className={styles.inputField}
+                />
+              </Box>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Box className={styles.fieldGroup}>
+                <Typography className={styles.fieldLabel}>Edition</Typography>
+                <TextField
+                  fullWidth
+                  size="small"
+                  variant="outlined"
+                  value={edition}
+                  disabled={hasIsbnFound && !isFormEditable}
+                  onChange={(e) => setEdition(e.target.value)}
+                  className={styles.inputField}
+                />
+              </Box>
+            </Grid>
+
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Box className={styles.fieldGroup}>
+                <Typography className={styles.fieldLabel}>Status</Typography>
+                <TextField
+                  select
+                  fullWidth
+                  size="small"
+                  variant="outlined"
+                  value={status}
+                  disabled={hasIsbnFound && !isFormEditable}
+                  onChange={(e) => setStatus(e.target.value)}
+                  className={styles.inputField}
+                >
+                  <MenuItem value="Owned">Owned</MenuItem>
+                  <MenuItem value="Wishlist">Wishlist</MenuItem>
+                  <MenuItem value="Borrowed">Borrowed</MenuItem>
+                </TextField>
+              </Box>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Box className={styles.fieldGroup}>
+                <Typography className={styles.fieldLabel}>Reading status</Typography>
+                <TextField
+                  select
+                  fullWidth
+                  size="small"
+                  variant="outlined"
+                  value={readingStatus}
+                  disabled={hasIsbnFound && !isFormEditable}
+                  onChange={(e) => setReadingStatus(e.target.value)}
+                  className={styles.inputField}
+                >
+                  <MenuItem value="To read">To read</MenuItem>
+                  <MenuItem value="Currently reading">Currently reading</MenuItem>
+                  <MenuItem value="Read">Read</MenuItem>
+                </TextField>
+              </Box>
+            </Grid>
+
+            <Grid size={{ xs: 12 }}>
+              <Box className={styles.fieldGroup}>
+                <Typography className={styles.fieldLabel}>Description</Typography>
+                <TextField
+                  fullWidth
+                  multiline
+                  rows={3}
+                  size="small"
+                  variant="outlined"
+                  value={description}
+                  disabled={hasIsbnFound && !isFormEditable}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className={styles.inputField}
+                />
+              </Box>
+            </Grid>
           </Grid>
 
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <Box className={styles.fieldGroup}>
-              <Typography className={styles.fieldLabel}>Tags (comma separated)</Typography>
-              <TextField
-                fullWidth
-                size="small"
-                variant="outlined"
-                value={tags}
-                onChange={(e) => setTags(e.target.value)}
-                className={styles.inputField}
-              />
-            </Box>
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <Box className={styles.fieldGroup}>
-              <Typography className={styles.fieldLabel}>Shelves / collections (comma separated)</Typography>
-              <TextField
-                fullWidth
-                size="small"
-                variant="outlined"
-                value={shelves}
-                onChange={(e) => setShelves(e.target.value)}
-                className={styles.inputField}
-              />
-            </Box>
-          </Grid>
-        </Grid>
+          {/* Actions Row: Add to library & Red Cancel Button */}
+          <Box className={styles.actionButtonsRow}>
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={!title.trim()}
+              className={styles.submitButton}
+            >
+              Add to library
+            </Button>
 
-        {/* Actions Row: Add to library & Red Cancel Button */}
-        <Box className={styles.actionButtonsRow}>
-          <Button
-            type="submit"
-            variant="contained"
-            className={styles.submitButton}
-            onSubmit={handleSubmit}
-          >
-            Add to library
-          </Button>
-
-          <Button
-            type="button"
-            variant="outlined"
-            onClick={onBack}
-            className={styles.cancelButton}
-          >
-            Cancel
-          </Button>
-        </Box>
-      </form>
+            <Button
+              type="button"
+              variant="outlined"
+              onClick={onBack}
+              className={styles.cancelButton}
+            >
+              Cancel
+            </Button>
+          </Box>
+        </form>
+      )}
     </Box>
   );
 };

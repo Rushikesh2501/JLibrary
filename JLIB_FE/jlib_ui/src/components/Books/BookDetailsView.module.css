@@ -145,6 +145,15 @@
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
 }
 
+.nativeTitleGreen {
+  font-family: var(--font-sans, system-ui, sans-serif) !important;
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+  line-height: 1.2 !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
 .whiteInfoSection {
   padding-top: 18px;
   padding-bottom: 4px;
