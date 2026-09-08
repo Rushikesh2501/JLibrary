@@ -34,6 +34,8 @@ export const BarcodeScannerModal: React.FC<BarcodeScannerModalProps> = ({
     codeReaderRef.current = codeReader;
     setErrorMsg(null);
 
+    let controls: any = null;
+
     const startScanner = async () => {
       try {
         const videoInputDevices = await BrowserMultiFormatReader.listVideoInputDevices();
@@ -50,8 +52,8 @@ export const BarcodeScannerModal: React.FC<BarcodeScannerModalProps> = ({
         );
         const selectedDeviceId = backCamera ? backCamera.deviceId : videoInputDevices[0].deviceId;
 
-        if (videoRef.current) {
-          await codeReader.decodeFromVideoDevice(
+        if (videoRef.current && isMounted) {
+          controls = await codeReader.decodeFromVideoDevice(
             selectedDeviceId,
             videoRef.current,
             (result, err) => {
@@ -83,12 +85,17 @@ export const BarcodeScannerModal: React.FC<BarcodeScannerModalProps> = ({
     return () => {
       isMounted = false;
       clearTimeout(timer);
-      if (codeReaderRef.current) {
+      if (controls) {
         try {
-          // Controls are reset automatically on unmount
+          controls.stop();
         } catch (e) {
-          // Ignore unmount cleanup error
+          console.error(e);
         }
+      }
+      if (videoRef.current && videoRef.current.srcObject) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        stream.getTracks().forEach(track => track.stop());
+        videoRef.current.srcObject = null;
       }
     };
   }, [open, onClose, onScanSuccess]);
