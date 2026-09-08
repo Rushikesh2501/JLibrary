@@ -413,6 +413,7 @@
   display: flex;
   align-items: center;
   gap: 14px;
+  width: 100%;
 }
 
 .submitButton {
@@ -458,4 +459,22 @@
   background-color: #ffebee !important;
   border-color: #c62828 !important;
   color: #c62828 !important;
+}
+
+@media (max-width: 600px) {
+  .actionButtonsRow {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  .submitButton,
+  .cancelButton,
+  .extractPhotoBtn {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
 }

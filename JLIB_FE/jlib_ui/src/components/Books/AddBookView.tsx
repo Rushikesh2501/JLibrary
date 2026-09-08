@@ -453,14 +453,14 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
 
           {/* Action Row: Auto-fill button & Cancel button when photos attached */}
           {(frontPhoto || backPhoto) && (
-            <Box style={{ marginTop: 20, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-              <Box style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 14 }}>
+            <Box sx={{ marginTop: 2.5, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+              <Box sx={{ width: '100%', display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: 'center', gap: 1.75 }}>
                 <Button
                   variant="contained"
                   disabled={isExtractingPhoto}
                   onClick={handlePhotoExtract}
                   className={styles.extractPhotoBtn}
-                  style={{ flex: 1 }}
+                  sx={{ flex: 1, width: { xs: '100%', sm: 'auto' } }}
                 >
                   {isExtractingPhoto ? (
                     <span>Extracting book details with Gemini<AnimatedDots /></span>
@@ -474,7 +474,7 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
                   variant="outlined"
                   onClick={handleCancelPhoto}
                   className={styles.cancelButton}
-                  style={{ flex: 1 }}
+                  sx={{ flex: 1, width: { xs: '100%', sm: 'auto' } }}
                 >
                   Cancel
                 </Button>
@@ -704,12 +704,13 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
           </Grid>
 
           {/* Actions Row: Add to library & Red Cancel Button */}
-          <Box className={styles.actionButtonsRow}>
+          <Box className={styles.actionButtonsRow} sx={{ flexDirection: { xs: 'column', sm: 'row' }, width: '100%', gap: 1.75 }}>
             <Button
               type="submit"
               variant="contained"
               disabled={!title.trim()}
               className={styles.submitButton}
+              sx={{ width: { xs: '100%', sm: 'auto' } }}
             >
               Add to library
             </Button>
@@ -719,6 +720,7 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
               variant="outlined"
               onClick={onBack}
               className={styles.cancelButton}
+              sx={{ width: { xs: '100%', sm: 'auto' } }}
             >
               Cancel
             </Button>
