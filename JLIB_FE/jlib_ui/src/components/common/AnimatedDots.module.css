@@ -1,0 +1,39 @@
+@keyframes animatedDotFade {
+  0% {
+    opacity: 0.15;
+    transform: scale(0.85);
+  }
+  35% {
+    opacity: 1;
+    transform: scale(1.25);
+  }
+  70%, 100% {
+    opacity: 0.15;
+    transform: scale(0.85);
+  }
+}
+
+.dotsContainer {
+  display: inline-flex;
+  align-items: baseline;
+  margin-left: 2px;
+}
+
+.dot {
+  display: inline-block;
+  animation: animatedDotFade 1.3s infinite ease-in-out both;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.dot:nth-of-type(1) {
+  animation-delay: 0s;
+}
+
+.dot:nth-of-type(2) {
+  animation-delay: 0.22s;
+}
+
+.dot:nth-of-type(3) {
+  animation-delay: 0.44s;
+}

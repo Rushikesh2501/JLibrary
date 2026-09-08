@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Typography, Grid, Skeleton } from '@mui/material';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
+import { AnimatedDots } from './AnimatedDots';
 import styles from './Loading.module.css';
 
 export const Loading: React.FC = () => {
@@ -10,7 +11,7 @@ export const Loading: React.FC = () => {
         <MenuBookIcon sx={{ fontSize: 36 }} />
       </Box>
       <Typography variant="h5" className={styles.title}>
-        Opening the library catalog...
+        Opening the library catalog<AnimatedDots />
       </Typography>
       <Typography variant="body2" className={styles.subtitle}>
         Fetching manuscript & collection records from JLibrary backend.

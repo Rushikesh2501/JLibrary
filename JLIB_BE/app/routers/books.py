@@ -35,3 +35,35 @@ def lookup_isbn(isbn: str):
         return {"error": "Book not found via Gemini LLM", "found": False}
     return {"found": True, "book": result}
 
+
+from fastapi import File, UploadFile
+from typing import Optional
+
+@router.post("/photo")
+async def lookup_photo(
+    front_cover: Optional[UploadFile] = File(None),
+    back_cover: Optional[UploadFile] = File(None)
+):
+    """
+    Extract book details from front and/or back cover images using Gemini Vision LLM.
+    Supports JPG, PNG, WEBP, and HEIC/HEIF images.
+    """
+    from app.services.gemini_service import lookup_book_by_photo_gemini
+
+    front_bytes = await front_cover.read() if front_cover else None
+    front_mime = front_cover.content_type if front_cover and front_cover.content_type else "image/jpeg"
+
+    back_bytes = await back_cover.read() if back_cover else None
+    back_mime = back_cover.content_type if back_cover and back_cover.content_type else "image/jpeg"
+
+    result = lookup_book_by_photo_gemini(
+        front_bytes=front_bytes,
+        front_mime=front_mime,
+        back_bytes=back_bytes,
+        back_mime=back_mime
+    )
+
+    if not result:
+        return {"error": "Could not extract book details from the uploaded photo(s)", "found": False}
+    return {"found": True, "book": result}
+

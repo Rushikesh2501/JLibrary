@@ -120,30 +120,74 @@
   margin-bottom: 18px !important;
 }
 
+.photoSubLabel {
+  color: var(--primary-forest) !important;
+  font-weight: 700 !important;
+  margin-bottom: 8px !important;
+  font-size: 0.95rem !important;
+}
+
 .photoButtonRow {
   display: flex;
   gap: 14px;
 }
 
-/* Desktop Drag & Drop Box */
 .dragDropArea {
   border: 2px dashed #c9c3b8;
   background-color: #faf7f2;
   border-radius: 14px;
-  padding: 32px 24px;
+  padding: 24px 20px;
+  height: 140px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
   cursor: pointer;
-  transition: all 0.25 ease;
+  transition: all 0.25s ease;
   position: relative;
 }
 
 .dragDropArea:hover, .dragActive {
   border-color: var(--primary-forest) !important;
   background-color: #f3efe6 !important;
+}
+
+.uploadedArea {
+  border-color: var(--primary-forest) !important;
+  background-color: #f6f9f6 !important;
+  height: 140px !important;
+  padding: 20px 24px !important;
+}
+
+.uploadedStateContainer {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.photoPreviewThumb {
+  width: 64px;
+  height: 84px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--border-parchment);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.uploadedMetaBox {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.uploadedFileName {
+  color: var(--primary-forest) !important;
+  font-weight: 700 !important;
+  font-size: 0.95rem !important;
+  margin-bottom: 4px !important;
 }
 
 .uploadCloudIcon {
@@ -197,6 +241,23 @@
 
 .scanBarcodeBtn:hover {
   background-color: #0b291c !important;
+}
+
+.extractPhotoBtn {
+  background-color: var(--primary-forest) !important;
+  color: #ffffff !important;
+  text-transform: none !important;
+  border-radius: 12px !important;
+  padding: 10px 24px !important;
+  font-weight: 700 !important;
+  font-size: 0.95rem !important;
+  box-shadow: 0 2px 8px rgba(27, 67, 50, 0.2) !important;
+  transition: all 0.2s ease !important;
+}
+
+.extractPhotoBtn:hover:not(:disabled) {
+  background-color: #2d5a27 !important;
+  box-shadow: 0 4px 12px rgba(27, 67, 50, 0.3) !important;
 }
 
 .lookupRow {
