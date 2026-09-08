@@ -153,16 +153,21 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack }
           <Chip label={`Book ID #${book.book_id}`} size="small" className={styles.topRightBookIdChip} />
         </div>
 
-        {/* Side-by-Side Header Info */}
+        {/* Side-by-Side Header Info on Desktop / Centered on Mobile */}
         <div className={styles.profileHeader}>
           <div className={styles.coverWrapper}>
             <img src={coverUrl} alt={book.book_name} className={styles.coverImage} />
           </div>
 
           <div className={styles.headerMainContent}>
-            {/* Title & Native Title inside Green Banner Area */}
+            {/* Mobile-only Book ID Badge */}
+            <div className={styles.mobileBookIdRow}>
+              <Chip label={`Book ID #${book.book_id}`} size="small" className={styles.mobileBookIdChip} />
+            </div>
+
+            {/* Title & Native Title */}
             <div className={styles.greenTitleRow}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+              <div className={styles.titleColumn}>
                 <span className={styles.bookTitleGreen}>{book.book_name}</span>
                 {book.native_title && (
                   <span className={styles.nativeTitleGreen}>{book.native_title}</span>

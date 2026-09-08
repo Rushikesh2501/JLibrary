@@ -126,6 +126,20 @@
   min-width: 0;
 }
 
+.mobileBookIdRow {
+  display: none;
+}
+
+.mobileBookIdChip {
+  display: none !important;
+}
+
+.titleColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .greenTitleRow {
   height: 95px;
   display: flex;
@@ -432,4 +446,114 @@
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* Mobile View Layout (<= 650px) */
+@media (max-width: 650px) {
+  .profileContainer {
+    padding: 12px 14px 28px 14px;
+  }
+
+  .coverContainer {
+    height: 120px;
+  }
+
+  .topRightBookIdChip {
+    display: none !important;
+  }
+
+  .profileHeader {
+    flex-direction: column;
+    align-items: center;
+    margin-top: -85px;
+    padding: 0 16px 24px 16px;
+    gap: 14px;
+  }
+
+  .coverWrapper {
+    align-self: center;
+    margin: 0 auto;
+    width: 130px;
+    height: 180px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+  }
+
+  .headerMainContent {
+    width: 100%;
+    align-items: center;
+    text-align: center;
+  }
+
+  .mobileBookIdRow {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+
+  .mobileBookIdChip {
+    display: inline-flex !important;
+    background: #e8f5e9 !important;
+    color: #1b4332 !important;
+    border: 1px solid #c8e6c9 !important;
+    font-weight: 700 !important;
+    font-size: 0.8rem !important;
+    font-family: 'Plus Jakarta Sans', monospace, sans-serif !important;
+    border-radius: 9999px !important;
+    padding: 2px 6px !important;
+  }
+
+  .greenTitleRow {
+    height: auto;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+  }
+
+  .titleColumn {
+    align-items: center;
+    text-align: center;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .bookTitleGreen {
+    color: var(--text-primary, #1b4332) !important;
+    font-size: 1.55rem !important;
+    line-height: 1.25 !important;
+    text-shadow: none !important;
+    text-align: center !important;
+    word-break: break-word;
+  }
+
+  .nativeTitleGreen {
+    color: var(--primary-forest, #2d5a27) !important;
+    font-size: 1.05rem !important;
+    line-height: 1.35 !important;
+    text-shadow: none !important;
+    text-align: center !important;
+    word-break: break-word;
+  }
+
+  .whiteInfoSection {
+    border-top: none;
+    margin-top: 10px;
+    padding: 0;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+  }
+
+  .bookMetaSub {
+    text-align: center;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--text-secondary, #666666);
+  }
+
+  .contentCanvas {
+    padding: 18px 14px;
+    border-radius: 16px;
+  }
 }
