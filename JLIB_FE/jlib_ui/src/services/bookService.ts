@@ -14,12 +14,16 @@ export async function getBooks(): Promise<Book[]> {
     }
 
     const data: Book[] = await response.json();
-    return data;
+    return data.map((b) => ({
+      ...b,
+      native_title: b.book_name_native_lang || b.native_title,
+    }));
   } catch (error) {
     console.error('Error fetching books in getBooks:', error);
     throw error;
   }
 }
+
 
 export interface GoogleBookDetails {
   title: string;
@@ -201,3 +205,93 @@ export async function fetchBookDetailsByPhoto(
 
   return null;
 }
+
+export async function createBook(bookData: Partial<Book>, prefix: string = 'JL-'): Promise<Book> {
+  const payload = {
+    book_name: bookData.book_name,
+    book_name_native_lang: bookData.book_name_native_lang || bookData.native_title || null,
+    author: bookData.author,
+    genre: bookData.genre || 'General',
+    publication: bookData.publication || 'Self Published',
+    section: bookData.section || 'General',
+    availability_status: bookData.availability_status || (bookData.is_available ? 'Available' : 'Unavailable'),
+    borrowed_by: bookData.borrowed_by || null,
+    book_id: bookData.book_id || undefined,
+  };
+
+  const response = await fetch(`${API_BASE_URL}/books/?prefix=${encodeURIComponent(prefix)}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to create book: ${response.status} ${errorText}`);
+  }
+
+  const created: Book = await response.json();
+  return {
+    ...bookData,
+    ...created,
+    native_title: created.book_name_native_lang || bookData.native_title,
+  };
+}
+
+export async function updateBook(bookId: string, bookData: Partial<Book>): Promise<Book> {
+  const payload = {
+    book_name: bookData.book_name,
+    book_name_native_lang: bookData.book_name_native_lang || bookData.native_title || null,
+    author: bookData.author,
+    genre: bookData.genre,
+    publication: bookData.publication,
+    section: bookData.section,
+    availability_status: bookData.availability_status,
+    borrowed_by: bookData.borrowed_by,
+  };
+
+  const response = await fetch(`${API_BASE_URL}/books/${encodeURIComponent(bookId)}`, {
+    method: 'PUT',
+
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to update book: ${response.status} ${errorText}`);
+  }
+
+  const updated: Book = await response.json();
+  return {
+    ...bookData,
+    ...updated,
+  };
+}
+
+export async function getNextBookId(prefix: string = 'JL-'): Promise<string> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/books/next-id?prefix=${encodeURIComponent(prefix)}`, {
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data && data.next_book_id) {
+        return data.next_book_id;
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to fetch next book id from backend:', err);
+  }
+  return `${prefix}1`;
+}
+

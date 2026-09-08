@@ -9,7 +9,9 @@ import { BookGrid } from './BookGrid';
 import { BookDetailsView } from './BookDetailsView';
 import { AddBookView } from './AddBookView';
 import { EmptyState } from '../common/EmptyState';
+import { createBook } from '../../services/bookService';
 import styles from './BooksPage.module.css';
+
 
 interface BooksPageProps {
   books: Book[];
@@ -87,8 +89,9 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books: initialBooks }) => 
       if (searchTerm.trim()) {
         const query = searchTerm.toLowerCase().trim();
         const matchesName = book.book_name?.toLowerCase().includes(query);
-        const matchesNativeTitle = book.native_title?.toLowerCase().includes(query);
+        const matchesNativeTitle = (book.book_name_native_lang || book.native_title)?.toLowerCase().includes(query);
         const matchesAuthor = book.author?.toLowerCase().includes(query);
+
         const matchesGenre = book.genre?.toLowerCase().includes(query);
         const matchesPub = book.publication?.toLowerCase().includes(query);
         const matchesSection = book.section?.toLowerCase().includes(query);
@@ -114,13 +117,20 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books: initialBooks }) => 
     setSearchTerm('');
   };
 
-  const handleAddNewBook = (newBookData: any) => {
-    const createdBook: Book = {
-      book_id: `JL-B-${Date.now()}`,
-      ...newBookData,
-    };
-    setBooksList((prev) => [createdBook, ...prev]);
+  const handleAddNewBook = async (newBookData: any) => {
+    try {
+      const savedBook = await createBook(newBookData);
+      setBooksList((prev) => [savedBook, ...prev]);
+    } catch (err) {
+      console.error('Failed to create book in backend:', err);
+      const fallbackBook: Book = {
+        book_id: `JL-${Date.now()}`,
+        ...newBookData,
+      };
+      setBooksList((prev) => [fallbackBook, ...prev]);
+    }
   };
+
 
   // If Add Book view is active, render full-page AddBookView (in-page, no popup)
   if (isAddBookViewActive) {

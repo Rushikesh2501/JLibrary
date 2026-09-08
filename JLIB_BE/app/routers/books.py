@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends
+from typing import Optional
+from fastapi import APIRouter, Depends, HTTPException, Query, File, UploadFile, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.schemas.book import BookResponse,BookNames
+from app.schemas.book import BookResponse, BookNames, BookCreate, BookUpdate, BookIdResponse
 from app.services import book_service
 
 router = APIRouter(
@@ -19,7 +20,21 @@ def get_books(db: Session = Depends(get_db)):
     return book_service.get_all_books(db)
 
 
-@router.get("/name",response_model=list[BookNames])
+@router.get("/next-id", response_model=BookIdResponse)
+def get_next_book_id(
+    prefix: str = Query("JL-", description="Prefix for book ID, e.g. JL- or shelf ID like A1-"),
+    db: Session = Depends(get_db)
+):
+    """
+    Get the next available sequential book ID starting with prefix (e.g. JL-1, JL-2, ..., JL-11).
+    Checks existing books to determine the latest number.
+    Later, this supports shelf IDs (e.g. A1-).
+    """
+    next_id = book_service.get_next_book_id(db, prefix=prefix)
+    return {"next_book_id": next_id}
+
+
+@router.get("/name", response_model=list[BookNames])
 def get_book_names(db: Session = Depends(get_db)):
     return book_service.get_book_names(db)
 
@@ -35,9 +50,6 @@ def lookup_isbn(isbn: str):
         return {"error": "Book not found via Gemini LLM", "found": False}
     return {"found": True, "book": result}
 
-
-from fastapi import File, UploadFile
-from typing import Optional
 
 @router.post("/photo")
 async def lookup_photo(
@@ -66,4 +78,51 @@ async def lookup_photo(
     if not result:
         return {"error": "Could not extract book details from the uploaded photo(s)", "found": False}
     return {"found": True, "book": result}
+
+
+@router.post("/", response_model=BookResponse, status_code=status.HTTP_201_CREATED)
+def add_book(
+    book_in: BookCreate,
+    prefix: str = Query("JL-", description="Prefix for auto-generated book ID if not provided"),
+    db: Session = Depends(get_db)
+):
+    """
+    Add a new book to the library collection.
+    If book_id is not provided, automatically assigns the next sequential ID starting with prefix (e.g. JL-1, JL-2, ..., JL-11).
+    """
+    return book_service.create_book(db, book_in=book_in, prefix=prefix)
+
+
+@router.get("/{book_id}", response_model=BookResponse)
+def get_book_by_id(book_id: str, db: Session = Depends(get_db)):
+    """
+    Get a single book by its book_id.
+    """
+    book = book_service.get_book_by_id(db, book_id=book_id)
+    if not book:
+        raise HTTPException(status_code=404, detail="Book not found")
+    return book
+
+
+@router.put("/{book_id}", response_model=BookResponse)
+def update_book(book_id: str, book_update: BookUpdate, db: Session = Depends(get_db)):
+    """
+    Update details for an existing book in the collection.
+    """
+    updated_book = book_service.update_book(db, book_id=book_id, book_update=book_update)
+    if not updated_book:
+        raise HTTPException(status_code=404, detail="Book not found")
+    return updated_book
+
+
+@router.delete("/{book_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_book(book_id: str, db: Session = Depends(get_db)):
+    """
+    Delete a book from the library collection.
+    """
+    success = book_service.delete_book(db, book_id=book_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Book not found")
+    return None
+
 

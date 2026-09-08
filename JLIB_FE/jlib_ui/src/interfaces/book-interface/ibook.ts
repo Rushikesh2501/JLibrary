@@ -18,6 +18,8 @@ export interface Book {
   reading_status?: string;
   description?: string;
   native_title?: string;
+  book_name_native_lang?: string | null;
 }
+
 
 export type IBook = Book;

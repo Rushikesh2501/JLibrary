@@ -1,5 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Box, Typography, Dialog, DialogContent, DialogTitle, IconButton, Tooltip } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Tooltip,
+  useTheme,
+  useMediaQuery,
+} from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import VideocamIcon from '@mui/icons-material/Videocam';
 import CameraswitchIcon from '@mui/icons-material/Cameraswitch';
@@ -22,7 +32,16 @@ export const BarcodeScannerModal: React.FC<BarcodeScannerModalProps> = ({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
   const [activeDeviceIndex, setActiveDeviceIndex] = useState<number>(0);
+  const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
   const codeReaderRef = useRef<BrowserMultiFormatReader | null>(null);
+
+  const theme = useTheme();
+  const isMobileBreakpoint = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobileDevice = typeof window !== 'undefined' && (
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+    (navigator.maxTouchPoints && navigator.maxTouchPoints > 0)
+  );
+  const isMobileView = isMobileBreakpoint || isMobileDevice;
 
   useEffect(() => {
     if (!open) {
@@ -30,6 +49,7 @@ export const BarcodeScannerModal: React.FC<BarcodeScannerModalProps> = ({
         codeReaderRef.current = null;
       }
       setErrorMsg(null);
+      setFacingMode('environment');
       return;
     }
 
@@ -56,39 +76,58 @@ export const BarcodeScannerModal: React.FC<BarcodeScannerModalProps> = ({
 
     const startScanner = async () => {
       try {
-        const videoInputDevices = await BrowserMultiFormatReader.listVideoInputDevices();
-        if (!isMounted) return;
-
-        if (!videoInputDevices || videoInputDevices.length === 0) {
-          setErrorMsg('No camera devices found. Please ensure your camera is connected and permitted.');
-          return;
+        // Enumerate devices if available before stream
+        let videoInputDevices: MediaDeviceInfo[] = [];
+        try {
+          videoInputDevices = await BrowserMultiFormatReader.listVideoInputDevices();
+          if (isMounted && videoInputDevices && videoInputDevices.length > 0) {
+            setDevices(videoInputDevices);
+          }
+        } catch (e) {
+          console.warn('Could not enumerate video devices ahead of stream:', e);
         }
 
-        setDevices(videoInputDevices);
-
-        // Selected camera device
-        const currentDevice = videoInputDevices[activeDeviceIndex % videoInputDevices.length];
-        const selectedDeviceId = currentDevice.deviceId;
-        const isBackCam = currentDevice.label.toLowerCase().includes('back') || 
-                          currentDevice.label.toLowerCase().includes('rear') || 
-                          currentDevice.label.toLowerCase().includes('environment');
-
         if (videoRef.current && isMounted) {
-          const constraints: MediaStreamConstraints = {
-            video: {
-              deviceId: selectedDeviceId ? { exact: selectedDeviceId } : undefined,
-              width: { ideal: 1920 },
-              height: { ideal: 1080 },
-              facingMode: isBackCam ? 'environment' : 'user',
-              // @ts-ignore
-              advanced: [{ focusMode: 'continuous' }],
-            },
-          };
+          let constraints: MediaStreamConstraints;
+
+          if (isMobileView) {
+            constraints = {
+              video: {
+                facingMode: { ideal: facingMode },
+                width: { ideal: 1920 },
+                height: { ideal: 1080 },
+                // @ts-ignore
+                advanced: [{ focusMode: 'continuous' }],
+              },
+            };
+          } else {
+            const currentDevice =
+              videoInputDevices && videoInputDevices.length > 0
+                ? videoInputDevices[activeDeviceIndex % videoInputDevices.length]
+                : null;
+            const selectedDeviceId = currentDevice?.deviceId;
+            const isBackCam = currentDevice?.label
+              ? currentDevice.label.toLowerCase().includes('back') ||
+                currentDevice.label.toLowerCase().includes('rear') ||
+                currentDevice.label.toLowerCase().includes('environment')
+              : false;
+
+            constraints = {
+              video: {
+                deviceId: selectedDeviceId ? { exact: selectedDeviceId } : undefined,
+                width: { ideal: 1920 },
+                height: { ideal: 1080 },
+                facingMode: isBackCam ? 'environment' : 'user',
+                // @ts-ignore
+                advanced: [{ focusMode: 'continuous' }],
+              },
+            };
+          }
 
           controls = await codeReader.decodeFromConstraints(
             constraints,
             videoRef.current,
-            (result, err) => {
+            (result) => {
               if (result && isMounted) {
                 const text = result.getText().trim();
                 // Clean non-digits/X
@@ -100,6 +139,25 @@ export const BarcodeScannerModal: React.FC<BarcodeScannerModalProps> = ({
               }
             }
           );
+
+          if (!isMounted) {
+            if (controls) {
+              try {
+                controls.stop();
+              } catch {}
+            }
+            return;
+          }
+
+          // Once permission is granted and stream is active, re-enumerate devices
+          try {
+            const updatedDevices = await BrowserMultiFormatReader.listVideoInputDevices();
+            if (isMounted && updatedDevices && updatedDevices.length > 0) {
+              setDevices(updatedDevices);
+            }
+          } catch {
+            // Ignore re-enumeration failure
+          }
         }
       } catch (err: any) {
         if (isMounted) {
@@ -128,13 +186,14 @@ export const BarcodeScannerModal: React.FC<BarcodeScannerModalProps> = ({
       }
       if (videoEl && videoEl.srcObject) {
         const stream = videoEl.srcObject as MediaStream;
-        stream.getTracks().forEach(track => track.stop());
+        stream.getTracks().forEach((track) => track.stop());
         videoEl.srcObject = null;
       }
     };
-  }, [open, activeDeviceIndex, onClose, onScanSuccess]);
+  }, [open, activeDeviceIndex, facingMode, isMobileView, onClose, onScanSuccess]);
 
   const handleSwitchCamera = () => {
+    setFacingMode((prev) => (prev === 'environment' ? 'user' : 'environment'));
     if (devices.length > 1) {
       setActiveDeviceIndex((prev) => (prev + 1) % devices.length);
     }
@@ -148,14 +207,14 @@ export const BarcodeScannerModal: React.FC<BarcodeScannerModalProps> = ({
           <Typography variant="h6" className={styles.titleText}>Scan ISBN Barcode</Typography>
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          {devices.length > 1 && (
-            <Tooltip title="Switch Camera (Front/Back)">
-              <IconButton onClick={handleSwitchCamera} size="small" color="primary">
+          {(isMobileView || devices.length > 1) && (
+            <Tooltip title={`Switch Camera (${facingMode === 'environment' ? 'Front' : 'Back'})`}>
+              <IconButton onClick={handleSwitchCamera} size="small" color="primary" aria-label="switch camera">
                 <CameraswitchIcon />
               </IconButton>
             </Tooltip>
           )}
-          <IconButton onClick={onClose} size="small">
+          <IconButton onClick={onClose} size="small" aria-label="close">
             <CloseIcon />
           </IconButton>
         </Box>

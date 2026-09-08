@@ -116,7 +116,9 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
     const newBookData = {
       book_name: title,
       native_title: nativeTitle,
+      book_name_native_lang: nativeTitle,
       author: authors || 'Unknown Author',
+
       genre: tags ? tags.split(',')[0].trim() : 'General',
       publication: publisher || 'Self Published',
       section: 'General',

@@ -173,10 +173,13 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack }
             <div className={styles.greenTitleRow}>
               <div className={styles.titleColumn}>
                 <span className={styles.bookTitleGreen}>{book.book_name}</span>
-                {book.native_title && (
-                  <span className={styles.nativeTitleGreen}>{book.native_title}</span>
+                {(book.book_name_native_lang || book.native_title) && (
+                  <span className={styles.nativeTitleGreen}>
+                    {book.book_name_native_lang || book.native_title}
+                  </span>
                 )}
               </div>
+
             </div>
 
             {/* Metadata inside White Area */}
