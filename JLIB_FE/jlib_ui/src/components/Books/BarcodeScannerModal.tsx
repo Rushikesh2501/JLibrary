@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Box, Typography, Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
+import { Box, Typography, Dialog, DialogContent, DialogTitle, IconButton, Tooltip } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import VideocamIcon from '@mui/icons-material/Videocam';
+import CameraswitchIcon from '@mui/icons-material/Cameraswitch';
 import { BrowserMultiFormatReader } from '@zxing/browser';
 import { BarcodeFormat, DecodeHintType } from '@zxing/library';
 import styles from './BarcodeScannerModal.module.css';
@@ -19,6 +20,8 @@ export const BarcodeScannerModal: React.FC<BarcodeScannerModalProps> = ({
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
+  const [activeDeviceIndex, setActiveDeviceIndex] = useState<number>(0);
   const codeReaderRef = useRef<BrowserMultiFormatReader | null>(null);
 
   useEffect(() => {
@@ -31,7 +34,8 @@ export const BarcodeScannerModal: React.FC<BarcodeScannerModalProps> = ({
     }
 
     let isMounted = true;
-    
+    let controls: any = null;
+
     // Explicitly configure barcode formats for ISBNs (EAN_13, EAN_8, CODE_128)
     const hints = new Map();
     const formats = [
@@ -50,8 +54,6 @@ export const BarcodeScannerModal: React.FC<BarcodeScannerModalProps> = ({
     codeReaderRef.current = codeReader;
     setErrorMsg(null);
 
-    let controls: any = null;
-
     const startScanner = async () => {
       try {
         const videoInputDevices = await BrowserMultiFormatReader.listVideoInputDevices();
@@ -62,11 +64,14 @@ export const BarcodeScannerModal: React.FC<BarcodeScannerModalProps> = ({
           return;
         }
 
-        // Prefer back camera if on mobile
-        const backCamera = videoInputDevices.find(device =>
-          device.label.toLowerCase().includes('back') || device.label.toLowerCase().includes('rear') || device.label.toLowerCase().includes('environment')
-        );
-        const selectedDeviceId = backCamera ? backCamera.deviceId : videoInputDevices[0].deviceId;
+        setDevices(videoInputDevices);
+
+        // Selected camera device
+        const currentDevice = videoInputDevices[activeDeviceIndex % videoInputDevices.length];
+        const selectedDeviceId = currentDevice.deviceId;
+        const isBackCam = currentDevice.label.toLowerCase().includes('back') || 
+                          currentDevice.label.toLowerCase().includes('rear') || 
+                          currentDevice.label.toLowerCase().includes('environment');
 
         if (videoRef.current && isMounted) {
           const constraints: MediaStreamConstraints = {
@@ -74,7 +79,7 @@ export const BarcodeScannerModal: React.FC<BarcodeScannerModalProps> = ({
               deviceId: selectedDeviceId ? { exact: selectedDeviceId } : undefined,
               width: { ideal: 1920 },
               height: { ideal: 1080 },
-              facingMode: backCamera ? 'environment' : 'user',
+              facingMode: isBackCam ? 'environment' : 'user',
               // @ts-ignore
               advanced: [{ focusMode: 'continuous' }],
             },
@@ -127,7 +132,13 @@ export const BarcodeScannerModal: React.FC<BarcodeScannerModalProps> = ({
         videoEl.srcObject = null;
       }
     };
-  }, [open, onClose, onScanSuccess]);
+  }, [open, activeDeviceIndex, onClose, onScanSuccess]);
+
+  const handleSwitchCamera = () => {
+    if (devices.length > 1) {
+      setActiveDeviceIndex((prev) => (prev + 1) % devices.length);
+    }
+  };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth slotProps={{ paper: { style: { borderRadius: 16 } } }}>
@@ -136,9 +147,18 @@ export const BarcodeScannerModal: React.FC<BarcodeScannerModalProps> = ({
           <VideocamIcon style={{ color: '#1b4332' }} />
           <Typography variant="h6" className={styles.titleText}>Scan ISBN Barcode</Typography>
         </Box>
-        <IconButton onClick={onClose} size="small">
-          <CloseIcon />
-        </IconButton>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          {devices.length > 1 && (
+            <Tooltip title="Switch Camera (Front/Back)">
+              <IconButton onClick={handleSwitchCamera} size="small" color="primary">
+                <CameraswitchIcon />
+              </IconButton>
+            </Tooltip>
+          )}
+          <IconButton onClick={onClose} size="small">
+            <CloseIcon />
+          </IconButton>
+        </Box>
       </DialogTitle>
 
       <DialogContent className={styles.dialogContent}>
