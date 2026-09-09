@@ -442,15 +442,6 @@
   margin: 0 !important;
 }
 
-.editingNoteText {
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--primary-forest, #1b4332);
-  background-color: #e8f5e9;
-  border: 1px solid #c8e6c9;
-  padding: 4px 10px;
-  border-radius: 8px;
-}
 
 .tableValueNonEditable {
   font-weight: 700;
@@ -540,6 +531,25 @@
   align-items: center;
   padding: 13px 0;
   border-bottom: 1px solid var(--border-parchment);
+}
+
+.tableRowEditable {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-parchment);
+  gap: 16px;
+}
+
+.tableRowEditable .tableLabel {
+  min-width: 120px;
+  flex-shrink: 0;
+}
+
+.tableRowEditable .editInputField {
+  flex: 1;
+  max-width: 360px;
 }
 
 .tableRow:last-child {
@@ -740,8 +750,40 @@
   }
 
   .editBtnGroup {
-    width: 100%;
-    justify-content: center;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column-reverse !important;
+    gap: 10px !important;
+    margin-top: 6px !important;
+  }
+
+  .editBtnGroup .cancelEditBtn,
+  .editBtnGroup .saveEditBtn {
+    width: 100% !important;
+    padding: 10px 16px !important;
+    font-size: 0.92rem !important;
+  }
+
+
+  .tableRowEditable {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 6px !important;
+    padding: 11px 0 !important;
+  }
+
+  .tableRowEditable .tableLabel {
+    width: 100% !important;
+    text-align: left !important;
+    font-size: 0.88rem !important;
+    font-weight: 700 !important;
+    color: var(--primary-forest, #1b4332) !important;
+    margin-bottom: 2px !important;
+  }
+
+  .tableRowEditable .editInputField {
+    width: 100% !important;
+    max-width: 100% !important;
   }
 
   .editInputField {
@@ -752,11 +794,14 @@
   .bottomEditActionsRow {
     justify-content: stretch;
     flex-direction: column-reverse;
+    gap: 10px !important;
   }
 
   .bottomEditActionsRow .cancelEditBtn,
   .bottomEditActionsRow .saveEditBtn {
     width: 100% !important;
+    padding: 10px 16px !important;
+    font-size: 0.92rem !important;
   }
 
   .bookMetaSub {

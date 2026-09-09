@@ -9,11 +9,15 @@ import {
   useMediaQuery,
   useTheme,
   Tooltip,
+  Checkbox,
+  FormControlLabel,
 } from '@mui/material';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
+import CropIcon from '@mui/icons-material/Crop';
+import { ImageCropModal } from '../common/ImageCropModal';
 import { BackButton } from '../common/BackButton';
 import { AnimatedDots } from '../common/AnimatedDots';
 import { fetchBookDetailsByIsbn, fetchBookDetailsByPhoto, formatLanguageName, getNextBookId, cleanDiacritics, determineNativeTitle, iastToDevanagari } from '../../services/bookService';
@@ -143,8 +147,13 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
     };
   }, [shelfNo]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Book Profile Photo & Crop State (strictly for Front Cover only)
+  const [usePhotoForProfile, setUsePhotoForProfile] = useState(false);
+  const [croppedCoverUrl, setCroppedCoverUrl] = useState<string | null>(null);
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [isSubmittingOnCrop, setIsSubmittingOnCrop] = useState(false);
+
+  const saveBookWithCover = async (coverUrlToUse?: string | null) => {
     if (!title.trim() || !shelfNo.trim()) return;
 
     let finalBookId = bookId;
@@ -153,6 +162,8 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
       const cleanPrefix = upperShelf.endsWith('-') ? upperShelf : `${upperShelf}-`;
       finalBookId = await getNextBookId(cleanPrefix);
     }
+
+    const finalCover = coverUrlToUse ?? (usePhotoForProfile && frontPhotoUrl ? (croppedCoverUrl || frontPhotoUrl) : null);
 
     const newBookData = {
       book_id: finalBookId,
@@ -174,12 +185,41 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
       language,
       edition,
       reading_status: readingStatus,
+      ...(finalCover ? { cover_url: finalCover } : {}),
     };
     console.log("newBookData", newBookData);
     if (onAddBook) {
       onAddBook(newBookData);
     }
     onBack();
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title.trim() || !shelfNo.trim()) return;
+
+    // If user checked "use front cover for book profile" and hasn't cropped it yet, open the crop tool before saving
+    if (usePhotoForProfile && frontPhotoUrl && !croppedCoverUrl) {
+      setIsSubmittingOnCrop(true);
+      setCropModalOpen(true);
+      return;
+    }
+
+    await saveBookWithCover(usePhotoForProfile && frontPhotoUrl ? (croppedCoverUrl || frontPhotoUrl) : null);
+  };
+
+  const handleCropSave = async (croppedDataUrl: string) => {
+    setCroppedCoverUrl(croppedDataUrl);
+    setCropModalOpen(false);
+    if (isSubmittingOnCrop) {
+      setIsSubmittingOnCrop(false);
+      await saveBookWithCover(croppedDataUrl);
+    }
+  };
+
+  const handleCropClose = () => {
+    setCropModalOpen(false);
+    setIsSubmittingOnCrop(false);
   };
 
   // Photo tab State (Front and Back cover - Default Native File Inputs)
@@ -241,11 +281,16 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
     setBackPhotoUrl(null);
     setPhotoExtractError(null);
     setHasPhotoFound(false);
+    setUsePhotoForProfile(false);
+    setCroppedCoverUrl(null);
+    setIsSubmittingOnCrop(false);
   };
 
   const handleFrontPhotoSelect = (file: File) => {
     setFrontPhoto(file);
     setHasPhotoFound(false);
+    setUsePhotoForProfile(true);
+    setCroppedCoverUrl(null);
     const reader = new FileReader();
     reader.onload = (e) => {
       if (e.target?.result) {
@@ -413,7 +458,11 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
               >
                 {frontPhotoUrl ? (
                   <Box className={styles.uploadedStateContainer}>
-                    <img src={frontPhotoUrl} alt="Front cover preview" className={styles.photoPreviewThumb} />
+                    <img
+                      src={croppedCoverUrl || frontPhotoUrl}
+                      alt="Front cover preview"
+                      className={styles.photoPreviewThumb}
+                    />
                     <Box className={styles.uploadedMetaBox}>
                       <Typography className={styles.uploadedFileName}>
                         ✓ Front cover attached
@@ -481,6 +530,71 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
               </Box>
             </Grid>
           </Grid>
+
+          {/* Option to use Front Cover photo for book profile - 100% Full Width, ONLY shown when frontPhoto exists */}
+          {frontPhoto && (
+            <Box
+              sx={{
+                width: '100%',
+                mt: 2,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                p: 1.5,
+                px: 2,
+                borderRadius: '12px',
+                backgroundColor: '#fbf8f2',
+                border: '1px solid var(--border-parchment, #e8ded0)',
+                boxSizing: 'border-box',
+              }}
+            >
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    size="small"
+                    checked={usePhotoForProfile}
+                    onChange={(e) => setUsePhotoForProfile(e.target.checked)}
+                    sx={{
+                      color: 'var(--primary-forest, #1b4332)',
+                      '&.Mui-checked': { color: 'var(--primary-forest, #1b4332)' },
+                    }}
+                  />
+                }
+                label={
+                  <Typography sx={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--primary-forest, #1b4332)' }}>
+                    Use this photo for book profile
+                  </Typography>
+                }
+                sx={{ m: 0 }}
+              />
+
+              {usePhotoForProfile && (
+                <Button
+                  size="small"
+                  variant="outlined"
+                  startIcon={<CropIcon fontSize="small" />}
+                  onClick={() => {
+                    setIsSubmittingOnCrop(false);
+                    setCropModalOpen(true);
+                  }}
+                  sx={{
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    fontSize: '0.82rem',
+                    borderRadius: '8px',
+                    borderColor: 'var(--primary-forest, #1b4332)',
+                    color: 'var(--primary-forest, #1b4332)',
+                    bgcolor: '#ffffff',
+                    py: 0.3,
+                    px: 1.25,
+                    '&:hover': { bgcolor: '#f4efe6' },
+                  }}
+                >
+                  {croppedCoverUrl ? 'Adjust crop' : 'Crop now'}
+                </Button>
+              )}
+            </Box>
+          )}
 
           {/* Hidden File Inputs (Default Native Device Options) */}
           <input
@@ -556,6 +670,70 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
               </Button>
             )}
           </Box>
+
+          {/* Book Profile Cover Photo Banner if front photo selected for profile */}
+          {usePhotoForProfile && frontPhotoUrl && (
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                p: 1.5,
+                px: 2,
+                mb: 2.5,
+                borderRadius: '12px',
+                backgroundColor: '#fbf8f2',
+                border: '1px solid var(--border-parchment, #e8ded0)',
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                <img
+                  src={croppedCoverUrl || frontPhotoUrl}
+                  alt="Front cover preview"
+                  style={{
+                    width: 44,
+                    height: 60,
+                    objectFit: 'cover',
+                    borderRadius: '6px',
+                    border: '1px solid #d6cebf',
+                  }}
+                />
+                <Box>
+                  <Typography sx={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--primary-forest, #1b4332)' }}>
+                    Front Cover Attached as Book Profile
+                  </Typography>
+                  <Typography sx={{ fontSize: '0.78rem', color: '#57534e' }}>
+                    {croppedCoverUrl
+                      ? '✓ Cropped and ready for book profile'
+                      : 'Will prompt to crop & adjust when clicking "Add to library"'}
+                  </Typography>
+                </Box>
+              </Box>
+
+              <Button
+                type="button"
+                size="small"
+                variant="outlined"
+                startIcon={<CropIcon fontSize="small" />}
+                onClick={() => {
+                  setIsSubmittingOnCrop(false);
+                  setCropModalOpen(true);
+                }}
+                sx={{
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  fontSize: '0.8rem',
+                  borderRadius: '8px',
+                  borderColor: 'var(--primary-forest, #1b4332)',
+                  color: 'var(--primary-forest, #1b4332)',
+                  bgcolor: '#ffffff',
+                  '&:hover': { bgcolor: '#f4efe6' },
+                }}
+              >
+                {croppedCoverUrl ? 'Adjust Crop' : 'Crop Now'}
+              </Button>
+            </Box>
+          )}
 
           {/* Shelf No & Auto-generated Book ID */}
           <Grid container spacing={2} sx={{ mb: 1 }}>
@@ -871,6 +1049,17 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
         onClose={() => setIsScannerOpen(false)}
         onScanSuccess={handleScanSuccess}
       />
+
+      {/* Interactive Crop & Adjust Modal (Always uses Front Cover) */}
+      {frontPhotoUrl && (
+        <ImageCropModal
+          open={cropModalOpen}
+          imageSrc={frontPhotoUrl}
+          onClose={handleCropClose}
+          onCropSave={handleCropSave}
+          aspectRatio={13 / 18}
+        />
+      )}
     </Box>
   );
 };

@@ -464,73 +464,21 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
                 </div>
               </div>
 
-              {/* Status Badges */}
-              <div className={styles.headerBadgesRow}>
-                <Chip
-                  label={isAvailable ? 'Available' : 'Borrowed'}
-                  size="small"
-                  className={isAvailable ? styles.statusAvailPill : styles.statusBorrowedPill}
-                />
-                {!isAvailable && (
-                  <span className={styles.borrowedByPill}>
-                    Borrowed by {borrowerId}
-                  </span>
-                )}
-                {isEditing && (
-                  <>
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      startIcon={<CropIcon fontSize="small" />}
-                      onClick={() => {
-                        const imgSource = editCoverUrl || currentBook.cover_url || defaultCoverUrl;
-                        setRawImageToCrop(imgSource);
-                        setCropModalOpen(true);
-                      }}
-                      sx={{
-                        textTransform: 'none',
-                        fontWeight: 700,
-                        fontSize: '0.8rem',
-                        borderRadius: '8px',
-                        borderColor: 'var(--primary-forest, #1b4332)',
-                        color: 'var(--primary-forest, #1b4332)',
-                        bgcolor: '#f4efe6',
-                        py: 0.3,
-                        px: 1.2,
-                        '&:hover': {
-                          bgcolor: '#e8ded0',
-                          borderColor: 'var(--primary-forest, #1b4332)',
-                        },
-                      }}
-                    >
-                      Adjust Crop
-                    </Button>
-
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      startIcon={<PhotoCameraIcon fontSize="small" />}
-                      onClick={() => coverFileInputRef.current?.click()}
-                      sx={{
-                        textTransform: 'none',
-                        fontWeight: 700,
-                        fontSize: '0.8rem',
-                        borderRadius: '8px',
-                        borderColor: '#d6cebf',
-                        color: '#57534e',
-                        bgcolor: '#ffffff',
-                        py: 0.3,
-                        px: 1.2,
-                        '&:hover': {
-                          bgcolor: '#f5efe6',
-                        },
-                      }}
-                    >
-                      Upload New
-                    </Button>
-                  </>
-                )}
-              </div>
+              {/* Status Badges - Hidden when editing */}
+              {!isEditing && (
+                <div className={styles.headerBadgesRow}>
+                  <Chip
+                    label={isAvailable ? 'Available' : 'Borrowed'}
+                    size="small"
+                    className={isAvailable ? styles.statusAvailPill : styles.statusBorrowedPill}
+                  />
+                  {!isAvailable && (
+                    <span className={styles.borrowedByPill}>
+                      Borrowed by {borrowerId}
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -562,16 +510,11 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
               <span className={styles.cardTitle}>
                 {isEditing ? 'Edit Book Details' : 'Details'}
               </span>
-              {isEditing && (
-                <span className={styles.editingNoteText}>
-                  Editing in progress — Book ID is locked
-                </span>
-              )}
             </div>
 
             <div className={styles.detailsTable}>
               {/* Book ID - NON-EDITABLE per user prompt */}
-              <div className={styles.tableRow}>
+              <div className={`${styles.tableRow} ${isEditing ? styles.tableRowEditable : ''}`}>
                 <span className={styles.tableLabel}>Book ID</span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                   <span className={styles.tableValueNonEditable}>{currentBook.book_id}</span>
@@ -597,7 +540,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
 
               {isEditing ? (
                 <>
-                  <div className={styles.tableRow}>
+                  <div className={`${styles.tableRow} ${styles.tableRowEditable}`}>
                     <span className={styles.tableLabel}>Title</span>
                     <TextField
                       size="small"
@@ -609,7 +552,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
                     />
                   </div>
 
-                  <div className={styles.tableRow}>
+                  <div className={`${styles.tableRow} ${styles.tableRowEditable}`}>
                     <span className={styles.tableLabel}>Native Title</span>
                     <TextField
                       size="small"
@@ -621,7 +564,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
                     />
                   </div>
 
-                  <div className={styles.tableRow}>
+                  <div className={`${styles.tableRow} ${styles.tableRowEditable}`}>
                     <span className={styles.tableLabel}>Author</span>
                     <TextField
                       size="small"
@@ -633,7 +576,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
                     />
                   </div>
 
-                  <div className={styles.tableRow}>
+                  <div className={`${styles.tableRow} ${styles.tableRowEditable}`}>
                     <span className={styles.tableLabel}>Shelf location</span>
                     <TextField
                       size="small"
@@ -645,7 +588,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
                     />
                   </div>
 
-                  <div className={styles.tableRow}>
+                  <div className={`${styles.tableRow} ${styles.tableRowEditable}`}>
                     <span className={styles.tableLabel}>Availability</span>
                     <TextField
                       select
@@ -660,7 +603,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
                     </TextField>
                   </div>
 
-                  <div className={styles.tableRow}>
+                  <div className={`${styles.tableRow} ${styles.tableRowEditable}`}>
                     <span className={styles.tableLabel}>ISBN</span>
                     <TextField
                       size="small"
@@ -672,7 +615,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
                     />
                   </div>
 
-                  <div className={styles.tableRow}>
+                  <div className={`${styles.tableRow} ${styles.tableRowEditable}`}>
                     <span className={styles.tableLabel}>Publisher</span>
                     <TextField
                       size="small"
@@ -684,7 +627,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
                     />
                   </div>
 
-                  <div className={styles.tableRow}>
+                  <div className={`${styles.tableRow} ${styles.tableRowEditable}`}>
                     <span className={styles.tableLabel}>Year</span>
                     <TextField
                       size="small"
@@ -696,7 +639,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
                     />
                   </div>
 
-                  <div className={styles.tableRow}>
+                  <div className={`${styles.tableRow} ${styles.tableRowEditable}`}>
                     <span className={styles.tableLabel}>Edition</span>
                     <TextField
                       size="small"
@@ -708,7 +651,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
                     />
                   </div>
 
-                  <div className={styles.tableRow}>
+                  <div className={`${styles.tableRow} ${styles.tableRowEditable}`}>
                     <span className={styles.tableLabel}>Language</span>
                     <TextField
                       size="small"
@@ -720,7 +663,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
                     />
                   </div>
 
-                  <div className={styles.tableRow}>
+                  <div className={`${styles.tableRow} ${styles.tableRowEditable}`}>
                     <span className={styles.tableLabel}>Pages</span>
                     <TextField
                       size="small"
@@ -733,7 +676,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
                     />
                   </div>
 
-                  <div className={styles.tableRow}>
+                  <div className={`${styles.tableRow} ${styles.tableRowEditable}`}>
                     <span className={styles.tableLabel}>Tags / Genre</span>
                     <TextField
                       size="small"
@@ -745,7 +688,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
                     />
                   </div>
 
-                  <div className={styles.tableRow}>
+                  <div className={`${styles.tableRow} ${styles.tableRowEditable}`}>
                     <span className={styles.tableLabel}>Description</span>
                     <TextField
                       size="small"
