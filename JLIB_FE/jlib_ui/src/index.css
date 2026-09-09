@@ -52,9 +52,9 @@ body {
 }
 
 /* Global button border radius */
-button:not(.MuiIconButton-root),
-.MuiButton-root,
-.MuiButtonBase-root.MuiButton-root,
+button:not(.MuiIconButton-root):not(.MuiFab-root),
+.MuiButton-root:not(.MuiFab-root),
+.MuiButtonBase-root.MuiButton-root:not(.MuiFab-root),
 input[type="button"],
 input[type="submit"] {
   border-radius: 5px !important;
@@ -70,20 +70,17 @@ h6,
   font-family: var(--font-serif) !important;
 }
 
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+/* Hide scrollbars everywhere on UI while maintaining full scroll functionality */
+* {
+  -ms-overflow-style: none !important;  /* IE and Edge */
+  scrollbar-width: none !important;  /* Firefox */
 }
 
-::-webkit-scrollbar-track {
-  background: var(--bg-app);
-}
-
-::-webkit-scrollbar-thumb {
-  background: #d8ceaa;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #b5a894;
+*::-webkit-scrollbar,
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
 }

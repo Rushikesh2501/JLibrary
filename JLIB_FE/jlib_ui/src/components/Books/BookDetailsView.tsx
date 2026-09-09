@@ -913,11 +913,13 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
         <DialogContent sx={{ px: 3, pt: 1, pb: 1 }}>
           <Typography variant="body2" sx={{ color: '#444444', lineHeight: 1.6 }}>
             Are you sure you want to delete <strong>"{currentBook.book_name}"</strong> ({currentBook.book_id})?
+          </Typography>
+          <Typography variant="body2" sx={{ color: '#cf1322', fontWeight: 600, mt: 1, lineHeight: 1.5 }}>
             This will permanently remove it from the library catalog.
           </Typography>
 
           {deleteError && (
-            <Alert severity="error" sx={{ mt: 2, borderRadius: '10px' }}>
+            <Alert severity="error" sx={{ mt: 2, borderRadius: '5px' }}>
               {deleteError}
             </Alert>
           )}
@@ -934,10 +936,10 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
           </Button>
 
           <Button
-            variant="contained"
+            variant="outlined"
             onClick={handleConfirmDelete}
             disabled={isDeleting}
-            className={styles.dialogDeleteBtn}
+            className={styles.dialogConfirmDeleteBtn}
             startIcon={isDeleting ? <CircularProgress size={16} color="inherit" /> : <DeleteOutlineIcon />}
           >
             {isDeleting ? 'Deleting...' : 'Delete'}
