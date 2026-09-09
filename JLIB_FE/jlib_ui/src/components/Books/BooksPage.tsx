@@ -147,6 +147,13 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books: initialBooks }) => 
     );
   }
 
+  const handleUpdateBook = (updatedBook: Book) => {
+    setBooksList((prev) =>
+      prev.map((b) => (String(b.book_id) === String(updatedBook.book_id) ? updatedBook : b))
+    );
+    setSelectedBook(updatedBook);
+  };
+
   // If a book is selected, render the In-Page Details View
   if (selectedBook) {
     return (
@@ -154,6 +161,7 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books: initialBooks }) => 
         book={selectedBook}
         onBack={() => setSelectedBook(null)}
         onDelete={handleDeleteBook}
+        onUpdate={handleUpdateBook}
       />
     );
   }

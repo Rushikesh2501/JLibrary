@@ -1,0 +1,138 @@
+.dialogPaper {
+  border-radius: 20px !important;
+  background-color: #ffffff !important;
+  border: 1px solid var(--border-parchment, #e8ded0) !important;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.2) !important;
+  overflow: hidden !important;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 24px 12px 24px;
+  border-bottom: 1px solid var(--border-parchment, #e8ded0);
+}
+
+.modalTitle {
+  font-family: var(--font-serif, serif) !important;
+  font-weight: 700 !important;
+  font-size: 1.25rem !important;
+  color: var(--primary-forest, #1b4332) !important;
+  margin: 0 !important;
+}
+
+.cropperContainer {
+  position: relative;
+  width: 100%;
+  height: 380px;
+  background-color: #1a1a1a;
+}
+
+.controlsArea {
+  padding: 16px 24px 10px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background-color: #fcfbf9;
+}
+
+.sliderRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.controlLabel {
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  color: var(--text-secondary, #57534e) !important;
+  min-width: 50px;
+}
+
+.zoomIcon {
+  color: #78716c;
+  font-size: 20px !important;
+}
+
+.actionButtonsRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 24px 20px 24px;
+  background-color: #fcfbf9;
+  border-top: 1px solid var(--border-parchment, #e8ded0);
+}
+
+.rotateBtn {
+  text-transform: none !important;
+  font-weight: 700 !important;
+  font-size: 0.85rem !important;
+  color: var(--primary-forest, #1b4332) !important;
+  border: 1px solid var(--border-parchment, #e8ded0) !important;
+  background-color: #ffffff !important;
+  border-radius: 10px !important;
+  padding: 6px 14px !important;
+  transition: all 0.2s ease !important;
+}
+
+.rotateBtn:hover {
+  background-color: #f4efe6 !important;
+}
+
+.rightActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cancelBtn {
+  text-transform: none !important;
+  font-weight: 600 !important;
+  font-size: 0.88rem !important;
+  color: #57534e !important;
+  border-radius: 10px !important;
+  padding: 8px 16px !important;
+}
+
+.cancelBtn:hover {
+  background-color: #f4efe6 !important;
+}
+
+.applyBtn {
+  text-transform: none !important;
+  font-weight: 700 !important;
+  font-size: 0.88rem !important;
+  background-color: var(--primary-forest, #1b4332) !important;
+  color: #ffffff !important;
+  border-radius: 10px !important;
+  padding: 8px 20px !important;
+  box-shadow: 0 2px 8px rgba(27, 67, 50, 0.2) !important;
+  transition: all 0.2s ease !important;
+}
+
+.applyBtn:hover {
+  background-color: #2d5a27 !important;
+  box-shadow: 0 4px 12px rgba(27, 67, 50, 0.3) !important;
+}
+
+@media (max-width: 600px) {
+  .cropperContainer {
+    height: 300px;
+  }
+
+  .actionButtonsRow {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .rotateBtn,
+  .rightActions {
+    width: 100%;
+  }
+
+  .rightActions {
+    justify-content: flex-end;
+  }
+}

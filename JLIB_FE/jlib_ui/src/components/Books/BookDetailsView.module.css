@@ -145,6 +145,47 @@
   display: block;
 }
 
+.coverWrapperEditing {
+  cursor: pointer;
+  box-shadow: 0 0 0 3px var(--primary-forest, #1b4332), 0 14px 32px rgba(0, 0, 0, 0.25) !important;
+}
+
+.coverEditOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.52);
+  backdrop-filter: blur(2px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #ffffff;
+  opacity: 0.9;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+  z-index: 6;
+  cursor: pointer;
+}
+
+.coverWrapper:hover .coverEditOverlay {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.65);
+}
+
+.coverCameraIcon {
+  font-size: 26px !important;
+  color: #ffffff !important;
+}
+
+.coverEditText {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 0 4px;
+}
+
 .headerMainContent {
   display: flex;
   flex-direction: column;
@@ -203,6 +244,61 @@
   gap: 12px;
   border-top: 1px solid var(--border-parchment, #e8ded0);
   margin-top: 12px;
+}
+
+.whiteInfoTopRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.headerEditAction {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.editBtnGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cancelEditBtn {
+  background-color: #ffffff !important;
+  color: #57534e !important;
+  border: 1px solid #d6cebf !important;
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+  text-transform: none !important;
+  padding: 5px 14px !important;
+  border-radius: 10px !important;
+  transition: all 0.2s ease !important;
+}
+
+.cancelEditBtn:hover {
+  background-color: #f5efe6 !important;
+  color: #292524 !important;
+}
+
+.saveEditBtn {
+  background-color: var(--primary-forest, #1b4332) !important;
+  color: #ffffff !important;
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+  text-transform: none !important;
+  padding: 5px 16px !important;
+  border-radius: 10px !important;
+  box-shadow: 0 2px 8px rgba(27, 67, 50, 0.2) !important;
+  transition: all 0.2s ease !important;
+}
+
+.saveEditBtn:hover {
+  background-color: #2d5a27 !important;
+  box-shadow: 0 4px 12px rgba(27, 67, 50, 0.3) !important;
 }
 
 .bookMetaSub {
@@ -344,6 +440,60 @@
   font-weight: 700 !important;
   color: var(--primary-forest) !important;
   margin: 0 !important;
+}
+
+.editingNoteText {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--primary-forest, #1b4332);
+  background-color: #e8f5e9;
+  border: 1px solid #c8e6c9;
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+
+.tableValueNonEditable {
+  font-weight: 700;
+  color: #57534e;
+  font-size: 0.95rem;
+  font-family: 'Plus Jakarta Sans', monospace, sans-serif;
+}
+
+.readOnlyChip {
+  background-color: #f4efe6 !important;
+  color: #78716c !important;
+  border: 1px solid #e0d7c7 !important;
+  font-weight: 600 !important;
+  font-size: 0.72rem !important;
+  height: 22px !important;
+}
+
+.editInputField {
+  max-width: 480px;
+}
+
+.editInputField :global(.MuiOutlinedInput-root) {
+  background-color: #faf7f2;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.editInputField :global(.MuiOutlinedInput-root:hover fieldset) {
+  border-color: var(--primary-forest, #1b4332);
+}
+
+.editInputField :global(.MuiOutlinedInput-root.Mui-focused fieldset) {
+  border-color: var(--primary-forest, #1b4332);
+}
+
+.bottomEditActionsRow {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  padding-top: 16px;
+  margin-top: 8px;
+  border-top: 1px solid var(--border-parchment, #e8ded0);
 }
 
 .editBtn {
@@ -576,6 +726,37 @@
     align-items: center;
     text-align: center;
     width: 100%;
+  }
+
+  .whiteInfoTopRow {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .headerEditAction {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .editBtnGroup {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .editInputField {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .bottomEditActionsRow {
+    justify-content: stretch;
+    flex-direction: column-reverse;
+  }
+
+  .bottomEditActionsRow .cancelEditBtn,
+  .bottomEditActionsRow .saveEditBtn {
+    width: 100% !important;
   }
 
   .bookMetaSub {

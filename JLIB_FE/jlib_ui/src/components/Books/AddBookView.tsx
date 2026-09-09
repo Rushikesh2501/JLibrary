@@ -8,20 +8,10 @@ import {
   Grid,
   useMediaQuery,
   useTheme,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  IconButton,
   Tooltip,
 } from '@mui/material';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
-import CollectionsIcon from '@mui/icons-material/Collections';
-import CloseIcon from '@mui/icons-material/Close';
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import { BackButton } from '../common/BackButton';
@@ -192,12 +182,9 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
     onBack();
   };
 
-  // Photo tab State (Front and Back cover)
-  const [photoTarget, setPhotoTarget] = useState<'front' | 'back' | null>(null);
-  const frontGalleryInputRef = useRef<HTMLInputElement>(null);
-  const frontCameraInputRef = useRef<HTMLInputElement>(null);
-  const backGalleryInputRef = useRef<HTMLInputElement>(null);
-  const backCameraInputRef = useRef<HTMLInputElement>(null);
+  // Photo tab State (Front and Back cover - Default Native File Inputs)
+  const frontFileInputRef = useRef<HTMLInputElement>(null);
+  const backFileInputRef = useRef<HTMLInputElement>(null);
 
   const [frontPhoto, setFrontPhoto] = useState<File | null>(null);
   const [frontPhotoUrl, setFrontPhotoUrl] = useState<string | null>(null);
@@ -422,7 +409,7 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
                     handleFrontPhotoSelect(e.dataTransfer.files[0]);
                   }
                 }}
-                onClick={() => setPhotoTarget('front')}
+                onClick={() => frontFileInputRef.current?.click()}
               >
                 {frontPhotoUrl ? (
                   <Box className={styles.uploadedStateContainer}>
@@ -466,7 +453,7 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
                     handleBackPhotoSelect(e.dataTransfer.files[0]);
                   }
                 }}
-                onClick={() => setPhotoTarget('back')}
+                onClick={() => backFileInputRef.current?.click()}
               >
                 {backPhotoUrl ? (
                   <Box className={styles.uploadedStateContainer}>
@@ -495,34 +482,18 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
             </Grid>
           </Grid>
 
-          {/* Hidden File Inputs for Camera and Gallery */}
+          {/* Hidden File Inputs (Default Native Device Options) */}
           <input
-            ref={frontGalleryInputRef}
+            ref={frontFileInputRef}
             type="file"
             accept="image/*,.heic,.heif"
             style={{ display: 'none' }}
             onChange={(e) => e.target.files?.[0] && handleFrontPhotoSelect(e.target.files[0])}
           />
           <input
-            ref={frontCameraInputRef}
-            type="file"
-            accept="image/*"
-            capture="environment"
-            style={{ display: 'none' }}
-            onChange={(e) => e.target.files?.[0] && handleFrontPhotoSelect(e.target.files[0])}
-          />
-          <input
-            ref={backGalleryInputRef}
+            ref={backFileInputRef}
             type="file"
             accept="image/*,.heic,.heif"
-            style={{ display: 'none' }}
-            onChange={(e) => e.target.files?.[0] && handleBackPhotoSelect(e.target.files[0])}
-          />
-          <input
-            ref={backCameraInputRef}
-            type="file"
-            accept="image/*"
-            capture="environment"
             style={{ display: 'none' }}
             onChange={(e) => e.target.files?.[0] && handleBackPhotoSelect(e.target.files[0])}
           />
@@ -893,114 +864,6 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
           </Box>
         </form>
       )}
-
-      {/* Photo Source Choice Dialog (Camera vs Gallery) */}
-      <Dialog
-        open={Boolean(photoTarget)}
-        onClose={() => setPhotoTarget(null)}
-        slotProps={{
-          paper: {
-            sx: {
-              borderRadius: '20px',
-              padding: '12px 8px 16px 8px',
-              maxWidth: 400,
-              width: '90%',
-              backgroundColor: '#ffffff',
-            },
-          },
-        }}
-      >
-        <DialogTitle
-          sx={{
-            display: 'flex',
-            justify: 'space-between',
-            alignItems: 'center',
-            fontWeight: 700,
-            color: 'var(--primary-forest, #1b4332)',
-            fontFamily: 'var(--font-serif)',
-            fontSize: '1.25rem',
-            pb: 1,
-          }}
-        >
-          {photoTarget === 'front' ? 'Upload Front Cover' : 'Upload Back Cover'}
-          <IconButton onClick={() => setPhotoTarget(null)} size="small">
-            <CloseIcon fontSize="small" />
-          </IconButton>
-        </DialogTitle>
-
-        <DialogContent sx={{ pt: 1, pb: 1 }}>
-          <Typography variant="body2" sx={{ color: 'var(--text-secondary)', mb: 2.5 }}>
-            Choose how you would like to attach the {photoTarget === 'front' ? 'front' : 'back'} cover photo:
-          </Typography>
-
-          <List disablePadding>
-            <ListItemButton
-              onClick={() => {
-                const target = photoTarget;
-                setPhotoTarget(null);
-                setTimeout(() => {
-                  if (target === 'front') {
-                    frontCameraInputRef.current?.click();
-                  } else if (target === 'back') {
-                    backCameraInputRef.current?.click();
-                  }
-                }, 100);
-              }}
-              sx={{
-                borderRadius: '12px',
-                border: '1.5px solid var(--border-parchment, #e8ded0)',
-                mb: 1.5,
-                p: '14px 16px',
-                transition: 'all 0.2s ease',
-                '&:hover': {
-                  backgroundColor: '#f4efe6',
-                  borderColor: 'var(--primary-forest, #1b4332)',
-                },
-              }}
-            >
-              <ListItemIcon sx={{ color: 'var(--primary-forest, #1b4332)', minWidth: 44 }}>
-                <PhotoCameraIcon fontSize="medium" />
-              </ListItemIcon>
-              <ListItemText
-                primary={<Typography sx={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-primary)' }}>Take a photo</Typography>}
-                secondary={<Typography sx={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Use camera to capture cover</Typography>}
-              />
-            </ListItemButton>
-
-            <ListItemButton
-              onClick={() => {
-                const target = photoTarget;
-                setPhotoTarget(null);
-                setTimeout(() => {
-                  if (target === 'front') {
-                    frontGalleryInputRef.current?.click();
-                  } else if (target === 'back') {
-                    backGalleryInputRef.current?.click();
-                  }
-                }, 100);
-              }}
-              sx={{
-                borderRadius: '12px',
-                border: '1.5px solid var(--border-parchment, #e8ded0)',
-                p: '14px 16px',
-                transition: 'all 0.2s ease',
-                '&:hover': {
-                  backgroundColor: '#f4efe6',
-                  borderColor: 'var(--primary-forest, #1b4332)',
-                },
-              }}
-            >
-              <ListItemIcon sx={{ color: 'var(--primary-forest, #1b4332)', minWidth: 44 }}>
-                <CollectionsIcon fontSize="medium" />
-              </ListItemIcon>
-              <ListItemText
-                primary={<Typography sx={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-primary)' }}>Upload from gallery</Typography>}
-                secondary={<Typography sx={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Select photo from library</Typography>}
-              />
-            </ListItemButton>
-          </List>
-        </DialogContent>
-      </Dialog>
 
       {/* Barcode Scanner Modal */}
       <BarcodeScannerModal
