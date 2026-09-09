@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -16,6 +16,7 @@ import {
   ListItemIcon,
   ListItemText,
   IconButton,
+  Tooltip,
 } from '@mui/material';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
@@ -25,7 +26,7 @@ import EditNoteIcon from '@mui/icons-material/EditNote';
 import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import { BackButton } from '../common/BackButton';
 import { AnimatedDots } from '../common/AnimatedDots';
-import { fetchBookDetailsByIsbn, fetchBookDetailsByPhoto } from '../../services/bookService';
+import { fetchBookDetailsByIsbn, fetchBookDetailsByPhoto, formatLanguageName, getNextBookId, cleanDiacritics, determineNativeTitle, iastToDevanagari } from '../../services/bookService';
 import { BarcodeScannerModal } from './BarcodeScannerModal';
 import styles from './AddBookView.module.css';
 
@@ -52,6 +53,9 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
   const isTouchOrTablet = useMediaQuery(theme.breakpoints.down('md'));
 
   // Form State
+  const [shelfNo, setShelfNo] = useState('');
+  const [bookId, setBookId] = useState('');
+  const [isFetchingBookId, setIsFetchingBookId] = useState(false);
   const [title, setTitle] = useState('');
   const [nativeTitle, setNativeTitle] = useState('');
   const [authors, setAuthors] = useState('');
@@ -74,16 +78,20 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
     try {
       const details = await fetchBookDetailsByIsbn(targetIsbn);
       if (details && (details.title || details.authors)) {
-        if (details.title) setTitle(details.title);
-        if (details.nativeTitle) setNativeTitle(details.nativeTitle);
-        if (details.authors) setAuthors(details.authors);
-        if (details.publisher) setPublisher(details.publisher);
+        const langName = details.language ? formatLanguageName(details.language) : 'English';
+        const cleanTitle = cleanDiacritics(details.title || '');
+        const computedNative = determineNativeTitle(details.title || '', details.nativeTitle || '', langName);
+
+        if (cleanTitle) setTitle(cleanTitle);
+        setNativeTitle(computedNative);
+        if (details.authors) setAuthors(cleanDiacritics(details.authors));
+        if (details.publisher) setPublisher(cleanDiacritics(details.publisher));
         if (details.publishedDate) setYear(details.publishedDate);
         if (details.pageCount) setPages(details.pageCount);
-        if (details.language) setLanguage(details.language);
+        setLanguage(langName);
         if (details.edition) setEdition(details.edition);
         if (details.categories) setTags(details.categories);
-        if (details.description) setDescription(details.description);
+        if (details.description) setDescription(cleanDiacritics(details.description));
         setHasIsbnFound(true);
         setIsFormEditable(false);
       } else {
@@ -109,11 +117,57 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
     executeLookupForIsbn(scannedIsbn);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Automatically compute the next sequential Book ID when Shelf No changes (e.g. shelf A -> A-1, A-2, etc.)
+  useEffect(() => {
+    const trimmedShelf = shelfNo.trim().toUpperCase();
+    if (!trimmedShelf) {
+      setBookId('');
+      setIsFetchingBookId(false);
+      return;
+    }
+
+    const cleanPrefix = trimmedShelf.endsWith('-') ? trimmedShelf : `${trimmedShelf}-`;
+    let isMounted = true;
+    setIsFetchingBookId(true);
+
+    const timer = setTimeout(async () => {
+      try {
+        const nextId = await getNextBookId(cleanPrefix);
+        if (isMounted) {
+          setBookId(nextId);
+        }
+      } catch (err) {
+        if (isMounted) {
+          setBookId(`${cleanPrefix}1`);
+        }
+      } finally {
+        if (isMounted) {
+          setIsFetchingBookId(false);
+        }
+      }
+    }, 200);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+    };
+  }, [shelfNo]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim()) return;
+    if (!title.trim() || !shelfNo.trim()) return;
+
+    let finalBookId = bookId;
+    const upperShelf = shelfNo.trim().toUpperCase();
+    if (!finalBookId) {
+      const cleanPrefix = upperShelf.endsWith('-') ? upperShelf : `${upperShelf}-`;
+      finalBookId = await getNextBookId(cleanPrefix);
+    }
 
     const newBookData = {
+      book_id: finalBookId,
+      shelf_no: upperShelf,
+      section: upperShelf,
       book_name: title,
       native_title: nativeTitle,
       book_name_native_lang: nativeTitle,
@@ -121,7 +175,6 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
 
       genre: tags ? tags.split(',')[0].trim() : 'General',
       publication: publisher || 'Self Published',
-      section: 'General',
       description: description,
       is_available: status === 'Owned',
       status: status,
@@ -166,16 +219,20 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
     try {
       const details = await fetchBookDetailsByPhoto(frontPhoto, backPhoto);
       if (details && (details.title || details.authors)) {
-        if (details.title) setTitle(details.title);
-        if (details.nativeTitle) setNativeTitle(details.nativeTitle);
-        if (details.authors) setAuthors(details.authors);
-        if (details.publisher) setPublisher(details.publisher);
+        const langName = details.language ? formatLanguageName(details.language) : 'English';
+        const cleanTitle = cleanDiacritics(details.title || '');
+        const computedNative = determineNativeTitle(details.title || '', details.nativeTitle || '', langName);
+
+        if (cleanTitle) setTitle(cleanTitle);
+        setNativeTitle(computedNative);
+        if (details.authors) setAuthors(cleanDiacritics(details.authors));
+        if (details.publisher) setPublisher(cleanDiacritics(details.publisher));
         if (details.publishedDate) setYear(details.publishedDate);
         if (details.pageCount) setPages(details.pageCount);
-        if (details.language) setLanguage(details.language);
+        setLanguage(langName);
         if (details.edition) setEdition(details.edition);
         if (details.categories) setTags(details.categories);
-        if (details.description) setDescription(details.description);
+        if (details.description) setDescription(cleanDiacritics(details.description));
         if (details.isbn) setIsbn(details.isbn);
         setHasPhotoFound(true);
       } else {
@@ -223,11 +280,28 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
     reader.readAsDataURL(file);
   };
 
-  // Condition to show Review & Save details section
   const shouldShowDetailsForm =
     activeTab === 'manual' ||
     (activeTab === 'isbn' && hasIsbnFound) ||
     (activeTab === 'photo' && hasPhotoFound);
+
+  // Mandatory fields validation and tooltip for Add to library button
+  const missingMandatoryFields: string[] = [];
+  if (!shelfNo.trim()) {
+    missingMandatoryFields.push('Shelf No');
+  }
+  if (!title.trim()) {
+    missingMandatoryFields.push('Title');
+  }
+
+  const isSubmitDisabled = missingMandatoryFields.length > 0 || isFetchingBookId;
+
+  const submitTooltipText =
+    missingMandatoryFields.length > 0
+      ? `Please enter mandatory field${missingMandatoryFields.length > 1 ? 's' : ''}: ${missingMandatoryFields.join(', ')}`
+      : isFetchingBookId
+        ? 'Calculating next Book ID...'
+        : '';
 
   return (
     <Box className={styles.container}>
@@ -512,16 +586,75 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
             )}
           </Box>
 
+          {/* Shelf No & Auto-generated Book ID */}
+          <Grid container spacing={2} sx={{ mb: 1 }}>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Box className={styles.fieldGroup}>
+                <Typography className={styles.fieldLabel}>
+                  Shelf No <span className={styles.requiredStar}>*</span>
+                </Typography>
+                <TextField
+                  fullWidth
+                  size="small"
+                  variant="outlined"
+                  placeholder='A/B/C'
+                  value={shelfNo}
+                  onChange={(e) => setShelfNo(e.target.value.toUpperCase())}
+                  required
+                  slotProps={{
+                    htmlInput: {
+                      style: { textTransform: 'uppercase', fontWeight: 600 },
+                    },
+                  }}
+                  className={styles.inputField}
+                />
+              </Box>
+            </Grid>
+
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Box className={styles.fieldGroup}>
+                <Typography className={styles.fieldLabel}>
+                  Book ID (Auto-assigned)
+                </Typography>
+                <TextField
+                  fullWidth
+                  size="small"
+                  variant="outlined"
+                  value={
+                    shelfNo.trim()
+                      ? (isFetchingBookId ? 'Finding next ID...' : bookId)
+                      : ''
+                  }
+                  disabled
+                  slotProps={{
+                    htmlInput: {
+                      style: { fontWeight: 700, letterSpacing: '0.5px' },
+                    },
+                  }}
+                  className={styles.inputField}
+                />
+              </Box>
+            </Grid>
+          </Grid>
+
           {/* Title */}
           <Box className={styles.fieldGroup}>
-            <Typography className={styles.fieldLabel}>Title *</Typography>
+            <Typography className={styles.fieldLabel}>
+              Title <span className={styles.requiredStar}>*</span>
+            </Typography>
             <TextField
               fullWidth
               size="small"
               variant="outlined"
               value={title}
               disabled={hasIsbnFound && !isFormEditable}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) => {
+                const clean = cleanDiacritics(e.target.value);
+                setTitle(clean);
+                if (language.toLowerCase() !== 'marathi') {
+                  setNativeTitle(clean);
+                }
+              }}
               required
               className={styles.inputField}
             />
@@ -554,7 +687,7 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
               placeholder="Jane Doe, John Roe"
               value={authors}
               disabled={hasIsbnFound && !isFormEditable}
-              onChange={(e) => setAuthors(e.target.value)}
+              onChange={(e) => setAuthors(cleanDiacritics(e.target.value))}
               className={styles.inputField}
             />
           </Box>
@@ -584,7 +717,7 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
                   variant="outlined"
                   value={publisher}
                   disabled={hasIsbnFound && !isFormEditable}
-                  onChange={(e) => setPublisher(e.target.value)}
+                  onChange={(e) => setPublisher(cleanDiacritics(e.target.value))}
                   className={styles.inputField}
                 />
               </Box>
@@ -628,7 +761,18 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
                   variant="outlined"
                   value={language}
                   disabled={hasIsbnFound && !isFormEditable}
-                  onChange={(e) => setLanguage(e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    const formatted = val ? formatLanguageName(val) : '';
+                    setLanguage(formatted);
+                    if (formatted.toLowerCase() === 'marathi') {
+                      if (!nativeTitle || nativeTitle === title) {
+                        setNativeTitle(iastToDevanagari(title));
+                      }
+                    } else if (formatted) {
+                      setNativeTitle(title);
+                    }
+                  }}
                   className={styles.inputField}
                 />
               </Box>
@@ -707,15 +851,35 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
 
           {/* Actions Row: Add to library & Red Cancel Button */}
           <Box className={styles.actionButtonsRow} sx={{ flexDirection: { xs: 'column', sm: 'row' }, width: '100%', gap: 1.75 }}>
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={!title.trim()}
-              className={styles.submitButton}
-              sx={{ width: { xs: '100%', sm: 'auto' } }}
+            <Tooltip
+              title={isSubmitDisabled ? submitTooltipText : ''}
+              arrow
+              placement="top"
+              disableHoverListener={!isSubmitDisabled}
+              slotProps={{
+                tooltip: {
+                  sx: {
+                    fontSize: '0.85rem',
+                    py: 0.75,
+                    px: 1.5,
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 14px rgba(0,0,0,0.18)',
+                  },
+                },
+              }}
             >
-              Add to library
-            </Button>
+              <span className={styles.submitButtonWrapper}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  disabled={isSubmitDisabled}
+                  className={styles.submitButton}
+                  sx={{ width: { xs: '100%', sm: 'auto' } }}
+                >
+                  Add to library
+                </Button>
+              </span>
+            </Tooltip>
 
             <Button
               type="button"

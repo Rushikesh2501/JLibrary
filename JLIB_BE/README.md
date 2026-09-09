@@ -148,7 +148,7 @@ You can test `GET /`, `GET /health`, and `GET /books/` interactively directly fr
 
 ## 6. How to Use `GET /books/` as a Pattern for Remaining APIs
 
-When you are ready to add new APIs (e.g. `GET /books/{book_id}`, `POST /books/`, `PUT /books/{book_id}`, `DELETE /books/{book_id}`):
+When you are ready to add new APIs (e.g. `GET /books/{book_id}`, `POST /books/`, `PUT /books/{book_id}`, `DELETE /books/delete-book/{book_id}`):
 
 ### Step 1: Add Pydantic Schemas (`app/schemas/book.py`)
 Define request payloads or updated response shapes:

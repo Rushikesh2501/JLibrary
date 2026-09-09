@@ -1,20 +1,37 @@
 import React, { useState } from 'react';
-import { Button, Tooltip, IconButton, Chip } from '@mui/material';
+import {
+  Button,
+  Tooltip,
+  IconButton,
+  Chip,
+  Dialog,
+  DialogContent,
+  DialogActions,
+  Typography,
+  CircularProgress,
+  Alert,
+} from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CheckIcon from '@mui/icons-material/Check';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';
+import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 import { IBook as Book } from 'interfaces/book-interface/ibook';
+import { deleteBook } from '../../services/bookService';
 import styles from './BookDetailsView.module.css';
 
 interface BookDetailsViewProps {
   book: Book;
   onBack: () => void;
+  onDelete?: (bookId: string | number) => void;
 }
 
+const BOOK_PLACEHOLDER_URL = '/assets/book-placeholder.png';
+
 const getBookCoverUrl = (book: Book, numericId: number): string => {
-  if (book.cover_url) return book.cover_url;
+  if (book.cover_url && book.cover_url.trim()) return book.cover_url.trim();
 
   const nameLower = (book.book_name || '').toLowerCase();
   if (nameLower.includes('boy who harnessed')) {
@@ -39,15 +56,7 @@ const getBookCoverUrl = (book: Book, numericId: number): string => {
     return 'https://m.media-amazon.com/images/I/81q77Q39nEL._AC_UF1000,1000_QL80_.jpg';
   }
 
-  const sampleCovers = [
-    'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=400&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1532012197267-da84d127e765?w=400&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=400&auto=format&fit=crop&q=80',
-  ];
-  return sampleCovers[Math.abs(numericId) % sampleCovers.length];
+  return BOOK_PLACEHOLDER_URL;
 };
 
 const getBookSummaryData = (book: Book) => {
@@ -93,11 +102,33 @@ const getBookSummaryData = (book: Book) => {
   };
 };
 
-export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack }) => {
+export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, onDelete }) => {
   const [activeTab, setActiveTab] = useState<'Overview' | 'Summary'>('Overview');
   const [reflection, setReflection] = useState('');
   const [copiedId, setCopiedId] = useState(false);
   const [copiedUserId, setCopiedUserId] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  const handleConfirmDelete = async () => {
+    setIsDeleting(true);
+    setDeleteError(null);
+    try {
+      await deleteBook(String(book.book_id));
+      setIsDeleteDialogOpen(false);
+      if (onDelete) {
+        onDelete(book.book_id);
+      } else {
+        onBack();
+      }
+    } catch (err: any) {
+      console.error('Failed to delete book:', err);
+      setDeleteError(err.message || 'Failed to delete book. Please try again.');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const handleCopyBookId = () => {
     navigator.clipboard.writeText(String(book.book_id));
@@ -137,7 +168,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack }
 
   return (
     <div className={styles.profileContainer}>
-      {/* Top Left Back Button */}
+      {/* Top Action Row with Back Button on Left and Circular Delete Button on Right */}
       <div className={styles.backButtonRow}>
         <Button
           variant="outlined"
@@ -147,6 +178,19 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack }
         >
           Back to Books List
         </Button>
+
+        <Tooltip title="Delete Book">
+          <IconButton
+            onClick={() => {
+              setDeleteError(null);
+              setIsDeleteDialogOpen(true);
+            }}
+            className={styles.circleDeleteButton}
+            aria-label="Delete book"
+          >
+            <DeleteOutlineIcon />
+          </IconButton>
+        </Tooltip>
       </div>
 
       {/* Box 1: Book Profile Header Card */}
@@ -160,7 +204,17 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack }
         {/* Side-by-Side Header Info on Desktop / Centered on Mobile */}
         <div className={styles.profileHeader}>
           <div className={styles.coverWrapper}>
-            <img src={coverUrl} alt={book.book_name} className={styles.coverImage} />
+            <img
+              src={coverUrl}
+              alt={book.book_name}
+              className={styles.coverImage}
+              onError={(e) => {
+                const target = e.currentTarget;
+                if (!target.src.endsWith(BOOK_PLACEHOLDER_URL)) {
+                  target.src = BOOK_PLACEHOLDER_URL;
+                }
+              }}
+            />
           </div>
 
           <div className={styles.headerMainContent}>
@@ -343,8 +397,82 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack }
           </div>
         )}
       </div>
+
+      {/* Delete Book Confirmation Dialog */}
+      <Dialog
+        open={isDeleteDialogOpen}
+        onClose={() => !isDeleting && setIsDeleteDialogOpen(false)}
+        maxWidth="xs"
+        fullWidth
+        slotProps={{ paper: { className: styles.dialogPaper } }}
+      >
+        <div className={styles.dialogHeader}>
+          <div className={styles.dialogWarnIconWrap}>
+            <WarningAmberRoundedIcon fontSize="medium" />
+          </div>
+          <div>
+            <Typography className={styles.dialogTitleText}>
+              Delete Book
+            </Typography>
+            <Typography variant="caption" sx={{ color: '#777777', display: 'block', mt: 0.2 }}>
+              Confirm permanent deletion
+            </Typography>
+          </div>
+        </div>
+
+        <DialogContent className={styles.dialogContent}>
+          <Typography className={styles.dialogDescription}>
+            Are you sure you want to delete this book? This will permanently remove it from the library collection and database.
+          </Typography>
+
+          {/* Book Details Summary Card */}
+          <div className={styles.dialogBookCard}>
+            <div className={styles.dialogBookRow}>
+              <span className={styles.dialogBookName}>{book.book_name}</span>
+              <Chip label={`ID #${book.book_id}`} size="small" className={styles.dialogBookIdBadge} />
+            </div>
+            {(book.book_name_native_lang || book.native_title) && (
+              <span className={styles.dialogBookNativeTitle}>
+                {book.book_name_native_lang || book.native_title}
+              </span>
+            )}
+            <div className={styles.dialogBookAuthor}>
+              Author: <strong>{book.author || 'Unknown'}</strong>
+            </div>
+            <div className={styles.dialogBookExtra}>
+              {book.genre && <span>Genre: <strong>{book.genre}</strong></span>}
+              {book.section && <span>Section: <strong>{book.section}</strong></span>}
+            </div>
+          </div>
+
+          {deleteError && (
+            <Alert severity="error" sx={{ mt: 2, borderRadius: '10px' }}>
+              {deleteError}
+            </Alert>
+          )}
+        </DialogContent>
+
+        <DialogActions className={styles.dialogActions}>
+          <Button
+            onClick={() => setIsDeleteDialogOpen(false)}
+            disabled={isDeleting}
+            className={styles.dialogCancelBtn}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmDelete}
+            disabled={isDeleting}
+            startIcon={isDeleting ? <CircularProgress size={16} color="inherit" /> : <DeleteOutlineIcon />}
+            className={styles.dialogConfirmDeleteBtn}
+          >
+            {isDeleting ? 'Deleting...' : 'Delete Book'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
 
 export default BookDetailsView;
+

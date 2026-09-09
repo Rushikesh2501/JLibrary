@@ -10,8 +10,10 @@ interface BookCardProps {
   viewMode?: 'grid' | 'list';
 }
 
+const BOOK_PLACEHOLDER_URL = '/assets/book-placeholder.png';
+
 const getBookCoverUrl = (book: Book, numericId: number): string => {
-  if (book.cover_url) return book.cover_url;
+  if (book.cover_url && book.cover_url.trim()) return book.cover_url.trim();
 
   const nameLower = (book.book_name || '').toLowerCase();
   if (nameLower.includes('boy who harnessed')) {
@@ -36,15 +38,7 @@ const getBookCoverUrl = (book: Book, numericId: number): string => {
     return 'https://m.media-amazon.com/images/I/81q77Q39nEL._AC_UF1000,1000_QL80_.jpg';
   }
 
-  const sampleCovers = [
-    'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=400&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1532012197267-da84d127e765?w=400&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=400&auto=format&fit=crop&q=80',
-  ];
-  return sampleCovers[Math.abs(numericId) % sampleCovers.length];
+  return BOOK_PLACEHOLDER_URL;
 };
 
 export const BookCard: React.FC<BookCardProps> = ({
@@ -89,7 +83,14 @@ export const BookCard: React.FC<BookCardProps> = ({
             src={coverUrl}
             alt={book.book_name}
             className={styles.coverImage}
-            onError={() => setImgError(true)}
+            onError={(e) => {
+              const target = e.currentTarget;
+              if (!target.src.endsWith(BOOK_PLACEHOLDER_URL)) {
+                target.src = BOOK_PLACEHOLDER_URL;
+              } else {
+                setImgError(true);
+              }
+            }}
           />
         ) : (
           <Box className={styles.fallbackCover} style={{ background: bgGradient }}>

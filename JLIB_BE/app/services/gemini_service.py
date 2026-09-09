@@ -3,6 +3,7 @@ import logging
 from google import genai
 from google.genai import types
 from app.core.config import settings
+from app.services.openlibrary_service import format_language_name, remove_diacritics, iast_to_devanagari
 
 logger = logging.getLogger(__name__)
 
@@ -76,17 +77,22 @@ If the ISBN does not match any known book in your database, return an empty JSON
                     import re
                     clean_title = re.sub(r'\s*\([A-Za-z\s]+\)$', '', raw_title).strip()
                     native_title = data.get("nativeTitle") or data.get("native_title") or ""
-                    authors = data.get("authors") or data.get("author") or ""
+                    lang = format_language_name(data.get("language", ""))
+                    final_title = remove_diacritics(clean_title)
+                    if lang.lower() == "marathi":
+                        final_native = native_title if (native_title and any("\u0900" <= c <= "\u097F" for c in native_title)) else iast_to_devanagari(native_title or clean_title)
+                    else:
+                        final_native = final_title
 
                     return {
-                        "title": clean_title,
-                        "nativeTitle": native_title,
-                        "authors": authors,
-                        "publisher": data.get("publisher", ""),
+                        "title": final_title,
+                        "nativeTitle": final_native,
+                        "authors": remove_diacritics(authors),
+                        "publisher": remove_diacritics(data.get("publisher", "")),
                         "publishedDate": str(data.get("publishedDate") or data.get("published_date") or data.get("year") or ""),
-                        "description": data.get("description", ""),
+                        "description": remove_diacritics(data.get("description", "")),
                         "pageCount": str(data.get("pageCount") or data.get("pages") or data.get("page_count") or ""),
-                        "language": data.get("language", ""),
+                        "language": lang,
                         "edition": data.get("edition", "First edition"),
                         "categories": data.get("categories", ""),
                         "coverUrl": data.get("coverUrl", ""),
@@ -191,18 +197,23 @@ Return ONLY a valid JSON object matching this schema:
                 if raw_title:
                     import re
                     clean_title = re.sub(r'\s*\([A-Za-z\s]+\)$', '', raw_title).strip()
-                    native_title = data.get("nativeTitle") or data.get("native_title") or ""
                     authors = data.get("authors") or data.get("author") or ""
+                    lang = format_language_name(data.get("language", ""))
+                    final_title = remove_diacritics(clean_title)
+                    if lang.lower() == "marathi":
+                        final_native = native_title if (native_title and any("\u0900" <= c <= "\u097F" for c in native_title)) else iast_to_devanagari(native_title or clean_title)
+                    else:
+                        final_native = final_title
 
                     return {
-                        "title": clean_title,
-                        "nativeTitle": native_title,
-                        "authors": authors,
-                        "publisher": data.get("publisher", ""),
+                        "title": final_title,
+                        "nativeTitle": final_native,
+                        "authors": remove_diacritics(authors),
+                        "publisher": remove_diacritics(data.get("publisher", "")),
                         "publishedDate": str(data.get("publishedDate") or data.get("published_date") or data.get("year") or ""),
-                        "description": data.get("description", ""),
+                        "description": remove_diacritics(data.get("description", "")),
                         "pageCount": str(data.get("pageCount") or data.get("pages") or data.get("page_count") or ""),
-                        "language": data.get("language", ""),
+                        "language": lang,
                         "edition": data.get("edition", "First edition"),
                         "categories": data.get("categories", ""),
                         "coverUrl": data.get("coverUrl", ""),

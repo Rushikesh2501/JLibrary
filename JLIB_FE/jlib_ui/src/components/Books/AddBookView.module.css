@@ -367,6 +367,16 @@
   font-weight: 600 !important;
   color: var(--text-primary) !important;
   margin-bottom: 6px !important;
+  display: flex;
+  align-items: center;
+}
+
+.requiredStar {
+  color: #d32f2f !important;
+  font-weight: 700 !important;
+  font-size: 1.05rem !important;
+  line-height: 1 !important;
+  margin-left: 3px;
 }
 
 .inputField fieldset {
@@ -434,12 +444,16 @@
   transform: translateY(-1px);
 }
 
-.submitButton:disabled {
-  background-color: #8ab09a !important;
-  opacity: 0.55 !important;
-  color: rgba(255, 255, 255, 0.8) !important;
+.submitButton:disabled,
+.submitButton:global(.Mui-disabled) {
+  background-color: #e5e0d8 !important;
+  color: #9c9488 !important;
   box-shadow: none !important;
   cursor: not-allowed !important;
+  border: 1px solid #dcd5c9 !important;
+  opacity: 1 !important;
+  transform: none !important;
+  pointer-events: auto !important;
 }
 
 /* Red Cancel Button with White Background & Red Border */
@@ -461,11 +475,20 @@
   color: #c62828 !important;
 }
 
+.submitButtonWrapper {
+  display: inline-flex;
+}
+
 @media (max-width: 600px) {
   .actionButtonsRow {
     flex-direction: column !important;
     align-items: stretch !important;
     gap: 10px !important;
+  }
+
+  .submitButtonWrapper {
+    width: 100% !important;
+    display: flex !important;
   }
 
   .submitButton,
@@ -478,3 +501,4 @@
     text-align: center !important;
   }
 }
+

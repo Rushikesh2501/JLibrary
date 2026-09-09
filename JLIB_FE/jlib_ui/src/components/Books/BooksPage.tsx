@@ -119,18 +119,23 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books: initialBooks }) => 
 
   const handleAddNewBook = async (newBookData: any) => {
     try {
-      const savedBook = await createBook(newBookData);
+      const shelfPrefix = newBookData.shelf_no ? `${newBookData.shelf_no}-` : 'JL-';
+      const savedBook = await createBook(newBookData, shelfPrefix);
       setBooksList((prev) => [savedBook, ...prev]);
     } catch (err) {
       console.error('Failed to create book in backend:', err);
       const fallbackBook: Book = {
-        book_id: `JL-${Date.now()}`,
+        book_id: newBookData.book_id || (newBookData.shelf_no ? `${newBookData.shelf_no}-1` : `JL-${Date.now()}`),
         ...newBookData,
       };
       setBooksList((prev) => [fallbackBook, ...prev]);
     }
   };
 
+  const handleDeleteBook = (deletedId: string | number) => {
+    setBooksList((prev) => prev.filter((b) => String(b.book_id) !== String(deletedId)));
+    setSelectedBook(null);
+  };
 
   // If Add Book view is active, render full-page AddBookView (in-page, no popup)
   if (isAddBookViewActive) {
@@ -148,6 +153,7 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books: initialBooks }) => 
       <BookDetailsView
         book={selectedBook}
         onBack={() => setSelectedBook(null)}
+        onDelete={handleDeleteBook}
       />
     );
   }

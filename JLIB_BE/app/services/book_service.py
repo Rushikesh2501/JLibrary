@@ -23,18 +23,22 @@ def get_next_book_id(db: Session, prefix: str = "JL-") -> str:
     """
     Finds the highest number of added books with the given prefix (default 'JL-'),
     e.g. JL-10 -> next is JL-11. If none exist, returns JL-1.
-    Later, this supports shelf IDs (e.g. prefix='A1-').
+    Supports shelf IDs (e.g. prefix='A' -> 'A-1', 'A-2', etc.).
     """
+    clean_prefix = (prefix or "JL-").strip().upper()
+    if not clean_prefix.endswith("-"):
+        clean_prefix = f"{clean_prefix}-"
+
     books_with_prefix = (
         db.query(Book.book_id)
-        .filter(Book.book_id.like(f"{prefix}%"))
+        .filter(Book.book_id.like(f"{clean_prefix}%"))
         .all()
     )
 
     max_num = 0
     for (bid,) in books_with_prefix:
-        if bid and bid.startswith(prefix):
-            suffix = bid[len(prefix):]
+        if bid and bid.startswith(clean_prefix):
+            suffix = bid[len(clean_prefix):]
             m = re.match(r"^(\d+)", suffix)
             if m:
                 try:
@@ -44,7 +48,7 @@ def get_next_book_id(db: Session, prefix: str = "JL-") -> str:
                 except ValueError:
                     pass
 
-    return f"{prefix}{max_num + 1}"
+    return f"{clean_prefix}{max_num + 1}"
 
 
 def create_book(db: Session, book_in: BookCreate, prefix: str = "JL-") -> Book:
