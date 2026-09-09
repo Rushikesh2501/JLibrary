@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import { Box, Typography, Paper, Button } from '@mui/material';
-import FilterAltOffIcon from '@mui/icons-material/FilterAltOff';
 import AddIcon from '@mui/icons-material/Add';
 import { IBook as Book } from 'interfaces/book-interface/ibook';
 import { BookSearch } from './BookSearch';
@@ -20,9 +19,7 @@ interface BooksPageProps {
 export const BooksPage: React.FC<BooksPageProps> = ({ books: initialBooks }) => {
   const [booksList, setBooksList] = useState<Book[]>(initialBooks);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedGenre, setSelectedGenre] = useState('ALL');
-  const [selectedSection, setSelectedSection] = useState('ALL');
-  const [selectedAvailability, setSelectedAvailability] = useState('ALL');
+  const [sortBy, setSortBy] = useState('DEFAULT');
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [isAddBookViewActive, setIsAddBookViewActive] = useState(false);
 
@@ -31,61 +28,9 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books: initialBooks }) => 
     setBooksList(initialBooks);
   }, [initialBooks]);
 
-  // Helper to determine availability
-  const isBookAvailable = (b: Book): boolean => {
-    if (b.availability_status) {
-      return b.availability_status.toLowerCase() === 'available';
-    }
-    if (typeof b.is_available === 'boolean') {
-      return b.is_available;
-    }
-    if (b.status) {
-      return b.status.toLowerCase().includes('avail') || b.status.toLowerCase().includes('in lib');
-    }
-    const strId = String(b.book_id);
-    const num = parseInt(strId.replace(/\D/g, ''), 10) || 1;
-    return num % 3 !== 0;
-  };
-
-  // Extract unique genres dynamically
-  const genres = useMemo(() => {
-    const set = new Set<string>();
-    booksList.forEach((b) => {
-      if (b.genre && b.genre.trim()) {
-        set.add(b.genre.trim());
-      }
-    });
-    return Array.from(set).sort();
-  }, [booksList]);
-
-  // Extract unique sections dynamically
-  const sections = useMemo(() => {
-    const set = new Set<string>();
-    booksList.forEach((b) => {
-      if (b.section && b.section.trim()) {
-        set.add(b.section.trim());
-      }
-    });
-    return Array.from(set).sort();
-  }, [booksList]);
-
-  // Filter books locally in real-time
+  // Filter and sort books locally in real-time
   const filteredBooks = useMemo(() => {
-    return booksList.filter((book) => {
-      if (selectedAvailability !== 'ALL') {
-        const avail = isBookAvailable(book);
-        if (selectedAvailability === 'Available' && !avail) return false;
-        if (selectedAvailability === 'Borrowed' && avail) return false;
-      }
-
-      if (selectedGenre !== 'ALL' && book.genre !== selectedGenre) {
-        return false;
-      }
-
-      if (selectedSection !== 'ALL' && book.section !== selectedSection) {
-        return false;
-      }
-
+    const result = booksList.filter((book) => {
       if (searchTerm.trim()) {
         const query = searchTerm.toLowerCase().trim();
         const matchesName = book.book_name?.toLowerCase().includes(query);
@@ -102,31 +47,84 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books: initialBooks }) => 
 
       return true;
     });
-  }, [booksList, searchTerm, selectedGenre, selectedSection, selectedAvailability]);
 
-  const isFilterActive =
-    selectedGenre !== 'ALL' ||
-    selectedSection !== 'ALL' ||
-    selectedAvailability !== 'ALL' ||
-    searchTerm.trim() !== '';
+    if (sortBy === 'ASCENDING') {
+      return [...result].sort((a, b) => {
+        const titleA = (a.book_name || '').trim();
+        const titleB = (b.book_name || '').trim();
+        return titleA.localeCompare(titleB, 'en', { sensitivity: 'base', numeric: true });
+      });
+    }
+
+    if (sortBy === 'DESCENDING') {
+      return [...result].sort((a, b) => {
+        const titleA = (a.book_name || '').trim();
+        const titleB = (b.book_name || '').trim();
+        return titleB.localeCompare(titleA, 'en', { sensitivity: 'base', numeric: true });
+      });
+    }
+
+    if (sortBy === 'DATE_ADDED') {
+      return [...result].sort((a, b) => {
+        const timeA = a.created_at || a.date_added ? new Date(a.created_at || a.date_added!).getTime() : 0;
+        const timeB = b.created_at || b.date_added ? new Date(b.created_at || b.date_added!).getTime() : 0;
+        if (timeA && timeB && timeA !== timeB) return timeB - timeA;
+
+        const numA = parseInt(String(a.book_id).replace(/\D/g, ''), 10) || 0;
+        const numB = parseInt(String(b.book_id).replace(/\D/g, ''), 10) || 0;
+        return numB - numA;
+      });
+    }
+
+    if (sortBy === 'DATE_MODIFIED') {
+      return [...result].sort((a, b) => {
+        const timeA = a.updated_at || a.date_modified || a.created_at || a.date_added
+          ? new Date(a.updated_at || a.date_modified || a.created_at || a.date_added!).getTime()
+          : 0;
+        const timeB = b.updated_at || b.date_modified || b.created_at || b.date_added
+          ? new Date(b.updated_at || b.date_modified || b.created_at || b.date_added!).getTime()
+          : 0;
+        if (timeA && timeB && timeA !== timeB) return timeB - timeA;
+
+        const numA = parseInt(String(a.book_id).replace(/\D/g, ''), 10) || 0;
+        const numB = parseInt(String(b.book_id).replace(/\D/g, ''), 10) || 0;
+        return numB - numA;
+      });
+    }
+
+    return result;
+  }, [booksList, searchTerm, sortBy]);
+
+  const isFilterActive = sortBy !== 'DEFAULT' || searchTerm.trim() !== '';
 
   const handleClearFilters = () => {
-    setSelectedGenre('ALL');
-    setSelectedSection('ALL');
-    setSelectedAvailability('ALL');
+    setSortBy('DEFAULT');
     setSearchTerm('');
   };
 
   const handleAddNewBook = async (newBookData: any) => {
     try {
       const shelfPrefix = newBookData.shelf_no ? `${newBookData.shelf_no}-` : 'JL-';
+      const now = new Date().toISOString();
       const savedBook = await createBook(newBookData, shelfPrefix);
-      setBooksList((prev) => [savedBook, ...prev]);
+      const bookWithTime: Book = {
+        ...savedBook,
+        created_at: savedBook.created_at || now,
+        updated_at: savedBook.updated_at || now,
+        date_added: savedBook.date_added || now,
+        date_modified: savedBook.date_modified || now,
+      };
+      setBooksList((prev) => [bookWithTime, ...prev]);
     } catch (err) {
       console.error('Failed to create book in backend:', err);
+      const now = new Date().toISOString();
       const fallbackBook: Book = {
         book_id: newBookData.book_id || (newBookData.shelf_no ? `${newBookData.shelf_no}-1` : `JL-${Date.now()}`),
         ...newBookData,
+        created_at: now,
+        updated_at: now,
+        date_added: now,
+        date_modified: now,
       };
       setBooksList((prev) => [fallbackBook, ...prev]);
     }
@@ -148,10 +146,16 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books: initialBooks }) => 
   }
 
   const handleUpdateBook = (updatedBook: Book) => {
+    const now = new Date().toISOString();
+    const bookWithTime: Book = {
+      ...updatedBook,
+      updated_at: now,
+      date_modified: now,
+    };
     setBooksList((prev) =>
-      prev.map((b) => (String(b.book_id) === String(updatedBook.book_id) ? updatedBook : b))
+      prev.map((b) => (String(b.book_id) === String(updatedBook.book_id) ? bookWithTime : b))
     );
-    setSelectedBook(updatedBook);
+    setSelectedBook(bookWithTime);
   };
 
   // If a book is selected, render the In-Page Details View
@@ -196,27 +200,13 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books: initialBooks }) => 
 
           <Box sx={{ width: { xs: '100%', lg: 'auto' }, flexShrink: 0 }}>
             <BookFilters
-              genres={genres}
-              sections={sections}
-              selectedGenre={selectedGenre}
-              selectedSection={selectedSection}
-              selectedAvailability={selectedAvailability}
-              onGenreChange={setSelectedGenre}
-              onSectionChange={setSelectedSection}
-              onAvailabilityChange={setSelectedAvailability}
+              sortBy={sortBy}
+              isFilterActive={isFilterActive}
+              onSortChange={setSortBy}
+              onClearFilters={handleClearFilters}
             />
           </Box>
         </Paper>
-
-        <Button
-          variant="outlined"
-          disabled={!isFilterActive}
-          onClick={handleClearFilters}
-          startIcon={<FilterAltOffIcon fontSize="small" />}
-          className={styles.outerClearButton}
-        >
-          Clear Filters
-        </Button>
       </Box>
 
       {/* List View or Empty State */}

@@ -51,6 +51,15 @@ body {
   font-family: var(--font-sans) !important;
 }
 
+/* Global button border radius */
+button:not(.MuiIconButton-root),
+.MuiButton-root,
+.MuiButtonBase-root.MuiButton-root,
+input[type="button"],
+input[type="submit"] {
+  border-radius: 5px !important;
+}
+
 h1,
 h2,
 h3,

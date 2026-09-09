@@ -1,92 +1,56 @@
 import React from 'react';
-import { Box, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { Box, FormControl, InputLabel, Select, MenuItem, Button } from '@mui/material';
+import FilterAltOffIcon from '@mui/icons-material/FilterAltOff';
 import styles from './BookFilters.module.css';
 
 interface BookFiltersProps {
-  genres: string[];
-  sections: string[];
-  selectedGenre: string;
-  selectedSection: string;
-  selectedAvailability: string;
-  onGenreChange: (genre: string) => void;
-  onSectionChange: (section: string) => void;
-  onAvailabilityChange: (availability: string) => void;
+  sortBy: string;
+  isFilterActive: boolean;
+  onSortChange: (sortBy: string) => void;
+  onClearFilters: () => void;
 }
 
 export const BookFilters: React.FC<BookFiltersProps> = ({
-  genres,
-  sections,
-  selectedGenre,
-  selectedSection,
-  selectedAvailability,
-  onGenreChange,
-  onSectionChange,
-  onAvailabilityChange,
+  sortBy,
+  isFilterActive,
+  onSortChange,
+  onClearFilters,
 }) => {
   return (
     <Box className={styles.filterContainer}>
       <FormControl size="small" className={styles.formControl}>
-        <InputLabel id="genre-filter-label" sx={{ color: 'var(--text-muted)' }}>
-          Genre
+        <InputLabel id="sort-filter-label" sx={{ color: 'var(--text-muted)' }}>
+          Sort By
         </InputLabel>
         <Select
-          labelId="genre-filter-label"
-          id="genre-filter"
-          value={selectedGenre}
-          label="Genre"
-          onChange={(e) => onGenreChange(e.target.value)}
+          labelId="sort-filter-label"
+          id="sort-filter"
+          value={sortBy}
+          label="Sort By"
+          onChange={(e) => onSortChange(e.target.value)}
           className={styles.selectField}
         >
-          <MenuItem value="ALL">All Genres</MenuItem>
-          {genres.map((genre) => (
-            <MenuItem key={genre} value={genre}>
-              {genre}
-            </MenuItem>
-          ))}
+          <MenuItem value="DEFAULT">Reset</MenuItem>
+          <MenuItem value="ASCENDING">A-Z</MenuItem>
+          <MenuItem value="DESCENDING">Z-A</MenuItem>
+          <MenuItem value="DATE_ADDED">Date Added</MenuItem>
+          <MenuItem value="DATE_MODIFIED">Date Modified</MenuItem>
         </Select>
       </FormControl>
 
-      <FormControl size="small" className={styles.formControl}>
-        <InputLabel id="availability-filter-label" sx={{ color: 'var(--text-muted)' }}>
-          Availability
-        </InputLabel>
-        <Select
-          labelId="availability-filter-label"
-          id="availability-filter"
-          value={selectedAvailability}
-          label="Availability"
-          onChange={(e) => onAvailabilityChange(e.target.value)}
-          className={styles.selectField}
-        >
-          <MenuItem value="ALL">All Statuses</MenuItem>
-          <MenuItem value="Available">Available</MenuItem>
-          <MenuItem value="Borrowed">Borrowed</MenuItem>
-        </Select>
-      </FormControl>
-
-      <FormControl size="small" className={styles.formControl}>
-        <InputLabel id="section-filter-label" sx={{ color: 'var(--text-muted)' }}>
-          Section / Shelf
-        </InputLabel>
-        <Select
-          labelId="section-filter-label"
-          id="section-filter"
-          value={selectedSection}
-          label="Section / Shelf"
-          onChange={(e) => onSectionChange(e.target.value)}
-          className={styles.selectField}
-        >
-          <MenuItem value="ALL">All Sections</MenuItem>
-          {sections.map((section) => (
-            <MenuItem key={section} value={section}>
-              Shelf {section}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+      <Button
+        variant="outlined"
+        disabled={!isFilterActive}
+        onClick={onClearFilters}
+        startIcon={<FilterAltOffIcon fontSize="small" />}
+        className={styles.clearButton}
+      >
+        Clear Filters
+      </Button>
     </Box>
   );
 };
+
 
 
 

@@ -19,6 +19,10 @@ export interface Book {
   description?: string;
   native_title?: string;
   book_name_native_lang?: string | null;
+  created_at?: string;
+  updated_at?: string;
+  date_added?: string;
+  date_modified?: string;
 }
 
 

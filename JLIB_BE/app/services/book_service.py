@@ -1,7 +1,9 @@
 import re
+from datetime import date
 from sqlalchemy.orm import Session
 from app.models.book import Book
 from app.schemas.book import BookCreate, BookUpdate
+
 
 
 def get_all_books(db: Session) -> list[Book]:
@@ -73,6 +75,8 @@ def create_book(db: Session, book_in: BookCreate, prefix: str = "JL-") -> Book:
         availability_status=book_in.availability_status or "Available",
         borrowed_by=book_in.borrowed_by,
         number_of_times_borrowed=0,
+        date_added=book_in.date_added or date.today(),
+        date_modified=book_in.date_modified or date.today(),
     )
     db.add(db_book)
     db.commit()
@@ -98,6 +102,10 @@ def update_book(db: Session, book_id: str, book_update: BookUpdate) -> Book | No
     for field, value in update_data.items():
         if hasattr(db_book, field):
             setattr(db_book, field, value)
+
+    # Always update date_modified on update unless explicitly set
+    if "date_modified" not in update_data:
+        db_book.date_modified = date.today()
 
     db.commit()
     db.refresh(db_book)

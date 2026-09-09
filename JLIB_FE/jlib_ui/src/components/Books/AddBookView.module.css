@@ -15,7 +15,7 @@
   text-transform: none !important;
   font-weight: 700 !important;
   font-size: 0.9rem !important;
-  border-radius: 12px !important;
+  border-radius: 5px !important;
   padding: 8px 18px !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
   transition: all 0.2s ease !important;
@@ -230,7 +230,7 @@
   background-color: #123d2b !important;
   color: #ffffff !important;
   text-transform: none !important;
-  border-radius: 10px !important;
+  border-radius: 5px !important;
   padding: 10px 20px !important;
   font-weight: 700 !important;
   font-size: 0.9rem !important;
@@ -247,7 +247,7 @@
   background-color: var(--primary-forest) !important;
   color: #ffffff !important;
   text-transform: none !important;
-  border-radius: 12px !important;
+  border-radius: 5px !important;
   padding: 10px 24px !important;
   font-weight: 700 !important;
   font-size: 0.95rem !important;
@@ -270,7 +270,7 @@
   background-color: var(--primary-forest) !important;
   color: #ffffff !important;
   text-transform: none !important;
-  border-radius: 10px !important;
+  border-radius: 5px !important;
   padding: 8px 24px !important;
   font-weight: 700 !important;
   font-size: 0.9rem !important;
@@ -297,7 +297,7 @@
   background-color: var(--primary-forest) !important;
   color: #ffffff !important;
   text-transform: none !important;
-  border-radius: 12px !important;
+  border-radius: 5px !important;
   padding: 10px 22px !important;
   font-weight: 700 !important;
   box-shadow: none !important;
@@ -311,7 +311,7 @@
   border: 1px solid var(--border-parchment) !important;
   color: var(--text-primary) !important;
   text-transform: none !important;
-  border-radius: 12px !important;
+  border-radius: 5px !important;
   padding: 10px 22px !important;
   font-weight: 600 !important;
   background-color: #ffffff !important;
@@ -430,7 +430,7 @@
   background-color: var(--primary-forest, #1b4332) !important;
   color: #ffffff !important;
   text-transform: none !important;
-  border-radius: 12px !important;
+  border-radius: 5px !important;
   padding: 10px 26px !important;
   font-weight: 700 !important;
   font-size: 0.95rem !important;
@@ -462,7 +462,7 @@
   color: #d32f2f !important;
   border: 1.5px solid #d32f2f !important;
   text-transform: none !important;
-  border-radius: 12px !important;
+  border-radius: 5px !important;
   padding: 10px 26px !important;
   font-weight: 700 !important;
   font-size: 0.95rem !important;

@@ -1,4 +1,5 @@
-from sqlalchemy import Integer, Text
+from datetime import date
+from sqlalchemy import Integer, Text, Date
 from sqlalchemy.orm import Mapped, mapped_column
 from app.core.database import Base
 
@@ -16,10 +17,13 @@ class Book(Base):
     availability_status: Mapped[str] = mapped_column(Text, nullable=False, default="Available")
     borrowed_by: Mapped[str | None] = mapped_column(Text, nullable=True)
     book_name_native_lang: Mapped[str | None] = mapped_column(Text, nullable=True)
+    date_added: Mapped[date | None] = mapped_column(Date, nullable=True)
+    date_modified: Mapped[date | None] = mapped_column(Date, nullable=True)
 
     @property
     def native_title(self) -> str | None:
         return self.book_name_native_lang
+
 
 
 

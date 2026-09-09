@@ -25,7 +25,7 @@
   text-transform: none !important;
   font-weight: 700 !important;
   font-size: 0.9rem !important;
-  border-radius: 12px !important;
+  border-radius: 5px !important;
   padding: 8px 18px !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
   transition: all 0.2s ease !important;
@@ -306,7 +306,7 @@
   font-weight: 700 !important;
   text-transform: none !important;
   padding: 5px 14px !important;
-  border-radius: 10px !important;
+  border-radius: 5px !important;
   transition: all 0.2s ease !important;
 }
 
@@ -322,7 +322,7 @@
   font-weight: 700 !important;
   text-transform: none !important;
   padding: 5px 16px !important;
-  border-radius: 10px !important;
+  border-radius: 5px !important;
   box-shadow: 0 2px 8px rgba(27, 67, 50, 0.2) !important;
   transition: all 0.2s ease !important;
 }
@@ -526,7 +526,7 @@
   font-weight: 700 !important;
   text-transform: none !important;
   padding: 6px 18px !important;
-  border-radius: 10px !important;
+  border-radius: 5px !important;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03) !important;
 }
 
@@ -542,7 +542,7 @@
   font-weight: 700 !important;
   text-transform: none !important;
   padding: 7px 18px !important;
-  border-radius: 10px !important;
+  border-radius: 5px !important;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03) !important;
 }
 
@@ -953,7 +953,7 @@
 }
 
 .dialogCancelBtn {
-  border-radius: 12px !important;
+  border-radius: 5px !important;
   text-transform: none !important;
   font-weight: 600 !important;
   color: #555555 !important;
@@ -963,7 +963,7 @@
 }
 
 .dialogConfirmDeleteBtn {
-  border-radius: 12px !important;
+  border-radius: 5px !important;
   text-transform: none !important;
   font-weight: 700 !important;
   background-color: #cf1322 !important;

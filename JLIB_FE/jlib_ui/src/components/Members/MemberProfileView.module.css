@@ -22,7 +22,7 @@
   text-transform: none !important;
   font-weight: 700 !important;
   font-size: 0.9rem !important;
-  border-radius: 12px !important;
+  border-radius: 5px !important;
   padding: 8px 18px !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
   transition: all 0.2s ease !important;
@@ -158,7 +158,7 @@
   color: #ffffff !important;
   text-transform: none !important;
   font-weight: 700 !important;
-  border-radius: 10px !important;
+  border-radius: 5px !important;
   padding: 10px 24px !important;
 }
 
@@ -167,7 +167,7 @@
   color: var(--text-primary) !important;
   text-transform: none !important;
   font-weight: 600 !important;
-  border-radius: 10px !important;
+  border-radius: 5px !important;
   padding: 10px 24px !important;
 }
 
