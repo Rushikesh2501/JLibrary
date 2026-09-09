@@ -484,6 +484,73 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
                   </>
                 )}
               </Box>
+
+              {/* Option to use Front Cover photo for book profile - Mobile view only (below front cover drag area) */}
+              {frontPhoto && (
+                <Box
+                  sx={{
+                    display: { xs: 'flex', md: 'none' },
+                    flexDirection: 'column',
+                    width: '100%',
+                    mt: 1.5,
+                    gap: 1.25,
+                    p: 1.5,
+                    borderRadius: '12px',
+                    backgroundColor: '#fbf8f2',
+                    border: '1px solid var(--border-parchment, #e8ded0)',
+                    boxSizing: 'border-box',
+                  }}
+                >
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        size="small"
+                        checked={usePhotoForProfile}
+                        onChange={(e) => setUsePhotoForProfile(e.target.checked)}
+                        sx={{
+                          color: 'var(--primary-forest, #1b4332)',
+                          '&.Mui-checked': { color: 'var(--primary-forest, #1b4332)' },
+                          p: 0.5,
+                          mr: 0.5,
+                        }}
+                      />
+                    }
+                    label={
+                      <Typography sx={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--primary-forest, #1b4332)', lineHeight: 1.3 }}>
+                        Use this front cover for book profile
+                      </Typography>
+                    }
+                    sx={{ m: 0, width: '100%', alignItems: 'center' }}
+                  />
+
+                  {usePhotoForProfile && (
+                    <Button
+                      fullWidth
+                      size="small"
+                      variant="outlined"
+                      startIcon={<CropIcon fontSize="small" />}
+                      onClick={() => {
+                        setIsSubmittingOnCrop(false);
+                        setCropModalOpen(true);
+                      }}
+                      sx={{
+                        width: '100%',
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        fontSize: '0.85rem',
+                        borderRadius: '8px',
+                        borderColor: 'var(--primary-forest, #1b4332)',
+                        color: 'var(--primary-forest, #1b4332)',
+                        bgcolor: '#ffffff',
+                        py: 0.75,
+                        '&:hover': { bgcolor: '#f4efe6' },
+                      }}
+                    >
+                      {croppedCoverUrl ? 'Adjust crop' : 'Crop now'}
+                    </Button>
+                  )}
+                </Box>
+              )}
             </Grid>
 
             {/* Back Cover Box */}
@@ -531,13 +598,13 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
             </Grid>
           </Grid>
 
-          {/* Option to use Front Cover photo for book profile - 100% Full Width, ONLY shown when frontPhoto exists */}
+          {/* Option to use Front Cover photo for book profile - Desktop view (100% full width below grid) */}
           {frontPhoto && (
             <Box
               sx={{
                 width: '100%',
                 mt: 2,
-                display: 'flex',
+                display: { xs: 'none', md: 'flex' },
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 p: 1.5,
@@ -562,7 +629,7 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
                 }
                 label={
                   <Typography sx={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--primary-forest, #1b4332)' }}>
-                    Use this photo for book profile
+                    Use this front cover for book profile
                   </Typography>
                 }
                 sx={{ m: 0 }}
@@ -626,7 +693,7 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
                   {isExtractingPhoto ? (
                     <span>Extracting book details with Gemini<AnimatedDots /></span>
                   ) : (
-                    'Auto-fill book details from photo'
+                    'Auto-fill book details'
                   )}
                 </Button>
 
