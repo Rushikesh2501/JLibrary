@@ -65,6 +65,29 @@
   border-top: 1px solid var(--border-parchment, #e8ded0);
 }
 
+.leftActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.changePhotoBtn {
+  text-transform: none !important;
+  font-weight: 700 !important;
+  font-size: 0.85rem !important;
+  color: var(--primary-forest, #1b4332) !important;
+  border: 1px solid var(--border-parchment, #e8ded0) !important;
+  background-color: #ffffff !important;
+  border-radius: 10px !important;
+  padding: 6px 14px !important;
+  transition: all 0.2s ease !important;
+}
+
+.changePhotoBtn:hover {
+  background-color: #f4efe6 !important;
+  border-color: var(--primary-forest, #1b4332) !important;
+}
+
 .rotateBtn {
   text-transform: none !important;
   font-weight: 700 !important;
@@ -124,15 +147,37 @@
 
   .actionButtonsRow {
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
   }
 
-  .rotateBtn,
+  .leftActions,
   .rightActions {
     width: 100%;
+    display: flex;
+    gap: 10px;
   }
 
-  .rightActions {
-    justify-content: flex-end;
+  .changePhotoBtn,
+  .rotateBtn,
+  .cancelBtn,
+  .applyBtn {
+    flex: 1;
+    padding: 10px 12px !important;
+    font-size: 0.85rem !important;
+    border-radius: 10px !important;
+    justify-content: center !important;
+    display: inline-flex !important;
+    align-items: center !important;
+  }
+
+  .cancelBtn {
+    border: 1px solid var(--border-parchment, #e8ded0) !important;
+    background-color: #ffffff !important;
+    color: #57534e !important;
+    font-weight: 700 !important;
+  }
+
+  .cancelBtn:hover {
+    background-color: #f4efe6 !important;
   }
 }

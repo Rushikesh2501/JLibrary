@@ -186,6 +186,37 @@
   padding: 0 4px;
 }
 
+.coverDeleteBtn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  color: #d32f2f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.coverDeleteBtn:hover {
+  background: #fee2e2;
+  color: #b91c1c;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+}
+
+.coverDeleteIcon {
+  font-size: 16px !important;
+}
+
 .headerMainContent {
   display: flex;
   flex-direction: column;

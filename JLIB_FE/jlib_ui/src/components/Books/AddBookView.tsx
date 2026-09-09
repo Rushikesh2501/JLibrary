@@ -1124,6 +1124,7 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
           imageSrc={frontPhotoUrl}
           onClose={handleCropClose}
           onCropSave={handleCropSave}
+          onImageSrcChange={(newSrc) => setFrontPhotoUrl(newSrc)}
           aspectRatio={13 / 18}
         />
       )}

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import Cropper, { Area, Point } from 'react-easy-crop';
 import 'react-easy-crop/react-easy-crop.css';
 import {
@@ -16,6 +16,7 @@ import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import RotateRightIcon from '@mui/icons-material/RotateRight';
 import CheckIcon from '@mui/icons-material/Check';
+import PhotoCameraOutlinedIcon from '@mui/icons-material/PhotoCameraOutlined';
 import styles from './ImageCropModal.module.css';
 
 interface ImageCropModalProps {
@@ -23,6 +24,7 @@ interface ImageCropModalProps {
   imageSrc: string;
   onClose: () => void;
   onCropSave: (croppedDataUrl: string) => void;
+  onImageSrcChange?: (newImageDataUrl: string) => void;
   aspectRatio?: number;
 }
 
@@ -101,8 +103,16 @@ export const ImageCropModal: React.FC<ImageCropModalProps> = ({
   imageSrc,
   onClose,
   onCropSave,
+  onImageSrcChange,
   aspectRatio = 13 / 18, // Default portrait book cover ratio (130px / 180px)
 }) => {
+  const [currentSrc, setCurrentSrc] = useState(imageSrc);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setCurrentSrc(imageSrc);
+  }, [imageSrc]);
+
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState(0);
@@ -117,12 +127,31 @@ export const ImageCropModal: React.FC<ImageCropModalProps> = ({
     setRotation((prev) => (prev + 90) % 360);
   };
 
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          const newSrc = event.target.result as string;
+          setCurrentSrc(newSrc);
+          setCrop({ x: 0, y: 0 });
+          setZoom(1);
+          setRotation(0);
+          onImageSrcChange?.(newSrc);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+    e.target.value = '';
+  };
+
   const handleApply = async () => {
-    if (!croppedAreaPixels || !imageSrc) return;
+    if (!croppedAreaPixels || !currentSrc) return;
     setIsProcessing(true);
     try {
       const croppedImage = await getCroppedImg(
-        imageSrc,
+        currentSrc,
         croppedAreaPixels,
         rotation
       );
@@ -156,9 +185,9 @@ export const ImageCropModal: React.FC<ImageCropModalProps> = ({
 
       <DialogContent sx={{ p: 0 }}>
         <div className={styles.cropperContainer}>
-          {imageSrc && (
+          {currentSrc && (
             <Cropper
-              image={imageSrc}
+              image={currentSrc}
               crop={crop}
               zoom={zoom}
               rotation={rotation}
@@ -192,14 +221,24 @@ export const ImageCropModal: React.FC<ImageCropModalProps> = ({
         </div>
 
         <div className={styles.actionButtonsRow}>
-          <Button
-            startIcon={<RotateRightIcon />}
-            onClick={handleRotate}
-            className={styles.rotateBtn}
-            disabled={isProcessing}
-          >
-            Rotate 90°
-          </Button>
+          <Box className={styles.leftActions}>
+            <Button
+              startIcon={<PhotoCameraOutlinedIcon fontSize="small" />}
+              onClick={() => fileInputRef.current?.click()}
+              className={styles.changePhotoBtn}
+              disabled={isProcessing}
+            >
+              Change Photo
+            </Button>
+            <Button
+              startIcon={<RotateRightIcon fontSize="small" />}
+              onClick={handleRotate}
+              className={styles.rotateBtn}
+              disabled={isProcessing}
+            >
+              Rotate 90°
+            </Button>
+          </Box>
 
           <Box className={styles.rightActions}>
             <Button
@@ -225,6 +264,15 @@ export const ImageCropModal: React.FC<ImageCropModalProps> = ({
               {isProcessing ? 'Cropping...' : 'Set Cover'}
             </Button>
           </Box>
+
+          {/* Hidden File Input for Changing Photo */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*,.heic,.heif"
+            style={{ display: 'none' }}
+            onChange={handleFileInputChange}
+          />
         </div>
       </DialogContent>
     </Dialog>

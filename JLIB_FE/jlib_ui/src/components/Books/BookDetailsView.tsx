@@ -236,7 +236,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
       availability_status: editAvailability,
       is_available: editAvailability === 'Available',
       description: editDescription.trim() || undefined,
-      ...(editCoverUrl ? { cover_url: editCoverUrl } : {}),
+      ...(editCoverUrl !== null ? { cover_url: editCoverUrl === BOOK_PLACEHOLDER_URL ? BOOK_PLACEHOLDER_URL : editCoverUrl } : {}),
     };
 
     try {
@@ -308,7 +308,25 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
     : (yearMatch ? yearMatch[0] : 'NA');
 
   const defaultCoverUrl = getBookCoverUrl(currentBook, numericId);
-  const activeCoverUrl = editCoverUrl || currentBook.cover_url || defaultCoverUrl;
+  const activeCoverUrl = editCoverUrl
+    ? editCoverUrl
+    : (currentBook.cover_url !== undefined && currentBook.cover_url !== null
+        ? (currentBook.cover_url.trim() ? currentBook.cover_url : BOOK_PLACEHOLDER_URL)
+        : defaultCoverUrl);
+  const isPlaceholder = !activeCoverUrl || activeCoverUrl === BOOK_PLACEHOLDER_URL || activeCoverUrl.endsWith('book-placeholder.png');
+
+  const handleDeleteCover = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (isEditing) {
+      setEditCoverUrl(BOOK_PLACEHOLDER_URL);
+    } else {
+      const updated: Book = { ...currentBook, cover_url: BOOK_PLACEHOLDER_URL };
+      setCurrentBook(updated);
+      onUpdate?.(updated);
+    }
+  };
+
   const summaryData = getBookSummaryData(currentBook);
 
   const displayIsbn = currentBook.isbn || `978${1984816000 + (numericId * 13) % 9999}`;
@@ -359,8 +377,8 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
             className={`${styles.coverWrapper} ${isEditing ? styles.coverWrapperEditing : ''}`}
             onClick={() => {
               if (isEditing) {
-                if (editCoverUrl) {
-                  setRawImageToCrop(editCoverUrl);
+                if (!isPlaceholder) {
+                  setRawImageToCrop(activeCoverUrl);
                   setCropModalOpen(true);
                 } else {
                   coverFileInputRef.current?.click();
@@ -382,10 +400,24 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
               }}
             />
 
+            {/* Small Delete Icon on Top Right Corner of Profile Cover */}
+            {!isPlaceholder && (
+              <Tooltip title="Remove photo">
+                <button
+                  type="button"
+                  className={styles.coverDeleteBtn}
+                  onClick={handleDeleteCover}
+                  aria-label="Remove photo"
+                >
+                  <DeleteOutlineIcon className={styles.coverDeleteIcon} />
+                </button>
+              </Tooltip>
+            )}
+
             {/* Edit Photo Overlay when in Edit Mode */}
             {isEditing && (
               <div className={styles.coverEditOverlay}>
-                {editCoverUrl ? (
+                {!isPlaceholder ? (
                   <>
                     <CropIcon className={styles.coverCameraIcon} />
                     <span className={styles.coverEditText}>Adjust Crop</span>
@@ -393,7 +425,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
                 ) : (
                   <>
                     <PhotoCameraIcon className={styles.coverCameraIcon} />
-                    <span className={styles.coverEditText}>Change Photo</span>
+                    <span className={styles.coverEditText}>Upload Photo</span>
                   </>
                 )}
               </div>
@@ -851,6 +883,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
             setRawImageToCrop(null);
           }}
           onCropSave={handleCropSave}
+          onImageSrcChange={(newSrc) => setRawImageToCrop(newSrc)}
           aspectRatio={13 / 18}
         />
       )}
