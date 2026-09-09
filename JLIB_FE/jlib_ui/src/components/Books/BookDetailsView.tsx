@@ -400,8 +400,8 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
               }}
             />
 
-            {/* Small Delete Icon on Top Right Corner of Profile Cover */}
-            {!isPlaceholder && (
+            {/* Small Delete Icon on Top Right Corner of Profile Cover (Editing Mode only) */}
+            {isEditing && !isPlaceholder && (
               <Tooltip title="Remove photo">
                 <button
                   type="button"

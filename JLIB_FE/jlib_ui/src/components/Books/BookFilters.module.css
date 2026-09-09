@@ -8,18 +8,20 @@
 .formControl {
   min-width: 170px !important;
   background-color: var(--bg-card) !important;
-  border-radius: 10px !important;
+  border-radius: 8px !important;
 }
 
-.selectField fieldset {
+.selectField fieldset,
+.selectField :global(.MuiOutlinedInput-root) {
   border-color: var(--border-parchment) !important;
+  border-radius: 8px !important;
 }
 
 .clearButton {
   height: 40px !important;
   min-height: 40px !important;
   max-height: 40px !important;
-  border-radius: 5px !important;
+  border-radius: 8px !important;
   border: 1px solid var(--primary-forest, #1b4332) !important;
   background-color: var(--primary-forest, #1b4332) !important;
   color: #ffffff !important;

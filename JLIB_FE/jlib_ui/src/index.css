@@ -52,12 +52,12 @@ body {
 }
 
 /* Global button border radius */
-button:not(.MuiIconButton-root):not(.MuiFab-root),
-.MuiButton-root:not(.MuiFab-root),
-.MuiButtonBase-root.MuiButton-root:not(.MuiFab-root),
+button:not(.MuiIconButton-root):not(.MuiFab-root):not([class*="tabBtn"]):not([class*="coverDeleteBtn"]):not([class*="round"]):not([class*="circle"]),
+.MuiButton-root:not(.MuiFab-root):not([class*="tabBtn"]):not([class*="coverDeleteBtn"]):not([class*="round"]):not([class*="circle"]),
+.MuiButtonBase-root.MuiButton-root:not(.MuiFab-root):not([class*="tabBtn"]):not([class*="coverDeleteBtn"]):not([class*="round"]):not([class*="circle"]),
 input[type="button"],
 input[type="submit"] {
-  border-radius: 5px !important;
+  border-radius: 8px !important;
 }
 
 h1,

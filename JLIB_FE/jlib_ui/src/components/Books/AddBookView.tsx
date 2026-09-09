@@ -1066,7 +1066,7 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
           </Grid>
 
           {/* Actions Row: Add to library & Red Cancel Button */}
-          <Box className={styles.actionButtonsRow} sx={{ flexDirection: { xs: 'column', sm: 'row' }, width: '100%', gap: 1.75 }}>
+          <Box className={styles.actionButtonsRow} sx={{ flexDirection: { xs: 'column', sm: 'row' }, justifyContent: { xs: 'stretch', sm: 'flex-end' }, width: '100%', gap: 1.75 }}>
             <Tooltip
               title={isSubmitDisabled ? submitTooltipText : ''}
               arrow

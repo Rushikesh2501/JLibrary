@@ -10,6 +10,7 @@ import {
   IconButton,
   CircularProgress,
   Box,
+  Tooltip,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
@@ -222,47 +223,62 @@ export const ImageCropModal: React.FC<ImageCropModalProps> = ({
 
         <div className={styles.actionButtonsRow}>
           <Box className={styles.leftActions}>
-            <Button
-              startIcon={<PhotoCameraOutlinedIcon fontSize="small" />}
-              onClick={() => fileInputRef.current?.click()}
-              className={styles.changePhotoBtn}
-              disabled={isProcessing}
-            >
-              Change Photo
-            </Button>
-            <Button
-              startIcon={<RotateRightIcon fontSize="small" />}
-              onClick={handleRotate}
-              className={styles.rotateBtn}
-              disabled={isProcessing}
-            >
-              Rotate 90°
-            </Button>
+            <Tooltip title="Change Photo" arrow>
+              <Button
+                startIcon={<PhotoCameraOutlinedIcon fontSize="small" />}
+                onClick={() => fileInputRef.current?.click()}
+                className={styles.changePhotoBtn}
+                disabled={isProcessing}
+                aria-label="Change Photo"
+              >
+                <span className={styles.btnText}>Change Photo</span>
+              </Button>
+            </Tooltip>
+            <Tooltip title="Rotate 90°" arrow>
+              <Button
+                startIcon={<RotateRightIcon fontSize="small" />}
+                onClick={handleRotate}
+                className={styles.rotateBtn}
+                disabled={isProcessing}
+                aria-label="Rotate 90°"
+              >
+                <span className={styles.btnText}>Rotate 90°</span>
+              </Button>
+            </Tooltip>
           </Box>
 
           <Box className={styles.rightActions}>
-            <Button
-              onClick={onClose}
-              disabled={isProcessing}
-              className={styles.cancelBtn}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="contained"
-              onClick={handleApply}
-              disabled={isProcessing}
-              className={styles.applyBtn}
-              startIcon={
-                isProcessing ? (
-                  <CircularProgress size={16} color="inherit" />
-                ) : (
-                  <CheckIcon fontSize="small" />
-                )
-              }
-            >
-              {isProcessing ? 'Cropping...' : 'Set Cover'}
-            </Button>
+            <Tooltip title="Cancel" arrow>
+              <Button
+                startIcon={<CloseIcon fontSize="small" />}
+                onClick={onClose}
+                disabled={isProcessing}
+                className={styles.cancelBtn}
+                aria-label="Cancel"
+              >
+                <span className={styles.btnText}>Cancel</span>
+              </Button>
+            </Tooltip>
+            <Tooltip title="Set Cover" arrow>
+              <Button
+                variant="contained"
+                onClick={handleApply}
+                disabled={isProcessing}
+                className={styles.applyBtn}
+                aria-label="Set Cover"
+                startIcon={
+                  isProcessing ? (
+                    <CircularProgress size={16} color="inherit" />
+                  ) : (
+                    <CheckIcon fontSize="small" />
+                  )
+                }
+              >
+                <span className={styles.btnText}>
+                  {isProcessing ? 'Cropping...' : 'Set Cover'}
+                </span>
+              </Button>
+            </Tooltip>
           </Box>
 
           {/* Hidden File Input for Changing Photo */}

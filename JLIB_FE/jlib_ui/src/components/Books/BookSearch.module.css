@@ -4,11 +4,13 @@
 
 .searchField {
   background-color: var(--bg-card) !important;
-  border-radius: 10px !important;
+  border-radius: 8px !important;
 }
 
-.searchField fieldset {
+.searchField fieldset,
+.searchField :global(.MuiOutlinedInput-root) {
   border-color: var(--border-parchment) !important;
+  border-radius: 8px !important;
 }
 
 .searchField:hover fieldset {

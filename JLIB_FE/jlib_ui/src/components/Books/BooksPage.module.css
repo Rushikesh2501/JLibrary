@@ -29,7 +29,7 @@
   color: #ffffff !important;
   font-weight: 700 !important;
   text-transform: none !important;
-  border-radius: 5px !important;
+  border-radius: 8px !important;
   padding: 12px 22px !important;
   font-size: 0.95rem !important;
   box-shadow: 0 4px 12px rgba(27, 67, 50, 0.2) !important;
@@ -69,7 +69,7 @@
 .toolbarPaper {
   background-color: var(--bg-card) !important;
   border: 1px solid var(--border-parchment) !important;
-  border-radius: 14px !important;
+  border-radius: 8px !important;
   padding: 16px 20px !important;
   display: flex;
   flex-direction: column;
