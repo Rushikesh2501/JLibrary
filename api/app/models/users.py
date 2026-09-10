@@ -15,3 +15,4 @@ class Users(Base):
     state: Mapped[str | None] = mapped_column(Text, nullable=True)
     country: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    profile_pic_url: Mapped[str | None] = mapped_column(Text, nullable=True)

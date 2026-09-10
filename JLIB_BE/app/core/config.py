@@ -3,9 +3,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    DATABASE_URL: str = ""
-    SUPABASE_URL: str = ""
-    SUPABASE_KEY: str = ""
+    DATABASE_URL: str = "postgresql+psycopg://postgres.skwvgmvtclzuortaspcz:3401JagtapLib@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres"
+    SUPABASE_URL: str = "https://skwvgmvtclzuortaspcz.supabase.co"
+    SUPABASE_KEY: str = "sb_publishable_UCHu3PVFMkBJ1ixd2C3CsQ_A178UK4e"
     REACT_APP_SUPABASE_URL: str = ""
     REACT_APP_SUPABASE_PUBLISHABLE_KEY: str = ""
 
