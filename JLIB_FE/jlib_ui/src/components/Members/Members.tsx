@@ -115,20 +115,23 @@ export const Members: React.FC = () => {
                   },
                 }}
               />
-              <div className={styles.memberCountBadge}>
-                {filteredUsers.length} {filteredUsers.length === 1 ? 'Member' : 'Members'}
+
+              <div className={styles.toolbarActions}>
+                <div className={styles.memberCountBadge}>
+                  {filteredUsers.length} {filteredUsers.length === 1 ? 'Member' : 'Members'}
+                </div>
+
+                <Button
+                  variant="outlined"
+                  disabled={!searchQuery.trim()}
+                  onClick={() => setSearchQuery('')}
+                  startIcon={<FilterAltOffIcon fontSize="small" />}
+                  className={styles.clearButton}
+                >
+                  Clear Filters
+                </Button>
               </div>
             </Paper>
-
-            <Button
-              variant="outlined"
-              disabled={!searchQuery.trim()}
-              onClick={() => setSearchQuery('')}
-              startIcon={<FilterAltOffIcon fontSize="small" />}
-              className={styles.outerClearButton}
-            >
-              Clear Filters
-            </Button>
           </div>
 
           {/* Content Rendering States */}
