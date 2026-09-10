@@ -96,7 +96,32 @@ async function getCroppedImg(
   // Draw cropped image
   ctx.putImageData(data, 0, 0);
 
-  return canvas.toDataURL('image/jpeg', 0.92);
+  // Scale down if dimensions exceed 1400px so image is sharp yet strictly < 1MB
+  const maxDim = 1400;
+  let finalCanvas = canvas;
+  if (pixelCrop.width > maxDim || pixelCrop.height > maxDim) {
+    const scale = Math.min(maxDim / pixelCrop.width, maxDim / pixelCrop.height);
+    const scaledCanvas = document.createElement('canvas');
+    scaledCanvas.width = Math.round(pixelCrop.width * scale);
+    scaledCanvas.height = Math.round(pixelCrop.height * scale);
+    const sCtx = scaledCanvas.getContext('2d');
+    if (sCtx) {
+      sCtx.drawImage(canvas, 0, 0, scaledCanvas.width, scaledCanvas.height);
+      finalCanvas = scaledCanvas;
+    }
+  }
+
+  // Dial quality down to 0.82 to ensure output is crisp and under 1MB
+  let quality = 0.82;
+  let dataUrl = finalCanvas.toDataURL('image/jpeg', quality);
+
+  // If base64 representation exceeds 1MB (~1,000,000 characters), dial down quality
+  while (dataUrl.length > 1000 * 1024 && quality > 0.3) {
+    quality -= 0.15;
+    dataUrl = finalCanvas.toDataURL('image/jpeg', quality);
+  }
+
+  return dataUrl;
 }
 
 export const ImageCropModal: React.FC<ImageCropModalProps> = ({

@@ -23,7 +23,7 @@ import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import CropIcon from '@mui/icons-material/Crop';
 import { IBook as Book } from 'interfaces/book-interface/ibook';
-import { deleteBook, updateBook } from '../../services/bookService';
+import { deleteBook, updateBook, deleteBookCover } from '../../services/bookService';
 import { ImageCropModal } from '../common/ImageCropModal';
 import styles from './BookDetailsView.module.css';
 
@@ -236,16 +236,19 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
       availability_status: editAvailability,
       is_available: editAvailability === 'Available',
       description: editDescription.trim() || undefined,
-      ...(editCoverUrl !== null ? { cover_url: editCoverUrl === BOOK_PLACEHOLDER_URL ? BOOK_PLACEHOLDER_URL : editCoverUrl } : {}),
+      ...(editCoverUrl !== null ? { cover_url: editCoverUrl === BOOK_PLACEHOLDER_URL ? '' : editCoverUrl } : {}),
     };
 
     try {
       const saved = await updateBook(String(currentBook.book_id), updatedPayload);
+      const isCoverRemoved = editCoverUrl === BOOK_PLACEHOLDER_URL;
       const mergedBook: Book = {
         ...currentBook,
-        ...saved,
         ...updatedPayload,
+        ...saved,
+        ...(isCoverRemoved ? { cover_url: undefined } : {}),
       };
+      setEditCoverUrl(null);
       setCurrentBook(mergedBook);
       setIsEditing(false);
       onUpdate?.(mergedBook);
@@ -321,9 +324,17 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
     if (isEditing) {
       setEditCoverUrl(BOOK_PLACEHOLDER_URL);
     } else {
-      const updated: Book = { ...currentBook, cover_url: BOOK_PLACEHOLDER_URL };
-      setCurrentBook(updated);
-      onUpdate?.(updated);
+      try {
+        await deleteBookCover(String(currentBook.book_id));
+        const updated: Book = { ...currentBook, cover_url: undefined };
+        setCurrentBook(updated);
+        onUpdate?.(updated);
+      } catch (err) {
+        console.warn('Failed to delete cover from backend:', err);
+        const updated: Book = { ...currentBook, cover_url: undefined };
+        setCurrentBook(updated);
+        onUpdate?.(updated);
+      }
     }
   };
 

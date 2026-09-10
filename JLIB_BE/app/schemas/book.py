@@ -17,6 +17,7 @@ class BookResponse(BaseModel):
     number_of_times_borrowed: int | None = 0
     date_added: date | None = None
     date_modified: date | None = None
+    cover_url: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -41,6 +42,7 @@ class BookCreate(BaseModel):
     book_id: str | None = None  # If not provided, will be auto-generated with prefix (e.g. JL-1, JL-2, ...)
     date_added: date | None = None
     date_modified: date | None = None
+    cover_url: str | None = None
 
 
 class BookUpdate(BaseModel):
@@ -56,6 +58,7 @@ class BookUpdate(BaseModel):
     book_id: str | None = None
     date_added: date | None = None
     date_modified: date | None = None
+    cover_url: str | None = None
 
 
 

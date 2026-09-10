@@ -121,6 +121,49 @@ def update_book(book_id: str, book_update: BookUpdate, db: Session = Depends(get
     return updated_book
 
 
+@router.post("/{book_id}/cover")
+async def upload_cover(
+    book_id: str,
+    file: Optional[UploadFile] = File(None),
+    db: Session = Depends(get_db)
+):
+    """
+    Upload a cover photo for a book to Supabase Storage in folder book_{book_id}/.
+    """
+    book = book_service.get_book_by_id(db, book_id=book_id)
+    if not book:
+        raise HTTPException(status_code=404, detail="Book not found")
+
+    if not file:
+        raise HTTPException(status_code=400, detail="No image file provided")
+
+    contents = await file.read()
+    content_type = file.content_type or "image/jpeg"
+    from app.core.supabase import upload_book_cover
+    public_url = upload_book_cover(book_id, contents, content_type=content_type)
+
+    book_service.update_book(db, book_id=book_id, book_update=BookUpdate(cover_url=public_url))
+    return {"cover_url": public_url, "message": "Cover uploaded successfully"}
+
+
+@router.delete("/{book_id}/cover")
+def remove_cover(
+    book_id: str,
+    db: Session = Depends(get_db)
+):
+    """
+    Remove cover photo for a book from Supabase Storage.
+    """
+    book = book_service.get_book_by_id(db, book_id=book_id)
+    if not book:
+        raise HTTPException(status_code=404, detail="Book not found")
+
+    from app.core.supabase import delete_book_cover
+    delete_book_cover(book_id)
+    book_service.update_book(db, book_id=book_id, book_update=BookUpdate(cover_url=""))
+    return {"message": "Cover removed successfully"}
+
+
 @router.delete("/delete-book/{book_id}")
 @router.delete("/{book_id}", include_in_schema=False)
 def delete_book(book_id: str, db: Session = Depends(get_db)):
@@ -131,6 +174,8 @@ def delete_book(book_id: str, db: Session = Depends(get_db)):
     if not success:
         raise HTTPException(status_code=404, detail="Book not found")
     return {"message": f"Book '{book_id}' deleted successfully", "success": True}
+
+
 
 
 

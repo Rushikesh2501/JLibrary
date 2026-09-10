@@ -19,6 +19,7 @@ class Book(Base):
     book_name_native_lang: Mapped[str | None] = mapped_column(Text, nullable=True)
     date_added: Mapped[date | None] = mapped_column(Date, nullable=True)
     date_modified: Mapped[date | None] = mapped_column(Date, nullable=True)
+    cover_url: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     @property
     def native_title(self) -> str | None:

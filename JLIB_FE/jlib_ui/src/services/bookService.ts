@@ -464,7 +464,7 @@ export async function fetchBookDetailsByPhoto(
 }
 
 export async function createBook(bookData: Partial<Book>, prefix: string = 'JL-'): Promise<Book> {
-  const payload = {
+  const payload: any = {
     book_name: bookData.book_name,
     book_name_native_lang: bookData.book_name_native_lang || bookData.native_title || null,
     author: bookData.author,
@@ -475,6 +475,9 @@ export async function createBook(bookData: Partial<Book>, prefix: string = 'JL-'
     borrowed_by: bookData.borrowed_by || null,
     book_id: bookData.book_id || undefined,
   };
+  if (bookData.cover_url) {
+    payload.cover_url = bookData.cover_url;
+  }
 
   const response = await fetch(`${API_BASE_URL}/books/?prefix=${encodeURIComponent(prefix)}`, {
     method: 'POST',
@@ -499,7 +502,7 @@ export async function createBook(bookData: Partial<Book>, prefix: string = 'JL-'
 }
 
 export async function updateBook(bookId: string, bookData: Partial<Book>): Promise<Book> {
-  const payload = {
+  const payload: any = {
     book_name: bookData.book_name,
     book_name_native_lang: bookData.book_name_native_lang || bookData.native_title || null,
     author: bookData.author,
@@ -509,10 +512,12 @@ export async function updateBook(bookId: string, bookData: Partial<Book>): Promi
     availability_status: bookData.availability_status,
     borrowed_by: bookData.borrowed_by,
   };
+  if (bookData.cover_url !== undefined) {
+    payload.cover_url = bookData.cover_url;
+  }
 
   const response = await fetch(`${API_BASE_URL}/books/${encodeURIComponent(bookId)}`, {
     method: 'PUT',
-
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
@@ -530,6 +535,35 @@ export async function updateBook(bookId: string, bookData: Partial<Book>): Promi
     ...bookData,
     ...updated,
   };
+}
+
+export async function uploadBookCover(bookId: string, file: File): Promise<string> {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const response = await fetch(`${API_BASE_URL}/books/${encodeURIComponent(bookId)}/cover`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to upload cover: ${response.status} ${errorText}`);
+  }
+
+  const data = await response.json();
+  return data.cover_url;
+}
+
+export async function deleteBookCover(bookId: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/books/${encodeURIComponent(bookId)}/cover`, {
+    method: 'DELETE',
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to delete cover: ${response.status} ${errorText}`);
+  }
 }
 
 export async function getNextBookId(prefix: string = 'JL-'): Promise<string> {
