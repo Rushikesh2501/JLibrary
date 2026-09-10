@@ -8,6 +8,7 @@ import { BookGrid } from './BookGrid';
 import { BookDetailsView } from './BookDetailsView';
 import { AddBookView } from './AddBookView';
 import { EmptyState } from '../common/EmptyState';
+import { PaginationBar } from '../common/PaginationBar';
 import { createBook } from '../../services/bookService';
 import styles from './BooksPage.module.css';
 
@@ -22,6 +23,15 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books: initialBooks }) => 
   const [sortBy, setSortBy] = useState('ASCENDING');
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [isAddBookViewActive, setIsAddBookViewActive] = useState(false);
+
+  // Pagination state (10 items per page)
+  const ITEMS_PER_PAGE = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Reset pagination when search or sort criteria change
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, sortBy]);
 
   // Sync state if prop changes
   React.useEffect(() => {
@@ -94,6 +104,18 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books: initialBooks }) => 
 
     return result;
   }, [booksList, searchTerm, sortBy]);
+
+  const totalPages = Math.ceil(filteredBooks.length / ITEMS_PER_PAGE);
+
+  const paginatedBooks = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredBooks.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredBooks, currentPage]);
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const isFilterActive = sortBy !== 'ASCENDING' || searchTerm.trim() !== '';
 
@@ -217,7 +239,14 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books: initialBooks }) => 
 
       {/* List View or Empty State */}
       {filteredBooks.length > 0 ? (
-        <BookGrid books={filteredBooks} onSelectBook={setSelectedBook} />
+        <>
+          <BookGrid books={paginatedBooks} onSelectBook={setSelectedBook} />
+          <PaginationBar
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </>
       ) : (
         <EmptyState
           title={

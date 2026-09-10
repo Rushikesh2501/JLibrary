@@ -23,6 +23,7 @@ import { AddMemberModal } from './AddMemberModal';
 import { Loading } from '../common/Loading';
 import { ErrorState } from '../common/ErrorState';
 import { EmptyState } from '../common/EmptyState';
+import { PaginationBar } from '../common/PaginationBar';
 import styles from './Members.module.css';
 
 const fallbackGradients = [
@@ -111,6 +112,15 @@ export const Members: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<IUserInfo | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
 
+  // Pagination state (10 members per page)
+  const ITEMS_PER_PAGE = 10;
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
+  // Reset page when search or sort changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, sortBy]);
+
   const fetchUsersData = async () => {
     setLoading(true);
     setError(null);
@@ -182,6 +192,18 @@ export const Members: React.FC = () => {
 
     return result;
   }, [users, searchQuery, sortBy]);
+
+  const totalPages = Math.ceil(filteredAndSortedUsers.length / ITEMS_PER_PAGE);
+
+  const paginatedUsers = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredAndSortedUsers.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredAndSortedUsers, currentPage]);
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <div className={styles.container}>
@@ -299,21 +321,28 @@ export const Members: React.FC = () => {
               }
             />
           ) : (
-            <div className={styles.userGrid}>
-              {filteredAndSortedUsers.map((user) => {
-                const numericId = parseInt(user.user_id.replace(/\D/g, ''), 10) || 1;
-                const bgGradient = fallbackGradients[numericId % fallbackGradients.length];
+            <>
+              <div className={styles.userGrid}>
+                {paginatedUsers.map((user) => {
+                  const numericId = parseInt(user.user_id.replace(/\D/g, ''), 10) || 1;
+                  const bgGradient = fallbackGradients[numericId % fallbackGradients.length];
 
-                return (
-                  <MemberCard
-                    key={user.user_id}
-                    user={user}
-                    bgGradient={bgGradient}
-                    onClick={() => handleCardClick(user)}
-                  />
-                );
-              })}
-            </div>
+                  return (
+                    <MemberCard
+                      key={user.user_id}
+                      user={user}
+                      bgGradient={bgGradient}
+                      onClick={() => handleCardClick(user)}
+                    />
+                  );
+                })}
+              </div>
+              <PaginationBar
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </>
           )}
         </>
       )}

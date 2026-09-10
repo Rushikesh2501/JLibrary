@@ -1,0 +1,149 @@
+.paginationWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 32px 0 20px 0;
+}
+
+.paginationContainer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background-color: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-parchment, #e5dec9);
+  border-radius: 12px;
+  padding: 8px 18px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+  user-select: none;
+}
+
+.arrowButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #9ca3af);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 8px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+}
+
+.arrowButton:not(:disabled):hover {
+  color: var(--primary-forest, #1b4332);
+  background-color: rgba(27, 67, 50, 0.05);
+}
+
+.arrowButton.prev:not(:disabled):hover {
+  transform: translateX(-3px);
+}
+
+.arrowButton.next:not(:disabled):hover {
+  transform: translateX(3px);
+}
+
+.arrowButton:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.numbersList {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pageItem {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 3px;
+  background: transparent;
+  border: none;
+  font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif);
+  font-size: 0.86rem;
+  font-weight: 500;
+  color: var(--text-muted, #9ca3af);
+  cursor: pointer;
+  border-radius: 7px;
+  transform: scale(1);
+  transition: transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1),
+              background-color 0.2s ease,
+              color 0.2s ease,
+              box-shadow 0.2s ease;
+  outline: none;
+}
+
+.pageItem:hover:not(.active) {
+  color: var(--primary-forest, #1b4332);
+  background-color: rgba(27, 67, 50, 0.06);
+  transform: scale(1.08);
+}
+
+.pageItem.active {
+  background-color: var(--primary-forest, #1b4332);
+  color: #ffffff !important;
+  font-weight: 600;
+  transform: scale(1.18);
+  box-shadow: 0 2px 8px rgba(27, 67, 50, 0.22);
+  cursor: default;
+}
+
+.ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 28px;
+  font-size: 0.85rem;
+  color: var(--text-muted, #9ca3af);
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 640px) {
+  .paginationWrapper {
+    margin: 24px 0 16px 0;
+  }
+
+  .paginationContainer {
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 10px;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .numbersList {
+    gap: 5px;
+  }
+
+  .pageItem {
+    min-width: 25px;
+    height: 25px;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+
+  .pageItem.active {
+    transform: scale(1.14);
+  }
+
+  .arrowButton {
+    padding: 2px;
+  }
+
+  .arrowButton svg {
+    font-size: 1rem;
+  }
+}
+
