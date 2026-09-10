@@ -11,6 +11,40 @@
   margin-bottom: 28px;
 }
 
+@media (min-width: 768px) {
+  .headerSection {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+  }
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.totalBookBadge {
+  background-color: var(--bg-card, #ffffff);
+  color: var(--primary-forest, #1b4332);
+  border: 1px solid var(--border-parchment, #e5dec9);
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
 .title {
   font-family: var(--font-serif) !important;
   color: var(--primary-forest) !important;
@@ -25,19 +59,19 @@
 }
 
 .addBookTopButton {
-  background-color: var(--primary-forest) !important;
+  background-color: var(--primary-forest, #1b4332) !important;
   color: #ffffff !important;
   font-weight: 700 !important;
   text-transform: none !important;
   border-radius: 8px !important;
-  padding: 12px 22px !important;
+  padding: 10px 22px !important;
   font-size: 0.95rem !important;
   box-shadow: 0 4px 12px rgba(27, 67, 50, 0.2) !important;
   transition: all 0.2s ease !important;
-  width: 100% !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  white-space: nowrap !important;
 }
 
 .addBookTopButton:hover {
@@ -49,7 +83,7 @@
   .headerSection {
     flex-direction: row;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     gap: 20px;
   }
 

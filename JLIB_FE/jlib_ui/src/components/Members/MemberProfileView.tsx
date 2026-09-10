@@ -1,29 +1,95 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Avatar,
   Chip,
   Button,
   Divider,
   Tooltip,
+  CircularProgress,
 } from '@mui/material';
 
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
 import { IUserInfo } from '../../interfaces/user-interface/iuserinfo';
+import { uploadUserProfilePic, getUserAvatarUrl } from '../../services/userService';
+import { ImageCropModal } from '../common/ImageCropModal';
 import styles from './MemberProfileView.module.css';
 
 interface MemberProfileViewProps {
   user: IUserInfo;
   onBack: () => void;
+  onUpdate?: (updatedUser: IUserInfo) => void;
 }
+
+const dataUrlToFile = (dataUrl: string, filename: string): File => {
+  const arr = dataUrl.split(',');
+  const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/jpeg';
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new File([u8arr], filename, { type: mime });
+};
 
 export const MemberProfileView: React.FC<MemberProfileViewProps> = ({
   user,
   onBack,
+  onUpdate,
 }) => {
+  const [currentUser, setCurrentUser] = useState<IUserInfo>(user);
+  const [isUploading, setIsUploading] = useState(false);
+  const [rawImageSrc, setRawImageSrc] = useState<string | null>(null);
+  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const processImageFile = (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload an image file (e.g. JPG, PNG, WEBP).');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string;
+      if (dataUrl) {
+        setRawImageSrc(dataUrl);
+        setIsCropModalOpen(true);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      processImageFile(e.target.files[0]);
+    }
+    if (e.target) e.target.value = '';
+  };
+
+  const handleCropSave = async (croppedDataUrl: string) => {
+    setIsCropModalOpen(false);
+    setIsUploading(true);
+    try {
+      const file = dataUrlToFile(croppedDataUrl, 'avatar.jpg');
+      const uploadedUrl = await uploadUserProfilePic(currentUser.user_id, file);
+      const updatedUser: IUserInfo = {
+        ...currentUser,
+        profile_pic_url: uploadedUrl,
+      };
+      setCurrentUser(updatedUser);
+      onUpdate?.(updatedUser);
+    } catch (err) {
+      console.error('Failed to upload user avatar to Supabase storage:', err);
+      alert('Failed to upload profile picture. Please try again.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
   // Formatting date string nicely
   const formatDate = (dateStr: string) => {
     try {
@@ -79,24 +145,46 @@ export const MemberProfileView: React.FC<MemberProfileViewProps> = ({
           <div className={styles.avatarWrapper}>
             <Avatar
               className={styles.avatar}
-              src={user.profile_pic_url || user.avatar_url}
+              src={getUserAvatarUrl(currentUser)}
             >
-              {getInitials(user.user_name)}
+              {getInitials(currentUser.user_name)}
             </Avatar>
 
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={handleFileChange}
+            />
+
+            <Tooltip title="Upload Profile Picture" arrow>
+              <button
+                type="button"
+                className={styles.avatarUploadBtn}
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading}
+              >
+                {isUploading ? (
+                  <CircularProgress size={16} style={{ color: '#ffffff' }} />
+                ) : (
+                  <PhotoCameraIcon style={{ fontSize: 18, color: '#ffffff' }} />
+                )}
+              </button>
+            </Tooltip>
           </div>
 
           <div className={styles.userNameRow}>
-            <span className={styles.userName}>{user.user_name}</span>
+            <span className={styles.userName}>{currentUser.user_name}</span>
             <Chip
-              label={user.user_id}
+              label={currentUser.user_id}
               size="small"
               className={styles.userIdChip}
             />
           </div>
 
           <div className={styles.userBio}>
-            Library Member • Joined {formatDate(user.created_at)}
+            Library Member • Joined {formatDate(currentUser.created_at)}
           </div>
         </div>
 
@@ -111,7 +199,7 @@ export const MemberProfileView: React.FC<MemberProfileViewProps> = ({
                 <div className={styles.infoIcon}>
                   <EmailOutlinedIcon fontSize="small" />
                 </div>
-                <div>
+                <div className={styles.infoTextWrapper}>
                   <div className={styles.infoLabel}>Email Address</div>
                   <div className={styles.infoValue}>{user.email || 'N/A'}</div>
                 </div>
@@ -123,7 +211,7 @@ export const MemberProfileView: React.FC<MemberProfileViewProps> = ({
                 <div className={styles.infoIcon}>
                   <PhoneOutlinedIcon fontSize="small" />
                 </div>
-                <div>
+                <div className={styles.infoTextWrapper}>
                   <div className={styles.infoLabel}>Phone Number</div>
                   <div className={styles.infoValue}>{user.phone || 'N/A'}</div>
                 </div>
@@ -135,7 +223,7 @@ export const MemberProfileView: React.FC<MemberProfileViewProps> = ({
                 <div className={styles.infoIcon}>
                   <LocationOnOutlinedIcon fontSize="small" />
                 </div>
-                <div>
+                <div className={styles.infoTextWrapper}>
                   <div className={styles.infoLabel}>Location</div>
                   <div className={styles.infoValue}>{formattedLocation || 'N/A'}</div>
                 </div>
@@ -163,6 +251,18 @@ export const MemberProfileView: React.FC<MemberProfileViewProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Image Crop Modal */}
+      {rawImageSrc && (
+        <ImageCropModal
+          open={isCropModalOpen}
+          imageSrc={rawImageSrc}
+          onClose={() => setIsCropModalOpen(false)}
+          onCropSave={handleCropSave}
+          onImageSrcChange={(newSrc) => setRawImageSrc(newSrc)}
+          aspectRatio={1}
+        />
+      )}
     </div>
   );
 };

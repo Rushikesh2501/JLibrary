@@ -19,7 +19,7 @@ interface BooksPageProps {
 export const BooksPage: React.FC<BooksPageProps> = ({ books: initialBooks }) => {
   const [booksList, setBooksList] = useState<Book[]>(initialBooks);
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('DEFAULT');
+  const [sortBy, setSortBy] = useState('ASCENDING');
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [isAddBookViewActive, setIsAddBookViewActive] = useState(false);
 
@@ -48,7 +48,7 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books: initialBooks }) => 
       return true;
     });
 
-    if (sortBy === 'ASCENDING') {
+    if (sortBy === 'ASCENDING' || sortBy === 'DEFAULT') {
       return [...result].sort((a, b) => {
         const titleA = (a.book_name || '').trim();
         const titleB = (b.book_name || '').trim();
@@ -95,10 +95,10 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books: initialBooks }) => 
     return result;
   }, [booksList, searchTerm, sortBy]);
 
-  const isFilterActive = sortBy !== 'DEFAULT' || searchTerm.trim() !== '';
+  const isFilterActive = sortBy !== 'ASCENDING' || searchTerm.trim() !== '';
 
   const handleClearFilters = () => {
-    setSortBy('DEFAULT');
+    setSortBy('ASCENDING');
     setSearchTerm('');
   };
 
@@ -173,7 +173,7 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books: initialBooks }) => 
   return (
     <Box className={styles.container}>
       <Box className={styles.headerSection}>
-        <Box>
+        <Box className={styles.headerLeft}>
           <Typography variant="h4" className={styles.title}>
             Library Collection
           </Typography>
@@ -181,14 +181,20 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books: initialBooks }) => 
             Browse and discover books in your collection.
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => setIsAddBookViewActive(true)}
-          className={styles.addBookTopButton}
-        >
-          Add Book
-        </Button>
+
+        <Box className={styles.headerRight}>
+          <div className={styles.totalBookBadge}>
+            {booksList.length} {booksList.length === 1 ? 'Book' : 'Books'}
+          </div>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => setIsAddBookViewActive(true)}
+            className={styles.addBookTopButton}
+          >
+            Add Book
+          </Button>
+        </Box>
       </Box>
 
       {/* Toolbar Row */}
@@ -202,7 +208,7 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books: initialBooks }) => 
             <BookFilters
               sortBy={sortBy}
               isFilterActive={isFilterActive}
-              onSortChange={setSortBy}
+              onSortChange={(val) => setSortBy(val === 'DEFAULT' ? 'ASCENDING' : val)}
               onClearFilters={handleClearFilters}
             />
           </Box>

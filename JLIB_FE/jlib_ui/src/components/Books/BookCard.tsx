@@ -10,7 +10,19 @@ interface BookCardProps {
   viewMode?: 'grid' | 'list';
 }
 
-const BOOK_PLACEHOLDER_URL = '/assets/book-placeholder.png';
+export const BOOK_PLACEHOLDERS = [
+  '/assets/book-placeholder-brown.png',
+  '/assets/book-placeholder-navy.png',
+  '/assets/book-placeholder-walnut.png',
+  '/assets/book-placeholder-blue.png',
+  '/assets/book-placeholder-teal.png',
+  '/assets/book-placeholder-green.png',
+  '/assets/book-placeholder.png', // red
+];
+
+export const getDefaultBookCover = (numericId: number): string => {
+  return BOOK_PLACEHOLDERS[Math.abs(numericId) % BOOK_PLACEHOLDERS.length];
+};
 
 const getBookCoverUrl = (book: Book, numericId: number): string => {
   if (book.cover_url && book.cover_url.trim()) return book.cover_url.trim();
@@ -38,7 +50,7 @@ const getBookCoverUrl = (book: Book, numericId: number): string => {
     return 'https://m.media-amazon.com/images/I/81q77Q39nEL._AC_UF1000,1000_QL80_.jpg';
   }
 
-  return BOOK_PLACEHOLDER_URL;
+  return getDefaultBookCover(numericId);
 };
 
 export const BookCard: React.FC<BookCardProps> = ({
@@ -85,8 +97,9 @@ export const BookCard: React.FC<BookCardProps> = ({
             className={styles.coverImage}
             onError={(e) => {
               const target = e.currentTarget;
-              if (!target.src.endsWith(BOOK_PLACEHOLDER_URL)) {
-                target.src = BOOK_PLACEHOLDER_URL;
+              const defaultPlaceholder = getDefaultBookCover(numericId);
+              if (!target.src.includes('book-placeholder')) {
+                target.src = defaultPlaceholder;
               } else {
                 setImgError(true);
               }

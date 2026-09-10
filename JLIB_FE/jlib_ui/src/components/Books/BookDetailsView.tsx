@@ -25,6 +25,7 @@ import CropIcon from '@mui/icons-material/Crop';
 import { IBook as Book } from 'interfaces/book-interface/ibook';
 import { deleteBook, updateBook, deleteBookCover } from '../../services/bookService';
 import { ImageCropModal } from '../common/ImageCropModal';
+import { getDefaultBookCover } from './BookCard';
 import styles from './BookDetailsView.module.css';
 
 interface BookDetailsViewProps {
@@ -62,7 +63,7 @@ const getBookCoverUrl = (book: Book, numericId: number): string => {
     return 'https://m.media-amazon.com/images/I/81q77Q39nEL._AC_UF1000,1000_QL80_.jpg';
   }
 
-  return BOOK_PLACEHOLDER_URL;
+  return getDefaultBookCover(numericId);
 };
 
 const getBookSummaryData = (book: Book) => {
@@ -315,7 +316,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
     : (currentBook.cover_url !== undefined && currentBook.cover_url !== null
         ? (currentBook.cover_url.trim() ? currentBook.cover_url : BOOK_PLACEHOLDER_URL)
         : defaultCoverUrl);
-  const isPlaceholder = !activeCoverUrl || activeCoverUrl === BOOK_PLACEHOLDER_URL || activeCoverUrl.endsWith('book-placeholder.png');
+  const isPlaceholder = !activeCoverUrl || activeCoverUrl.includes('book-placeholder');
 
   const handleDeleteCover = async (e: React.MouseEvent) => {
     e.stopPropagation();

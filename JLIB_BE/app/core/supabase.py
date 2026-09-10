@@ -39,6 +39,7 @@ if settings.SUPABASE_URL and settings.SUPABASE_KEY:
         logger.warning(f"Could not initialize Supabase client: {e}")
 
 STORAGE_BUCKET = "Book_profile"
+USER_STORAGE_BUCKET = "user_profile"
 MAX_IMAGE_BYTES = 900 * 1024  # Strict < 1 MB limit (900 KB target for high quality + safety margin)
 
 
@@ -55,6 +56,21 @@ def get_book_storage_folder(book_id: str) -> str:
     clean_id = re.sub(r"[^a-zA-Z0-9]", "_", clean_id)
     clean_id = re.sub(r"_+", "_", clean_id).strip("_")
     return f"book_{clean_id}"
+
+
+def get_user_storage_folder(user_id: str) -> str:
+    """
+    Format user ID to a folder name in Supabase storage:
+    e.g. 'JL-01' -> 'user_JL_01'
+         'JL-1' -> 'user_JL_1'
+         'JL-21' -> 'user_JL_21'
+    """
+    clean_id = str(user_id).strip()
+    if clean_id.lower().startswith("user_"):
+        clean_id = clean_id[5:]
+    clean_id = re.sub(r"[^a-zA-Z0-9]", "_", clean_id)
+    clean_id = re.sub(r"_+", "_", clean_id).strip("_")
+    return f"user_{clean_id}"
 
 
 def compress_image_to_under_1mb(
@@ -207,3 +223,93 @@ def delete_book_cover(book_id: str) -> bool:
     except Exception as e:
         logger.warning(f"Error deleting book cover from storage for {book_id}: {e}")
         return False
+
+
+def upload_user_profile_pic(
+    user_id: str,
+    image_data: bytes | str,
+    content_type: str = "image/jpeg"
+) -> str:
+    """
+    Upload a user profile picture to Supabase Storage bucket 'user_profile'
+    under folder '{user_folder}/avatar.{ext}'.
+    Folder name format: 'user_JL_01', 'user_JL_02', etc.
+    Dials image quality down to strictly less than 1 MB before uploading.
+    Returns the public URL of the uploaded image.
+    """
+    if not supabase_client:
+        raise RuntimeError("Supabase client is not configured")
+
+    folder = get_user_storage_folder(user_id)
+    raw_bytes: bytes
+
+    if isinstance(image_data, str):
+        if image_data.startswith("data:"):
+            # Format: data:<mime>;base64,<encoded>
+            header, base64_str = image_data.split(",", 1)
+            mime_match = re.match(r"data:([^;]+);base64", header)
+            if mime_match:
+                content_type = mime_match.group(1).lower()
+            raw_bytes = base64.b64decode(base64_str)
+        else:
+            raw_bytes = base64.b64decode(image_data)
+    else:
+        raw_bytes = image_data
+
+    # Dial photo quality down to under 1 MB
+    compressed_bytes, content_type = compress_image_to_under_1mb(raw_bytes, max_bytes=MAX_IMAGE_BYTES)
+
+    # Determine file extension based on mime type
+    ext = ".jpg"
+    if "png" in content_type:
+        ext = ".png"
+    elif "webp" in content_type:
+        ext = ".webp"
+
+    file_name = f"avatar{ext}"
+    object_path = f"{folder}/{file_name}"
+
+    # Upload to Supabase Storage bucket 'user_profile' with upsert
+    supabase_client.storage.from_(USER_STORAGE_BUCKET).upload(
+        path=object_path,
+        file=compressed_bytes,
+        file_options={"content-type": content_type, "upsert": "true"}
+    )
+
+    # Obtain public URL
+    public_url = supabase_client.storage.from_(USER_STORAGE_BUCKET).get_public_url(object_path)
+    timestamped_url = f"{public_url}?v={int(time.time())}"
+    return timestamped_url
+
+
+def delete_user_profile_pic(user_id: str) -> bool:
+    """
+    Delete the user's profile picture and completely remove that folder from Supabase Storage bucket 'user_profile'.
+    """
+    if not supabase_client:
+        return False
+
+    folder = get_user_storage_folder(user_id)
+    try:
+        files = supabase_client.storage.from_(USER_STORAGE_BUCKET).list(folder)
+        paths_to_remove = []
+        if files:
+            for f in files:
+                fname = f.get("name")
+                if fname:
+                    paths_to_remove.append(f"{folder}/{fname}")
+
+        for standard_file in ["avatar.jpg", "avatar.png", "avatar.webp", "avatar.jpeg", "profile.jpg", "profile.png", ".emptyFolderPlaceholder"]:
+            cand = f"{folder}/{standard_file}"
+            if cand not in paths_to_remove:
+                paths_to_remove.append(cand)
+
+        if paths_to_remove:
+            supabase_client.storage.from_(USER_STORAGE_BUCKET).remove(paths_to_remove)
+
+        logger.info(f"Removed folder and avatar files for {user_id} from {USER_STORAGE_BUCKET}")
+        return True
+    except Exception as e:
+        logger.warning(f"Error deleting user avatar from storage for {user_id}: {e}")
+        return False
+
