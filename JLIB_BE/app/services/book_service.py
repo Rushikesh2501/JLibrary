@@ -92,6 +92,7 @@ def create_book(db: Session, book_in: BookCreate, prefix: str = "JL-") -> Book:
         date_added=book_in.date_added or date.today(),
         date_modified=book_in.date_modified or date.today(),
         cover_url=cover_url,
+        description=book_in.description,
     )
     db.add(db_book)
     db.commit()

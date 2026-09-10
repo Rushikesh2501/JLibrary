@@ -111,7 +111,6 @@ const getBookSummaryData = (book: Book) => {
 export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, onDelete, onUpdate }) => {
   const [currentBook, setCurrentBook] = useState<Book>(book);
   const [activeTab, setActiveTab] = useState<'Overview' | 'Summary'>('Overview');
-  const [reflection, setReflection] = useState('');
   const [copiedId, setCopiedId] = useState(false);
   const [copiedUserId, setCopiedUserId] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -840,8 +839,23 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
             </div>
 
             <div className={styles.summaryBlock}>
-              <span className={styles.summaryBlockLabel}>Overview</span>
-              <div className={styles.summaryTextBox}>{summaryData.overview}</div>
+              <span className={styles.summaryBlockLabel}>Description</span>
+              {isEditing ? (
+                <TextField
+                  size="small"
+                  fullWidth
+                  multiline
+                  rows={4}
+                  value={editDescription}
+                  onChange={(e) => setEditDescription(e.target.value)}
+                  placeholder="Enter book description or summary from back cover..."
+                  className={styles.editInputField}
+                />
+              ) : (
+                <div className={styles.summaryTextBox}>
+                  {currentBook.description || editDescription || summaryData.overview || 'No description available for this book.'}
+                </div>
+              )}
             </div>
 
             <div className={styles.summaryBlock}>
@@ -857,20 +871,25 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
               </div>
             </div>
 
-            <div className={styles.summaryBlock}>
-              <span className={styles.summaryBlockLabel}>Who should read this</span>
-              <div className={styles.summaryTextBox}>{summaryData.whoShouldRead}</div>
-            </div>
-
-            <div className={styles.summaryBlock}>
-              <span className={styles.summaryBlockLabel}>Your reflections</span>
-              <textarea
-                className={styles.reflectionTextarea}
-                placeholder="Add your personal thoughts, key quotes, or reading reflections..."
-                value={reflection}
-                onChange={(e) => setReflection(e.target.value)}
-              />
-            </div>
+            {isEditing && (
+              <div className={styles.bottomEditActionsRow}>
+                <Button
+                  className={styles.cancelEditBtn}
+                  onClick={handleCancelEdit}
+                  disabled={isSaving}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className={styles.saveEditBtn}
+                  onClick={handleSaveEdit}
+                  disabled={isSaving}
+                  startIcon={isSaving ? <CircularProgress size={16} color="inherit" /> : <CheckIcon fontSize="small" />}
+                >
+                  {isSaving ? 'Saving...' : 'Save Changes'}
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </div>

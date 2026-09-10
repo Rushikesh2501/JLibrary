@@ -478,6 +478,9 @@ export async function createBook(bookData: Partial<Book>, prefix: string = 'JL-'
   if (bookData.cover_url) {
     payload.cover_url = bookData.cover_url;
   }
+  if (bookData.description !== undefined) {
+    payload.description = bookData.description;
+  }
 
   const response = await fetch(`${API_BASE_URL}/books/?prefix=${encodeURIComponent(prefix)}`, {
     method: 'POST',
@@ -514,6 +517,9 @@ export async function updateBook(bookId: string, bookData: Partial<Book>): Promi
   };
   if (bookData.cover_url !== undefined) {
     payload.cover_url = bookData.cover_url;
+  }
+  if (bookData.description !== undefined) {
+    payload.description = bookData.description;
   }
 
   const response = await fetch(`${API_BASE_URL}/books/${encodeURIComponent(bookId)}`, {

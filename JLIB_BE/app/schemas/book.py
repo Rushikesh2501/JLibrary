@@ -18,6 +18,7 @@ class BookResponse(BaseModel):
     date_added: date | None = None
     date_modified: date | None = None
     cover_url: str | None = None
+    description: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -43,6 +44,7 @@ class BookCreate(BaseModel):
     date_added: date | None = None
     date_modified: date | None = None
     cover_url: str | None = None
+    description: str | None = None
 
 
 class BookUpdate(BaseModel):
@@ -59,6 +61,7 @@ class BookUpdate(BaseModel):
     date_added: date | None = None
     date_modified: date | None = None
     cover_url: str | None = None
+    description: str | None = None
 
 
 

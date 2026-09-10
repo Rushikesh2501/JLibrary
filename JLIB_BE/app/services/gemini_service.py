@@ -150,8 +150,14 @@ def lookup_book_by_photo_gemini(
             contents.append(types.Part.from_bytes(data=proc_bytes, mime_type=proc_mime))
 
         prompt = """
-Examine the uploaded book cover photo(s) (front cover, back cover, spine, title/copyright page).
+Examine the uploaded book cover photo(s) (front cover and/or back cover).
 Extract the exact book metadata visible on the covers or from your catalog knowledge base.
+
+CRITICAL INSTRUCTION FOR BACK COVER & DESCRIPTION:
+- If a BACK COVER photo is provided, read the text printed on the back cover (such as the synopsis, blurb, summary, story overview, or author/review notes).
+- Take that text (or a clear, engaging 2 to 4 sentence excerpt/summary from the back cover) and put it into the "description" field.
+- If only the front cover is provided, generate a concise, informative 2-3 sentence overview of the book's premise/subject for the "description" field.
+- Do NOT leave "description" empty.
 
 Return ONLY a valid JSON object matching this schema:
 {
@@ -160,7 +166,7 @@ Return ONLY a valid JSON object matching this schema:
   "authors": "Author name(s)",
   "publisher": "Publisher name",
   "publishedDate": "Publication year",
-  "description": "Short summary or description from back cover text",
+  "description": "Synopsis or summary extracted from the back cover text, or a concise book overview",
   "pageCount": "Number of pages if visible else empty string",
   "language": "Language of the text",
   "edition": "Edition details if visible",
