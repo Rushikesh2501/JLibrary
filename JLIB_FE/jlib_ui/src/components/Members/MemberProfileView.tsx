@@ -4,7 +4,9 @@ import {
   Chip,
   Button,
   Divider,
+  Tooltip,
 } from '@mui/material';
+
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
@@ -75,9 +77,13 @@ export const MemberProfileView: React.FC<MemberProfileViewProps> = ({
         {/* Profile Avatar & Header Details */}
         <div className={styles.profileHeader}>
           <div className={styles.avatarWrapper}>
-            <Avatar className={styles.avatar}>
+            <Avatar
+              className={styles.avatar}
+              src={user.profile_pic_url || user.avatar_url}
+            >
               {getInitials(user.user_name)}
             </Avatar>
+
           </div>
 
           <div className={styles.userNameRow}>
@@ -100,36 +106,43 @@ export const MemberProfileView: React.FC<MemberProfileViewProps> = ({
         <div className={styles.contentBody}>
           <h3 className={styles.sectionTitle}>Profile Details</h3>
           <div className={styles.infoGrid}>
-            <div className={styles.infoCard}>
-              <div className={styles.infoIcon}>
-                <EmailOutlinedIcon fontSize="small" />
+            <Tooltip title={`Email: ${user.email || 'N/A'}`} arrow placement="top">
+              <div className={styles.infoCard}>
+                <div className={styles.infoIcon}>
+                  <EmailOutlinedIcon fontSize="small" />
+                </div>
+                <div>
+                  <div className={styles.infoLabel}>Email Address</div>
+                  <div className={styles.infoValue}>{user.email || 'N/A'}</div>
+                </div>
               </div>
-              <div>
-                <div className={styles.infoLabel}>Email Address</div>
-                <div className={styles.infoValue}>{user.email || 'N/A'}</div>
-              </div>
-            </div>
+            </Tooltip>
 
-            <div className={styles.infoCard}>
-              <div className={styles.infoIcon}>
-                <PhoneOutlinedIcon fontSize="small" />
+            <Tooltip title={`Phone: ${user.phone || 'N/A'}`} arrow placement="top">
+              <div className={styles.infoCard}>
+                <div className={styles.infoIcon}>
+                  <PhoneOutlinedIcon fontSize="small" />
+                </div>
+                <div>
+                  <div className={styles.infoLabel}>Phone Number</div>
+                  <div className={styles.infoValue}>{user.phone || 'N/A'}</div>
+                </div>
               </div>
-              <div>
-                <div className={styles.infoLabel}>Phone Number</div>
-                <div className={styles.infoValue}>{user.phone || 'N/A'}</div>
-              </div>
-            </div>
+            </Tooltip>
 
-            <div className={styles.infoCard}>
-              <div className={styles.infoIcon}>
-                <LocationOnOutlinedIcon fontSize="small" />
+            <Tooltip title={`Location: ${formattedLocation || 'N/A'}`} arrow placement="top">
+              <div className={styles.infoCard}>
+                <div className={styles.infoIcon}>
+                  <LocationOnOutlinedIcon fontSize="small" />
+                </div>
+                <div>
+                  <div className={styles.infoLabel}>Location</div>
+                  <div className={styles.infoValue}>{formattedLocation || 'N/A'}</div>
+                </div>
               </div>
-              <div>
-                <div className={styles.infoLabel}>Location</div>
-                <div className={styles.infoValue}>{formattedLocation || 'N/A'}</div>
-              </div>
-            </div>
+            </Tooltip>
           </div>
+
 
           {/* Borrowed Books Section */}
           <div className={styles.borrowedSection}>

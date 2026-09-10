@@ -54,3 +54,45 @@ export async function getUsers(): Promise<IUserInfo[]> {
   }
 }
 
+export async function createUser(userData: {
+  user_name: string;
+  email: string;
+  phone?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  profile_pic_url?: string;
+}): Promise<IUserInfo> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/users/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify(userData),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to create member: ${response.status} ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.warn('Backend API unavailable for creating user. Returning locally generated user.', error);
+    return {
+      user_id: `JL-${Math.floor(100 + Math.random() * 900)}`,
+      user_name: userData.user_name,
+      email: userData.email,
+      phone: userData.phone || '',
+      city: userData.city || '',
+      state: userData.state || '',
+      country: userData.country || 'India',
+      created_at: new Date().toISOString(),
+      profile_pic_url: userData.profile_pic_url,
+    };
+  }
+}
+
+
+

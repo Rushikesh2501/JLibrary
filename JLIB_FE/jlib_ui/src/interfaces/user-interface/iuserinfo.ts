@@ -7,4 +7,7 @@ export interface IUserInfo {
   state: string;
   country: string;
   created_at: string;
+  profile_pic_url?: string;
+  avatar_url?: string;
 }
+

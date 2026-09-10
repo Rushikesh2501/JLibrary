@@ -11,9 +11,11 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import FilterAltOffIcon from '@mui/icons-material/FilterAltOff';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import AddIcon from '@mui/icons-material/Add';
 import { IUserInfo } from '../../interfaces/user-interface/iuserinfo';
-import { getUsers } from '../../services/userService';
+import { getUsers, createUser } from '../../services/userService';
 import { MemberProfileView } from './MemberProfileView';
+import { AddMemberModal } from './AddMemberModal';
 import { Loading } from '../common/Loading';
 import { ErrorState } from '../common/ErrorState';
 import { EmptyState } from '../common/EmptyState';
@@ -25,6 +27,7 @@ export const Members: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedUser, setSelectedUser] = useState<IUserInfo | null>(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
 
   const fetchUsersData = async () => {
     setLoading(true);
@@ -51,6 +54,20 @@ export const Members: React.FC = () => {
   const handleBackToList = () => {
     setSelectedUser(null);
   };
+
+  const handleAddMember = async (userData: {
+    user_name: string;
+    email: string;
+    phone: string;
+    city: string;
+    state: string;
+    country: string;
+    profile_pic_url?: string;
+  }) => {
+    const created = await createUser(userData);
+    setUsers((prev) => [created, ...prev]);
+  };
+
 
   // Get user initials for avatar
   const getInitials = (name: string) => {
@@ -87,12 +104,28 @@ export const Members: React.FC = () => {
         <>
           {/* Header Section */}
           <div className={styles.headerSection}>
-            <Typography variant="h4" className={styles.title}>
-              Library Members
-            </Typography>
-            <Typography variant="body1" className={styles.subtitle}>
-              Browse directory of registered members and view member profiles
-            </Typography>
+            <div className={styles.headerLeft}>
+              <Typography variant="h4" className={styles.title}>
+                Library Members
+              </Typography>
+              <Typography variant="body1" className={styles.subtitle}>
+                Browse directory of registered members and view member profiles
+              </Typography>
+            </div>
+
+            <div className={styles.headerRight}>
+              <div className={styles.totalMemberBadge}>
+                {users.length} {users.length === 1 ? 'Member' : 'Members'}
+              </div>
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={() => setIsAddModalOpen(true)}
+                className={styles.addMemberTopButton}
+              >
+                Add Member
+              </Button>
+            </div>
           </div>
 
           {/* Search & Filter Toolbar */}
@@ -116,23 +149,18 @@ export const Members: React.FC = () => {
                 }}
               />
 
-              <div className={styles.toolbarActions}>
-                <div className={styles.memberCountBadge}>
-                  {filteredUsers.length} {filteredUsers.length === 1 ? 'Member' : 'Members'}
-                </div>
-
-                <Button
-                  variant="outlined"
-                  disabled={!searchQuery.trim()}
-                  onClick={() => setSearchQuery('')}
-                  startIcon={<FilterAltOffIcon fontSize="small" />}
-                  className={styles.clearButton}
-                >
-                  Clear Filters
-                </Button>
-              </div>
+              <Button
+                variant="outlined"
+                disabled={!searchQuery.trim()}
+                onClick={() => setSearchQuery('')}
+                startIcon={<FilterAltOffIcon fontSize="small" />}
+                className={styles.clearButton}
+              >
+                Clear Filters
+              </Button>
             </Paper>
           </div>
+
 
           {/* Content Rendering States */}
           {loading ? (
@@ -156,9 +184,13 @@ export const Members: React.FC = () => {
                   className={styles.userCard}
                   onClick={() => handleCardClick(user)}
                 >
-                  <Avatar className={styles.avatar}>
+                  <Avatar
+                    className={styles.avatar}
+                    src={user.profile_pic_url || user.avatar_url}
+                  >
                     {getInitials(user.user_name)}
                   </Avatar>
+
 
                   <div className={styles.userInfo}>
                     <div className={styles.userName}>{user.user_name}</div>
@@ -183,8 +215,17 @@ export const Members: React.FC = () => {
           )}
         </>
       )}
+
+
+      {/* Add Member Modal */}
+      <AddMemberModal
+        open={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onSubmit={handleAddMember}
+      />
     </div>
   );
+
 };
 
 export default Members;
