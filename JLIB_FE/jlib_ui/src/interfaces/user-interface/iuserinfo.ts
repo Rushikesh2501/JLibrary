@@ -9,5 +9,7 @@ export interface IUserInfo {
   created_at: string;
   profile_pic_url?: string;
   avatar_url?: string;
+  status?: string;
+  is_active?: boolean;
 }
 

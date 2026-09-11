@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Box, Typography, Button } from '@mui/material';
+import { Card, Box, Typography } from '@mui/material';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import { IBook as Book } from 'interfaces/book-interface/ibook';
 import styles from './BookCard.module.css';
@@ -75,7 +75,7 @@ export const BookCard: React.FC<BookCardProps> = ({
     ? book.availability_status.toLowerCase() === 'available'
     : (book.is_available ?? (numericId % 3 !== 0));
 
-  const statusText = isAvailable ? 'To read' : 'Borrowed';
+  const statusText = isAvailable ? 'Available' : 'Borrowed';
   const languageText = (book.language || 'ENGLISH').toUpperCase();
 
   const fallbackGradients = [
@@ -134,19 +134,12 @@ export const BookCard: React.FC<BookCardProps> = ({
         </Box>
 
         <Box className={styles.pillRow}>
-          <span className={styles.statusPill}>{statusText}</span>
-          <span className={styles.ownedPill}>Owned</span>
-          <span className={styles.langPill}>{languageText}</span>
-          <Button
-            size="small"
-            className={styles.summaryBtn}
-            onClick={(e) => {
-              e.stopPropagation();
-              onSelectBook(book);
-            }}
-          >
-            Summary
-          </Button>
+          <span className={isAvailable ? styles.statusAvailPill : styles.statusBorrowedPill}>
+            {statusText}
+          </span>
+          <span className={styles.langPill} title={languageText}>
+            {languageText}
+          </span>
         </Box>
       </Box>
     </Card>

@@ -370,72 +370,87 @@
 .pillRow {
   display: flex !important;
   align-items: center !important;
-  flex-wrap: wrap !important;
-  gap: 8px !important;
+  gap: 10px !important;
   margin-top: 6px !important;
 }
 
-.statusPill {
-  background-color: #f4efe6;
-  color: #4a443f;
-  font-size: 0.72rem;
-  font-weight: 600;
-  padding: 3px 12px;
-  border-radius: 9999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1.2;
+.statusActivePill {
+  background-color: #4cc52415 !important;
+  border: 1.5px solid #2e7d32 !important;
+  color: #2e7d32 !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  width: 90px !important;
+  height: 26px !important;
+  border-radius: 9999px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  text-align: center !important;
+  line-height: 1 !important;
+  flex-shrink: 0 !important;
+}
+
+.statusInactivePill {
+  background-color: #c9090918 !important;
+  border: 1.5px solid #d32f2f !important;
+  color: #d32f2f !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  width: 90px !important;
+  height: 26px !important;
+  border-radius: 9999px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  text-align: center !important;
+  line-height: 1 !important;
+  flex-shrink: 0 !important;
 }
 
 .ownedPill {
-  background-color: #ffffff;
-  border: 1px solid #e7e2d9;
-  color: #4a443f;
-  font-size: 0.72rem;
-  font-weight: 600;
-  padding: 3px 12px;
-  border-radius: 9999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1.2;
+  background-color: #ffffff !important;
+  border: 1.5px solid #e7e2d9 !important;
+  color: #4a443f !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  width: 90px !important;
+  height: 26px !important;
+  border-radius: 9999px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  text-align: center !important;
+  line-height: 1 !important;
+  flex-shrink: 0 !important;
+  text-overflow: ellipsis !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
 }
 
 .langPill {
-  background-color: #ffffff;
-  border: 1px solid #e7e2d9;
-  color: #4a443f;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.4px;
-  padding: 3px 12px;
-  border-radius: 9999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-transform: uppercase;
-  line-height: 1.2;
-}
-
-.summaryBtn {
-  background-color: #1e5138 !important;
-  color: #ffffff !important;
-  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
-  font-size: 0.72rem !important;
-  font-weight: 600 !important;
-  text-transform: none !important;
-  padding: 3px 14px !important;
+  background-color: #ffffff !important;
+  border: 1.5px solid #e7e2d9 !important;
+  color: #4a443f !important;
+  font-size: 0.7rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.4px !important;
+  width: 90px !important;
+  height: 26px !important;
   border-radius: 9999px !important;
-  box-shadow: none !important;
-  line-height: 1.2 !important;
-  min-width: auto !important;
-  transition: background-color 0.2s ease !important;
-}
-
-.summaryBtn:hover {
-  background-color: #143c28 !important;
-  box-shadow: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  text-transform: uppercase !important;
+  line-height: 1 !important;
+  flex-shrink: 0 !important;
+  text-overflow: ellipsis !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
 }
 
 

@@ -49,6 +49,12 @@ const MemberCard: React.FC<MemberCardProps> = ({ user, bgGradient, onClick }) =>
     setImgError(false);
   }, [user.profile_pic_url, user.avatar_url]);
 
+  const isActive = user.status
+    ? user.status.toLowerCase() === 'active'
+    : (user.is_active ?? true);
+  const statusText = isActive ? 'Active' : 'Inactive';
+  const cityText = (user.city || 'Member').toUpperCase();
+
   return (
     <Card className={styles.bookCard} onClick={onClick} elevation={0}>
       {/* Left: Thumbnail Cover */}
@@ -84,19 +90,15 @@ const MemberCard: React.FC<MemberCardProps> = ({ user, bgGradient, onClick }) =>
         </Box>
 
         <Box className={styles.pillRow}>
-          <span className={styles.statusPill}>Active</span>
-          <span className={styles.ownedPill}>{user.user_id}</span>
-          <span className={styles.langPill}>{(user.city || 'Member').toUpperCase()}</span>
-          <Button
-            size="small"
-            className={styles.summaryBtn}
-            onClick={(e) => {
-              e.stopPropagation();
-              onClick();
-            }}
-          >
-            Profile
-          </Button>
+          <span className={isActive ? styles.statusActivePill : styles.statusInactivePill}>
+            {statusText}
+          </span>
+          <span className={styles.ownedPill} title={user.user_id}>
+            {user.user_id}
+          </span>
+          <span className={styles.langPill} title={cityText}>
+            {cityText}
+          </span>
         </Box>
       </Box>
     </Card>
