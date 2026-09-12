@@ -58,6 +58,23 @@
   gap: 14px;
 }
 
+.rowInputs > .fieldGroup {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 600px) {
+  .rowInputs {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .rowInputs > .fieldGroup {
+    flex: none;
+    width: 100%;
+  }
+}
+
 .inputField {
   width: 100%;
 }
@@ -151,8 +168,9 @@
 }
 
 .avatarPreviewThumb {
-  width: 58px !important;
-  height: 58px !important;
+  width: 64px !important;
+  height: 64px !important;
+  flex-shrink: 0 !important;
   border-radius: 50% !important;
   border: 2px solid var(--primary-forest) !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
@@ -163,30 +181,39 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 6px;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  width: 100%;
 }
 
 .avatarUploadedText {
   color: var(--primary-forest) !important;
   font-weight: 700 !important;
-  font-size: 0.88rem !important;
+  font-size: 0.85rem !important;
 }
 
 .avatarActionBtns {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
 }
 
 .cropBtn {
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
   border-color: var(--primary-forest) !important;
   color: var(--primary-forest) !important;
   text-transform: none !important;
   font-weight: 600 !important;
-  font-size: 0.8rem !important;
+  font-size: 0.82rem !important;
   border-radius: 6px !important;
-  padding: 3px 12px !important;
+  padding: 4px 12px !important;
   background-color: #ffffff !important;
+  box-sizing: border-box !important;
 }
 
 .cropBtn:hover {
@@ -194,15 +221,20 @@
 }
 
 .removeBtn {
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
   background-color: #ffffff !important;
   color: #d32f2f !important;
   border: 1.5px solid #d32f2f !important;
   text-transform: none !important;
   font-weight: 600 !important;
-  font-size: 0.8rem !important;
+  font-size: 0.82rem !important;
   border-radius: 6px !important;
-  padding: 3px 12px !important;
+  padding: 4px 12px !important;
   transition: all 0.2s ease !important;
+  box-sizing: border-box !important;
 }
 
 .removeBtn:hover {

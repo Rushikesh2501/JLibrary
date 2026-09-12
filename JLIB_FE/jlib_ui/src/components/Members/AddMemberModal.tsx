@@ -232,6 +232,7 @@ export const AddMemberModal: React.FC<AddMemberModalProps> = ({
                       </Typography>
                       <div className={styles.avatarActionBtns}>
                         <Button
+                          fullWidth
                           size="small"
                           variant="outlined"
                           startIcon={<CropIcon fontSize="small" />}
@@ -244,6 +245,7 @@ export const AddMemberModal: React.FC<AddMemberModalProps> = ({
                           Adjust Crop
                         </Button>
                         <Button
+                          fullWidth
                           size="small"
                           variant="outlined"
                           startIcon={<DeleteOutlineIcon fontSize="small" />}
@@ -255,7 +257,6 @@ export const AddMemberModal: React.FC<AddMemberModalProps> = ({
                         >
                           Remove
                         </Button>
-
                       </div>
                     </div>
                   </div>
@@ -346,7 +347,7 @@ export const AddMemberModal: React.FC<AddMemberModalProps> = ({
 
             {/* City & State */}
             <div className={styles.rowInputs}>
-              <div className={styles.fieldGroup} style={{ flex: 1 }}>
+              <div className={styles.fieldGroup}>
                 <Typography className={styles.fieldLabel}>
                   City <span className={styles.requiredStar}>*</span>
                 </Typography>
@@ -364,7 +365,7 @@ export const AddMemberModal: React.FC<AddMemberModalProps> = ({
                 />
               </div>
 
-              <div className={styles.fieldGroup} style={{ flex: 1 }}>
+              <div className={styles.fieldGroup}>
                 <Typography className={styles.fieldLabel}>
                   State <span className={styles.requiredStar}>*</span>
                 </Typography>
