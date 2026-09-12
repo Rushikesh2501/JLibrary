@@ -20,8 +20,9 @@ import CheckIcon from '@mui/icons-material/Check';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';
 import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import CropIcon from '@mui/icons-material/Crop';
+import AutoStoriesIcon from '@mui/icons-material/AutoStories';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { IBook as Book } from 'interfaces/book-interface/ibook';
 import { deleteBook, updateBook, deleteBookCover } from '../../services/bookService';
 import { ImageCropModal } from '../common/ImageCropModal';
@@ -318,6 +319,21 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
         : defaultCoverUrl);
   const isPlaceholder = !activeCoverUrl || activeCoverUrl.includes('book-placeholder');
 
+  const [coverLoaded, setCoverLoaded] = useState(false);
+  const [coverError, setCoverError] = useState(false);
+  const coverImgRef = useRef<HTMLImageElement | null>(null);
+
+  useEffect(() => {
+    setCoverLoaded(false);
+    setCoverError(false);
+  }, [activeCoverUrl]);
+
+  useEffect(() => {
+    if (coverImgRef.current && coverImgRef.current.complete && coverImgRef.current.naturalWidth > 0) {
+      setCoverLoaded(true);
+    }
+  }, [activeCoverUrl]);
+
   const handleDeleteCover = async (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
@@ -399,15 +415,70 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
             role={isEditing ? 'button' : undefined}
             tabIndex={isEditing ? 0 : undefined}
           >
+            {/* Fallback Cover with Book Icon (stays visible until cover image loads) */}
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                background: 'linear-gradient(135deg, #1b4332 0%, #2d5a27 100%)',
+                color: '#ffffff',
+                zIndex: 1,
+                padding: '16px 12px',
+                textAlign: 'center',
+                boxSizing: 'border-box',
+              }}
+            >
+              <div
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  width: 5,
+                  backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                }}
+              />
+              <AutoStoriesIcon sx={{ fontSize: 36, opacity: 0.88, mt: 1 }} />
+              <Typography
+                sx={{
+                  fontSize: '0.74rem',
+                  fontWeight: 700,
+                  lineHeight: 1.2,
+                  color: '#ffffff',
+                  display: '-webkit-box',
+                  WebkitLineClamp: 3,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                }}
+              >
+                {isEditing ? editTitle : currentBook.book_name}
+              </Typography>
+            </div>
+
             <img
+              ref={coverImgRef}
               src={activeCoverUrl}
               alt={isEditing ? editTitle : currentBook.book_name}
               className={styles.coverImage}
+              onLoad={() => setCoverLoaded(true)}
               onError={(e) => {
                 const target = e.currentTarget;
                 if (!target.src.endsWith(BOOK_PLACEHOLDER_URL)) {
                   target.src = BOOK_PLACEHOLDER_URL;
+                  setCoverLoaded(false);
+                } else {
+                  setCoverError(true);
                 }
+              }}
+              style={{
+                opacity: coverLoaded && !coverError ? 1 : 0,
+                transition: 'opacity 0.25s ease-in-out',
+                position: 'relative',
+                zIndex: 2,
               }}
             />
 

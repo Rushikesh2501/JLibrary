@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Paper,
   TextField,
@@ -42,12 +42,21 @@ interface MemberCardProps {
 }
 
 const MemberCard: React.FC<MemberCardProps> = ({ user, bgGradient, onClick }) => {
+  const [imgLoaded, setImgLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
+  const imgRef = useRef<HTMLImageElement | null>(null);
   const picUrl = getUserAvatarUrl(user);
 
   useEffect(() => {
+    setImgLoaded(false);
     setImgError(false);
   }, [user.profile_pic_url, user.avatar_url]);
+
+  useEffect(() => {
+    if (imgRef.current && imgRef.current.complete && imgRef.current.naturalWidth > 0) {
+      setImgLoaded(true);
+    }
+  }, [picUrl]);
 
   const isActive = user.status
     ? user.status.toLowerCase() === 'active'
@@ -59,21 +68,39 @@ const MemberCard: React.FC<MemberCardProps> = ({ user, bgGradient, onClick }) =>
     <Card className={styles.bookCard} onClick={onClick} elevation={0}>
       {/* Left: Thumbnail Cover */}
       <Box className={styles.coverWrapper}>
-        {picUrl && !imgError ? (
+        {/* Placeholder Cover with User Icon (stays visible until profile photo loads or if error / no photo) */}
+        <Box
+          className={styles.fallbackCover}
+          style={{
+            background: bgGradient,
+            position: picUrl && !imgError ? 'absolute' : 'relative',
+            inset: 0,
+            zIndex: 1,
+          }}
+        >
+          <Box className={styles.coverSpine} />
+          <PersonOutlinedIcon className={styles.coverIcon} />
+          <Typography className={styles.fallbackTitle}>
+            {user.user_name}
+          </Typography>
+        </Box>
+
+        {/* Member Profile Image (smoothly fades in once loaded) */}
+        {picUrl && !imgError && (
           <img
+            ref={imgRef}
             src={picUrl}
             alt={user.user_name}
             className={styles.coverImage}
+            onLoad={() => setImgLoaded(true)}
             onError={() => setImgError(true)}
+            style={{
+              opacity: imgLoaded ? 1 : 0,
+              transition: 'opacity 0.25s ease-in-out',
+              position: 'relative',
+              zIndex: 2,
+            }}
           />
-        ) : (
-          <Box className={styles.fallbackCover} style={{ background: bgGradient }}>
-            <Box className={styles.coverSpine} />
-            <PersonOutlinedIcon className={styles.coverIcon} />
-            <Typography className={styles.fallbackTitle}>
-              {user.user_name}
-            </Typography>
-          </Box>
         )}
       </Box>
 

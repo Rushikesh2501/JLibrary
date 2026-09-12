@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, Box, Typography } from '@mui/material';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import { IBook as Book } from 'interfaces/book-interface/ibook';
@@ -57,7 +57,9 @@ export const BookCard: React.FC<BookCardProps> = ({
   book,
   onSelectBook,
 }) => {
+  const [imgLoaded, setImgLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
+  const imgRef = useRef<HTMLImageElement | null>(null);
 
   const strId = String(book.book_id);
   const numericId = typeof book.book_id === 'number'
@@ -70,6 +72,17 @@ export const BookCard: React.FC<BookCardProps> = ({
     : (yearMatch ? yearMatch[0] : 'NA');
 
   const coverUrl = getBookCoverUrl(book, numericId);
+
+  useEffect(() => {
+    setImgLoaded(false);
+    setImgError(false);
+  }, [coverUrl]);
+
+  useEffect(() => {
+    if (imgRef.current && imgRef.current.complete && imgRef.current.naturalWidth > 0) {
+      setImgLoaded(true);
+    }
+  }, [coverUrl]);
 
   const isAvailable = book.availability_status
     ? book.availability_status.toLowerCase() === 'available'
@@ -90,29 +103,48 @@ export const BookCard: React.FC<BookCardProps> = ({
     <Card className={styles.bookCard} onClick={() => onSelectBook(book)} elevation={0}>
       {/* Left: Cover Thumbnail */}
       <Box className={styles.coverWrapper}>
-        {!imgError ? (
+        {/* Fallback Cover with Book Icon (stays visible until book cover loads or if error / no cover) */}
+        <Box
+          className={styles.fallbackCover}
+          style={{
+            background: bgGradient,
+            position: coverUrl && !imgError ? 'absolute' : 'relative',
+            inset: 0,
+            zIndex: 1,
+          }}
+        >
+          <Box className={styles.coverSpine} />
+          <AutoStoriesIcon className={styles.coverIcon} />
+          <Typography className={styles.fallbackTitle}>
+            {book.book_name}
+          </Typography>
+        </Box>
+
+        {/* Book Cover Image (smoothly fades in once loaded) */}
+        {coverUrl && !imgError && (
           <img
+            ref={imgRef}
             src={coverUrl}
             alt={book.book_name}
             className={styles.coverImage}
+            onLoad={() => setImgLoaded(true)}
             onError={(e) => {
               const target = e.currentTarget;
               const defaultPlaceholder = getDefaultBookCover(numericId);
               if (!target.src.includes('book-placeholder')) {
                 target.src = defaultPlaceholder;
+                setImgLoaded(false);
               } else {
                 setImgError(true);
               }
             }}
+            style={{
+              opacity: imgLoaded ? 1 : 0,
+              transition: 'opacity 0.25s ease-in-out',
+              position: 'relative',
+              zIndex: 2,
+            }}
           />
-        ) : (
-          <Box className={styles.fallbackCover} style={{ background: bgGradient }}>
-            <Box className={styles.coverSpine} />
-            <AutoStoriesIcon className={styles.coverIcon} />
-            <Typography className={styles.fallbackTitle}>
-              {book.book_name}
-            </Typography>
-          </Box>
         )}
       </Box>
 
