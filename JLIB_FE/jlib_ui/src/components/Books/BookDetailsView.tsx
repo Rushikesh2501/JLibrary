@@ -24,7 +24,7 @@ import CropIcon from '@mui/icons-material/Crop';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { IBook as Book } from 'interfaces/book-interface/ibook';
-import { deleteBook, updateBook, deleteBookCover } from '../../services/bookService';
+import { deleteBook, updateBook, deleteBookCover, getSafeBookCoverUrl } from '../../services/bookService';
 import { ImageCropModal } from '../common/ImageCropModal';
 import { getDefaultBookCover } from './BookCard';
 import styles from './BookDetailsView.module.css';
@@ -39,6 +39,8 @@ interface BookDetailsViewProps {
 const BOOK_PLACEHOLDER_URL = '/assets/book-placeholder.png';
 
 const getBookCoverUrl = (book: Book, numericId: number): string => {
+  const safeCover = getSafeBookCoverUrl(book);
+  if (safeCover) return safeCover;
   if (book.cover_url && book.cover_url.trim()) return book.cover_url.trim();
 
   const nameLower = (book.book_name || '').toLowerCase();
@@ -312,11 +314,12 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
     : (yearMatch ? yearMatch[0] : 'NA');
 
   const defaultCoverUrl = getBookCoverUrl(currentBook, numericId);
+  const safeCoverUrl = getSafeBookCoverUrl(currentBook);
   const activeCoverUrl = editCoverUrl
     ? editCoverUrl
     : (currentBook.cover_url !== undefined && currentBook.cover_url !== null
-        ? (currentBook.cover_url.trim() ? currentBook.cover_url : BOOK_PLACEHOLDER_URL)
-        : defaultCoverUrl);
+      ? (currentBook.cover_url.trim() ? (safeCoverUrl || currentBook.cover_url) : BOOK_PLACEHOLDER_URL)
+      : defaultCoverUrl);
   const isPlaceholder = !activeCoverUrl || activeCoverUrl.includes('book-placeholder');
 
   const [coverLoaded, setCoverLoaded] = useState(false);
@@ -357,7 +360,6 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
   const summaryData = getBookSummaryData(currentBook);
 
   const displayIsbn = currentBook.isbn || `978${1984816000 + (numericId * 13) % 9999}`;
-  const displayPages = currentBook.pages || (200 + (numericId * 17) % 250);
   const displayEdition = (currentBook.edition && currentBook.edition.trim() && currentBook.edition.trim() !== '—' && currentBook.edition.trim().toLowerCase() !== 'null')
     ? currentBook.edition.trim()
     : 'NA';
@@ -542,7 +544,6 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
                   {(isEditing ? editYear : publishedYear) ? ` · ${isEditing ? editYear : publishedYear}` : ''}
                   {(isEditing ? editPublisher : currentBook.publication) ? ` • Published by ${isEditing ? editPublisher : currentBook.publication}` : ''}
                 </div>
-
                 {/* Edit Button moved to top right corner below green area */}
                 <div className={styles.headerEditAction}>
                   {!isEditing ? (
@@ -778,19 +779,6 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
                   </div>
 
                   <div className={`${styles.tableRow} ${styles.tableRowEditable}`}>
-                    <span className={styles.tableLabel}>Pages</span>
-                    <TextField
-                      size="small"
-                      fullWidth
-                      type="number"
-                      value={editPages}
-                      onChange={(e) => setEditPages(e.target.value)}
-                      placeholder="Total pages"
-                      className={styles.editInputField}
-                    />
-                  </div>
-
-                  <div className={`${styles.tableRow} ${styles.tableRowEditable}`}>
                     <span className={styles.tableLabel}>Tags / Genre</span>
                     <TextField
                       size="small"
@@ -880,16 +868,6 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
                   </div>
 
                   <div className={styles.tableRow}>
-                    <span className={styles.tableLabel}>Pages</span>
-                    <span className={styles.tableValue}>{displayPages}</span>
-                  </div>
-
-                  <div className={styles.tableRow}>
-                    <span className={styles.tableLabel}>Condition</span>
-                    <span className={styles.tableValue}>Good</span>
-                  </div>
-
-                  <div className={styles.tableRow}>
                     <span className={styles.tableLabel}>Shelf location</span>
                     <span className={styles.tableValue}>{currentBook.section ? `Shelf ${currentBook.section}` : '—'}</span>
                   </div>
@@ -928,19 +906,6 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
                   {currentBook.description || editDescription || summaryData.overview || 'No description available for this book.'}
                 </div>
               )}
-            </div>
-
-            <div className={styles.summaryBlock}>
-              <span className={styles.summaryBlockLabel}>Key themes (one per line)</span>
-              <div className={styles.summaryTextBox}>
-                <ul className={styles.themeList}>
-                  {summaryData.keyThemes.map((theme, i) => (
-                    <li key={i} className={styles.themeItem}>
-                      {theme}
-                    </li>
-                  ))}
-                </ul>
-              </div>
             </div>
 
             {isEditing && (

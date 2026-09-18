@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Card, Box, Typography } from '@mui/material';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import { IBook as Book } from 'interfaces/book-interface/ibook';
+import { getSafeBookCoverUrl } from '../../services/bookService';
 import styles from './BookCard.module.css';
 
 interface BookCardProps {
@@ -25,6 +26,8 @@ export const getDefaultBookCover = (numericId: number): string => {
 };
 
 const getBookCoverUrl = (book: Book, numericId: number): string => {
+  const safeCover = getSafeBookCoverUrl(book);
+  if (safeCover) return safeCover;
   if (book.cover_url && book.cover_url.trim()) return book.cover_url.trim();
 
   const nameLower = (book.book_name || '').toLowerCase();

@@ -1,6 +1,28 @@
 import { IBook as Book } from '../interfaces/book-interface/ibook';
 import { API_BASE_URL } from '../config/api';
 
+/**
+ * Safely resolves a book's cover photo URL.
+ * Routes Supabase storage URLs through the backend /books/{book_id}/cover endpoint so that
+ * client-side ISP DNS blocks on *.supabase.co (e.g. on mobile networks) do not prevent covers from displaying.
+ */
+export function getSafeBookCoverUrl(book?: Book | null): string | undefined {
+  if (!book) return undefined;
+  const rawUrl = book.cover_url;
+  if (!rawUrl || !rawUrl.trim()) return undefined;
+
+  const trimmed = rawUrl.trim();
+  if (trimmed.startsWith('data:')) {
+    return trimmed;
+  }
+  if (trimmed.includes('supabase.co')) {
+    const queryMatch = trimmed.match(/\?.*$/);
+    const query = queryMatch ? queryMatch[0] : '';
+    return `${API_BASE_URL}/books/${encodeURIComponent(book.book_id)}/cover${query}`;
+  }
+  return trimmed;
+}
+
 export async function getBooks(): Promise<Book[]> {
   try {
     const response = await fetch(`${API_BASE_URL}/books/`, {

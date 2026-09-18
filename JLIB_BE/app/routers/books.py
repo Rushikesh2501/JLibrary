@@ -1,5 +1,5 @@
 from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, Query, File, UploadFile, status
+from fastapi import APIRouter, Depends, HTTPException, Query, File, UploadFile, status, Response
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -119,6 +119,63 @@ def update_book(book_id: str, book_update: BookUpdate, db: Session = Depends(get
     if not updated_book:
         raise HTTPException(status_code=404, detail="Book not found")
     return updated_book
+
+
+@router.get("/{book_id}/cover")
+def get_book_cover(book_id: str, db: Session = Depends(get_db)):
+    """
+    Serve book cover photo directly from Supabase Storage bucket 'Book_profile'.
+    Bypasses any client-side ISP DNS blocks on *.supabase.co.
+    """
+    book = book_service.get_book_by_id(db, book_id=book_id)
+    if not book:
+        raise HTTPException(status_code=404, detail="Book not found")
+
+    # If book has base64 data url, decode and return it directly
+    if book.cover_url and book.cover_url.startswith("data:image"):
+        try:
+            import base64
+            header, b64 = book.cover_url.split(",", 1)
+            media_type = header.split(";")[0].replace("data:", "")
+            return Response(
+                content=base64.b64decode(b64),
+                media_type=media_type,
+                headers={"Cache-Control": "public, max-age=86400"}
+            )
+        except Exception:
+            pass
+
+    from app.core.supabase import supabase_client, get_book_storage_folder, STORAGE_BUCKET
+    if not supabase_client:
+        raise HTTPException(status_code=404, detail="Storage client not configured")
+
+    folder = get_book_storage_folder(book_id)
+
+    # If cover_url specifies a path in Book_profile, try that exact path first
+    paths_to_try = []
+    if book.cover_url and "/Book_profile/" in book.cover_url:
+        exact_path = book.cover_url.split("/Book_profile/", 1)[1].split("?")[0]
+        paths_to_try.append(exact_path)
+
+    for filename in ["cover.jpg", "cover.png", "cover.webp", "cover.jpeg"]:
+        cand = f"{folder}/{filename}"
+        if cand not in paths_to_try:
+            paths_to_try.append(cand)
+
+    for path in paths_to_try:
+        try:
+            img_bytes = supabase_client.storage.from_(STORAGE_BUCKET).download(path)
+            if img_bytes:
+                media_type = "image/png" if "png" in path else ("image/webp" if "webp" in path else "image/jpeg")
+                return Response(
+                    content=img_bytes,
+                    media_type=media_type,
+                    headers={"Cache-Control": "public, max-age=86400"}
+                )
+        except Exception:
+            continue
+
+    raise HTTPException(status_code=404, detail="Book cover not found")
 
 
 @router.post("/{book_id}/cover")
