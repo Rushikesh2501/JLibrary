@@ -13,12 +13,36 @@ import styles from './App.module.css';
 import { MembersPage } from './pages/MembersPage';
 
 export const App: React.FC = () => {
-  const [currentView, setCurrentView] = useState<NavView>('dashboard');
+  const [currentView, setCurrentView] = useState<NavView>(() => {
+    try {
+      const saved = sessionStorage.getItem('currentView');
+      if (saved === 'dashboard' || saved === 'books' || saved === 'members') {
+        return saved as NavView;
+      }
+    } catch (e) {}
+    return 'dashboard';
+  });
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+
+  const handleSelectView = (view: NavView) => {
+    setCurrentView(view);
+    try {
+      sessionStorage.setItem('currentView', view);
+    } catch (e) {}
+  };
 
   const [books, setBooks] = useState<Book[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (window.location.search.includes('_t=')) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('_t');
+      const cleanUrl = url.pathname + (url.search ? url.search : '') + url.hash;
+      window.history.replaceState({}, document.title, cleanUrl);
+    }
+  }, []);
 
   const fetchBooks = useCallback(async () => {
     setIsLoading(true);
@@ -61,7 +85,7 @@ export const App: React.FC = () => {
             backgroundColor: 'var(--bg-sidebar)',
           }}
         >
-          <Sidebar currentView={currentView} onSelectView={setCurrentView} />
+          <Sidebar currentView={currentView} onSelectView={handleSelectView} />
         </Grid>
 
         {/* Mobile Navigation Drawer */}
@@ -73,7 +97,7 @@ export const App: React.FC = () => {
         >
           <Sidebar
             currentView={currentView}
-            onSelectView={setCurrentView}
+            onSelectView={handleSelectView}
             onCloseMobileDrawer={() => setMobileDrawerOpen(false)}
           />
         </Drawer>
@@ -92,7 +116,7 @@ export const App: React.FC = () => {
             ) : error ? (
               <ErrorState message={error} onRetry={fetchBooks} />
             ) : currentView === 'dashboard' ? (
-              <DashboardPage books={books} onNavigateToBooks={() => setCurrentView('books')} />
+              <DashboardPage books={books} onNavigateToBooks={() => handleSelectView('books')} />
             ) : currentView === 'books' ? (
               <BooksPage books={books} />
             ) : (
