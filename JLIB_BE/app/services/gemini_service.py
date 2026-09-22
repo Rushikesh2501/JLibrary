@@ -50,7 +50,15 @@ Return ONLY a valid JSON object matching this schema:
 }}
 If the ISBN does not match any known book in your database, return an empty JSON object: {{}}
 """
-        models_to_try = ['gemini-3.5-flash', 'gemini-3.6-flash', 'gemini-flash-latest']
+        models_to_try = [
+            'gemini-flash-lite-latest',
+            'gemini-3.5-flash-lite',
+            'gemini-3.1-flash-lite',
+            'gemini-3.7-flash',
+            'gemini-3.5-flash',
+            'gemini-3.6-flash',
+            'gemini-flash-latest',
+        ]
         response_text = None
 
         for model_name in models_to_try:
@@ -77,6 +85,7 @@ If the ISBN does not match any known book in your database, return an empty JSON
                     import re
                     clean_title = re.sub(r'\s*\([A-Za-z\s]+\)$', '', raw_title).strip()
                     native_title = data.get("nativeTitle") or data.get("native_title") or ""
+                    authors = data.get("authors") or data.get("author") or ""
                     lang = format_language_name(data.get("language", ""))
                     final_title = remove_diacritics(clean_title)
                     if lang in ("Marathi", "मराठी") or lang.lower() == "marathi":
@@ -182,7 +191,15 @@ Return ONLY a valid JSON object matching this schema:
 """
         contents.append(prompt)
 
-        models_to_try = ['gemini-3.5-flash', 'gemini-3.6-flash', 'gemini-flash-latest']
+        models_to_try = [
+            'gemini-flash-lite-latest',
+            'gemini-3.5-flash-lite',
+            'gemini-3.1-flash-lite',
+            'gemini-3.7-flash',
+            'gemini-3.5-flash',
+            'gemini-3.6-flash',
+            'gemini-flash-latest',
+        ]
         response_text = None
 
         for model_name in models_to_try:
