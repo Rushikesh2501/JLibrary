@@ -69,23 +69,29 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
     setIsLookingUp(true);
     setLookupError(null);
 
+    const isbnPayload = {
+      isbn: targetIsbn.trim(),
+    };
+    console.log('isbn add book', isbnPayload);
+
     try {
       const details = await fetchBookDetailsByIsbn(targetIsbn);
+      console.log('isbn add book response', details);
       if (details && (details.title || details.authors)) {
         const langName = details.language ? formatLanguageName(details.language) : 'English';
         const cleanTitle = cleanDiacritics(details.title || '');
         const computedNative = determineNativeTitle(details.title || '', details.nativeTitle || '', langName);
 
         if (cleanTitle) setTitle(cleanTitle);
-        setNativeTitle(computedNative);
-        if (details.authors) setAuthors(cleanDiacritics(details.authors));
-        if (details.publisher) setPublisher(cleanDiacritics(details.publisher));
-        if (details.publishedDate) setYear(details.publishedDate);
-        if (details.pageCount) setPages(details.pageCount);
-        setLanguage(langName);
-        if (details.edition) setEdition(details.edition);
-        if (details.categories) setTags(details.categories);
-        if (details.description) setDescription(cleanDiacritics(details.description));
+        setNativeTitle(computedNative || 'N/A');
+        setAuthors(details.authors && details.authors.trim() ? cleanDiacritics(details.authors) : 'N/A');
+        setPublisher(details.publisher && details.publisher.trim() ? cleanDiacritics(details.publisher) : 'N/A');
+        setYear(details.publishedDate && details.publishedDate.trim() ? details.publishedDate : 'N/A');
+        setPages(details.pageCount && details.pageCount.trim() ? details.pageCount : 'N/A');
+        setLanguage(langName || 'N/A');
+        setEdition(details.edition && details.edition.trim() ? details.edition : 'N/A');
+        setTags(details.categories && details.categories.trim() ? details.categories : 'N/A');
+        setDescription(details.description && details.description.trim() ? cleanDiacritics(details.description) : 'N/A');
         setHasIsbnFound(true);
         setIsFormEditable(false);
       } else {
@@ -94,6 +100,7 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
         setLookupError('No book details found for this ISBN.');
       }
     } catch (err) {
+      console.error('isbn add book error', err);
       setHasIsbnFound(false);
       setIsFormEditable(false);
       setLookupError('Failed to fetch details.');
@@ -165,28 +172,35 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
 
     const finalCover = coverUrlToUse ?? (usePhotoForProfile && frontPhotoUrl ? (croppedCoverUrl || frontPhotoUrl) : null);
 
-    const newBookData = {
+    const addType = `${activeTab} add book`;
+    const cleanedIsbn = isbn.trim();
+    // Do not add any ISBN if photo doesn't have an ISBN
+    const shouldIncludeIsbn = activeTab === 'photo' ? Boolean(cleanedIsbn) : Boolean(cleanedIsbn);
+
+    const newBookData: any = {
       book_id: finalBookId,
       shelf_no: upperShelf,
       section: upperShelf,
       book_name: title,
-      native_title: nativeTitle,
-      book_name_native_lang: nativeTitle,
-      author: authors || 'Unknown Author',
+      native_title: nativeTitle.trim() || 'N/A',
+      book_name_native_lang: nativeTitle.trim() || 'N/A',
+      author: authors.trim() || 'N/A',
 
-      genre: tags ? tags.split(',')[0].trim() : 'General',
-      publication: publisher || 'Self Published',
-      description: description,
+      genre: tags.trim() ? tags.split(',')[0].trim() : 'N/A',
+      publication: publisher.trim() || 'N/A',
+      description: description.trim() || 'N/A',
       is_available: status === 'Owned',
       status: status,
-      isbn,
-      year,
-      pages,
-      language,
-      edition,
+      ...(shouldIncludeIsbn ? { isbn: cleanedIsbn } : {}),
+      year: year.trim() || 'N/A',
+      pages: pages.trim() || 'N/A',
+      language: language.trim() || 'N/A',
+      edition: edition.trim() || 'N/A',
       reading_status: readingStatus,
       ...(finalCover ? { cover_url: finalCover } : {}),
+      add_type: addType,
     };
+    console.log(addType, newBookData);
     console.log("newBookData", newBookData);
     if (onAddBook) {
       onAddBook(newBookData);
@@ -243,35 +257,62 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
     setIsExtractingPhoto(true);
     setPhotoExtractError(null);
 
+    const photoPayload = {
+      frontPhoto: frontPhoto ? { name: frontPhoto.name, size: frontPhoto.size, type: frontPhoto.type } : null,
+      backPhoto: backPhoto ? { name: backPhoto.name, size: backPhoto.size, type: backPhoto.type } : null,
+    };
+    console.log('photo add book', photoPayload);
+
     try {
       const details = await fetchBookDetailsByPhoto(frontPhoto, backPhoto);
+      console.log('photo add book response', details);
       if (details && (details.title || details.authors)) {
         const langName = details.language ? formatLanguageName(details.language) : 'English';
         const cleanTitle = cleanDiacritics(details.title || '');
         const computedNative = determineNativeTitle(details.title || '', details.nativeTitle || '', langName);
 
         if (cleanTitle) setTitle(cleanTitle);
-        setNativeTitle(computedNative);
-        if (details.authors) setAuthors(cleanDiacritics(details.authors));
-        if (details.publisher) setPublisher(cleanDiacritics(details.publisher));
-        if (details.publishedDate) setYear(details.publishedDate);
-        if (details.pageCount) setPages(details.pageCount);
-        setLanguage(langName);
-        if (details.edition) setEdition(details.edition);
-        if (details.categories) setTags(details.categories);
-        if (details.description) setDescription(cleanDiacritics(details.description));
-        if (details.isbn) setIsbn(details.isbn);
+        setNativeTitle(computedNative || 'N/A');
+        setAuthors(details.authors && details.authors.trim() ? cleanDiacritics(details.authors) : 'N/A');
+        setPublisher(details.publisher && details.publisher.trim() ? cleanDiacritics(details.publisher) : 'N/A');
+        setYear(details.publishedDate && details.publishedDate.trim() ? details.publishedDate : 'N/A');
+        setPages(details.pageCount && details.pageCount.trim() ? details.pageCount : 'N/A');
+        setLanguage(langName || 'N/A');
+        setEdition(details.edition && details.edition.trim() ? details.edition : 'N/A');
+        setTags(details.categories && details.categories.trim() ? details.categories : 'N/A');
+        setDescription(details.description && details.description.trim() ? cleanDiacritics(details.description) : 'N/A');
+        if (details.isbn && details.isbn.trim()) {
+          setIsbn(details.isbn.trim());
+        } else {
+          setIsbn('');
+        }
         setHasPhotoFound(true);
+
+        console.log('[handlePhotoExtract] Extracted fields:', {
+          cleanTitle,
+          computedNative,
+          authors: details.authors,
+          publisher: details.publisher,
+          publishedDate: details.publishedDate,
+          pageCount: details.pageCount,
+          language: langName,
+          edition: details.edition,
+          categories: details.categories,
+          description: details.description,
+          isbn: details.isbn,
+        });
       } else {
         setHasPhotoFound(false);
         setPhotoExtractError('Could not extract details from the uploaded photo. Please enter details manually.');
       }
     } catch (err) {
+      console.error('photo add book error', err);
       setHasPhotoFound(false);
       setPhotoExtractError('Failed to process image with Gemini AI.');
     } finally {
       setIsExtractingPhoto(false);
     }
+
   };
 
   const handleCancelPhoto = () => {
@@ -281,6 +322,7 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
     setBackPhotoUrl(null);
     setPhotoExtractError(null);
     setHasPhotoFound(false);
+    setIsbn('');
     setUsePhotoForProfile(false);
     setCroppedCoverUrl(null);
     setIsSubmittingOnCrop(false);
@@ -289,6 +331,7 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
   const handleFrontPhotoSelect = (file: File) => {
     setFrontPhoto(file);
     setHasPhotoFound(false);
+    setIsbn('');
     setUsePhotoForProfile(true);
     setCroppedCoverUrl(null);
     const reader = new FileReader();
@@ -303,6 +346,7 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
   const handleBackPhotoSelect = (file: File) => {
     setBackPhoto(file);
     setHasPhotoFound(false);
+    setIsbn('');
     const reader = new FileReader();
     reader.onload = (e) => {
       if (e.target?.result) {
@@ -981,7 +1025,7 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
                     const val = e.target.value;
                     const formatted = val ? formatLanguageName(val) : '';
                     setLanguage(formatted);
-                    if (formatted.toLowerCase() === 'marathi') {
+                    if (formatted.toLowerCase() === 'marathi' || formatted === 'मराठी') {
                       if (!nativeTitle || nativeTitle === title) {
                         setNativeTitle(iastToDevanagari(title));
                       }

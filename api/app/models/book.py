@@ -21,10 +21,20 @@ class Book(Base):
     date_modified: Mapped[date | None] = mapped_column(Date, nullable=True)
     cover_url: Mapped[str | None] = mapped_column(Text, nullable=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    isbn: Mapped[str | None] = mapped_column(Text, nullable=True)
+    published_year: Mapped[str | None] = mapped_column(Text, nullable=True)
+    edition: Mapped[str | None] = mapped_column(Text, nullable=True)
+    language: Mapped[str | None] = mapped_column(Text, nullable=True)
+    pages: Mapped[str | None] = mapped_column(Text, nullable=True)
+    reading_status: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     @property
     def native_title(self) -> str | None:
         return self.book_name_native_lang
+
+    @property
+    def year(self) -> str | None:
+        return self.published_year
 
 
 

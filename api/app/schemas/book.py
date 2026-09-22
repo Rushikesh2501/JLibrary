@@ -19,6 +19,13 @@ class BookResponse(BaseModel):
     date_modified: date | None = None
     cover_url: str | None = None
     description: str | None = None
+    isbn: str | None = None
+    published_year: str | None = None
+    year: str | None = None
+    edition: str | None = None
+    language: str | None = None
+    pages: str | None = None
+    reading_status: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -45,6 +52,13 @@ class BookCreate(BaseModel):
     date_modified: date | None = None
     cover_url: str | None = None
     description: str | None = None
+    isbn: str | None = None
+    published_year: str | None = None
+    year: str | None = None
+    edition: str | None = None
+    language: str | None = None
+    pages: str | None = None
+    reading_status: str | None = None
 
 
 class BookUpdate(BaseModel):
@@ -62,6 +76,13 @@ class BookUpdate(BaseModel):
     date_modified: date | None = None
     cover_url: str | None = None
     description: str | None = None
+    isbn: str | None = None
+    published_year: str | None = None
+    year: str | None = None
+    edition: str | None = None
+    language: str | None = None
+    pages: str | None = None
+    reading_status: str | None = None
 
 
 

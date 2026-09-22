@@ -107,13 +107,20 @@ const LANGUAGE_NAME_MAP: Record<string, string> = {
 export function formatLanguageName(codeOrName: string): string {
   if (!codeOrName || !codeOrName.trim()) return 'English';
   const clean = codeOrName.trim().toLowerCase();
+  if (clean === 'marathi' || clean === 'mr' || clean === 'mar' || clean === 'मराठी') {
+    return 'मराठी';
+  }
   if (LANGUAGE_NAME_MAP[clean]) {
-    return LANGUAGE_NAME_MAP[clean];
+    const mapped = LANGUAGE_NAME_MAP[clean];
+    return mapped.toLowerCase() === 'marathi' ? 'मराठी' : mapped;
   }
   try {
     const displayNames = new Intl.DisplayNames(['en'], { type: 'language' });
     const name = displayNames.of(clean);
     if (name) {
+      if (name.toLowerCase() === 'marathi') {
+        return 'मराठी';
+      }
       return name.charAt(0).toUpperCase() + name.slice(1);
     }
   } catch (e) {
@@ -222,7 +229,7 @@ export function iastToDevanagari(text: string): string {
 export function determineNativeTitle(rawTitle: string, rawNative: string, language: string): string {
   const cleanTitle = cleanDiacritics(rawTitle);
   const lang = formatLanguageName(language);
-  if (lang.toLowerCase() === 'marathi') {
+  if (lang.toLowerCase() === 'marathi' || lang === 'मराठी') {
     if (rawNative && /[\u0900-\u097F]/.test(rawNative)) {
       return rawNative;
     }
@@ -348,15 +355,15 @@ export async function fetchBookDetailsByIsbn(isbn: string): Promise<GoogleBookDe
 
           return {
             title: cleanTitle,
-            nativeTitle,
-            authors: cleanDiacritics(b.authors || ''),
-            publisher: cleanDiacritics(b.publisher || ''),
-            publishedDate: b.publishedDate || '',
-            description: cleanDiacritics(b.description || ''),
-            pageCount: b.pageCount || '',
-            language: langName,
-            edition: b.edition || '',
-            categories: b.categories || '',
+            nativeTitle: nativeTitle || 'N/A',
+            authors: cleanDiacritics(b.authors || '').trim() || 'N/A',
+            publisher: cleanDiacritics(b.publisher || '').trim() || 'N/A',
+            publishedDate: (b.publishedDate || '').trim() || 'N/A',
+            description: cleanDiacritics(b.description || '').trim() || 'N/A',
+            pageCount: (b.pageCount || '').trim() || 'N/A',
+            language: langName || 'N/A',
+            edition: (b.edition || '').trim() || 'N/A',
+            categories: (b.categories || '').trim() || 'N/A',
             coverUrl: b.coverUrl || '',
             isbn: cleanIsbn,
           };
@@ -455,6 +462,7 @@ export async function fetchBookDetailsByPhoto(
 
     if (res.ok) {
       const data = await res.json();
+      console.log('[fetchBookDetailsByPhoto] API response:', data);
       if (data && data.found && data.book) {
         const b = data.book;
         const rawTitle = b.title || '';
@@ -462,21 +470,29 @@ export async function fetchBookDetailsByPhoto(
         const langName = formatLanguageName(b.language || '');
         const nativeTitle = determineNativeTitle(rawTitle, b.nativeTitle || '', langName);
 
+        const rawIsbn = (b.isbn || '').trim();
+        const cleanIsbnDigits = rawIsbn.replace(/[^0-9X]/gi, '');
+        const validIsbn = (cleanIsbnDigits.length === 10 || cleanIsbnDigits.length === 13) ? cleanIsbnDigits : '';
+
         return {
           title: cleanTitle,
-          nativeTitle,
-          authors: cleanDiacritics(b.authors || ''),
-          publisher: cleanDiacritics(b.publisher || ''),
-          publishedDate: b.publishedDate || '',
-          description: cleanDiacritics(b.description || ''),
-          pageCount: b.pageCount || '',
-          language: langName,
-          edition: b.edition || '',
-          categories: b.categories || '',
+          nativeTitle: nativeTitle || 'N/A',
+          authors: cleanDiacritics(b.authors || '').trim() || 'N/A',
+          publisher: cleanDiacritics(b.publisher || '').trim() || 'N/A',
+          publishedDate: (b.publishedDate || '').trim() || 'N/A',
+          description: cleanDiacritics(b.description || '').trim() || 'N/A',
+          pageCount: (b.pageCount || '').trim() || 'N/A',
+          language: langName || 'N/A',
+          edition: (b.edition || '').trim() || 'N/A',
+          categories: (b.categories || '').trim() || 'N/A',
           coverUrl: b.coverUrl || '',
-          isbn: b.isbn || '',
+          isbn: validIsbn,
         };
+      } else {
+        console.warn('[fetchBookDetailsByPhoto] No book found in photo response:', data);
       }
+    } else {
+      console.error(`[fetchBookDetailsByPhoto] Server responded with status ${res.status}: ${res.statusText}`);
     }
   } catch (err) {
     console.error('Backend Gemini Photo lookup error:', err);
@@ -491,11 +507,17 @@ export async function createBook(bookData: Partial<Book>, prefix: string = 'JL-'
     book_name_native_lang: bookData.book_name_native_lang || bookData.native_title || null,
     author: bookData.author,
     genre: bookData.genre || 'General',
-    publication: bookData.publication || 'Self Published',
+    publication: bookData.publication || 'N/A',
     section: bookData.section || 'General',
     availability_status: bookData.availability_status || (bookData.is_available ? 'Available' : 'Unavailable'),
     borrowed_by: bookData.borrowed_by || null,
     book_id: bookData.book_id || undefined,
+    isbn: bookData.isbn || undefined,
+    published_year: bookData.published_year || (bookData as any).year || undefined,
+    edition: bookData.edition || undefined,
+    language: bookData.language || undefined,
+    pages: bookData.pages ? String(bookData.pages) : undefined,
+    reading_status: bookData.reading_status || undefined,
   };
   if (bookData.cover_url) {
     payload.cover_url = bookData.cover_url;
@@ -536,6 +558,14 @@ export async function updateBook(bookId: string, bookData: Partial<Book>): Promi
     section: bookData.section,
     availability_status: bookData.availability_status,
     borrowed_by: bookData.borrowed_by,
+    ...(bookData.isbn !== undefined ? { isbn: bookData.isbn } : {}),
+    ...(bookData.published_year !== undefined || (bookData as any).year !== undefined
+      ? { published_year: bookData.published_year || (bookData as any).year }
+      : {}),
+    ...(bookData.edition !== undefined ? { edition: bookData.edition } : {}),
+    ...(bookData.language !== undefined ? { language: bookData.language } : {}),
+    ...(bookData.pages !== undefined ? { pages: String(bookData.pages) } : {}),
+    ...(bookData.reading_status !== undefined ? { reading_status: bookData.reading_status } : {}),
   };
   if (bookData.cover_url !== undefined) {
     payload.cover_url = bookData.cover_url;

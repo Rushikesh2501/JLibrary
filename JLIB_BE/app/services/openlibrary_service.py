@@ -64,6 +64,8 @@ def format_language_name(code: str) -> str:
     if not code:
         return "English"
     c = code.strip().lower()
+    if c in ("marathi", "mr", "mar", "मराठी"):
+        return "मराठी"
     return LANGUAGE_MAP.get(c, code.strip().capitalize())
 
 

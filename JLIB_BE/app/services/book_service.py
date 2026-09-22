@@ -93,6 +93,12 @@ def create_book(db: Session, book_in: BookCreate, prefix: str = "JL-") -> Book:
         date_modified=book_in.date_modified or date.today(),
         cover_url=cover_url,
         description=book_in.description,
+        isbn=book_in.isbn,
+        published_year=book_in.published_year or book_in.year,
+        edition=book_in.edition,
+        language=book_in.language,
+        pages=book_in.pages,
+        reading_status=book_in.reading_status,
     )
     db.add(db_book)
     db.commit()
@@ -116,6 +122,12 @@ def update_book(db: Session, book_id: str, book_update: BookUpdate) -> Book | No
         update_data["book_name_native_lang"] = update_data.pop("native_title")
     else:
         update_data.pop("native_title", None)
+
+    # If year was passed instead of published_year, map it
+    if "year" in update_data and not update_data.get("published_year"):
+        update_data["published_year"] = update_data.pop("year")
+    else:
+        update_data.pop("year", None)
 
     # Handle cover_url updates
     if "cover_url" in update_data:

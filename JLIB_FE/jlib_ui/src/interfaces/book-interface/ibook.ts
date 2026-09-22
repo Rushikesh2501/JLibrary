@@ -11,6 +11,7 @@ export interface Book {
   is_available?: boolean;
   cover_url?: string;
   published_year?: number | string;
+  year?: number | string;
   language?: string;
   isbn?: string;
   edition?: string;

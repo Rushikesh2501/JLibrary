@@ -79,7 +79,7 @@ If the ISBN does not match any known book in your database, return an empty JSON
                     native_title = data.get("nativeTitle") or data.get("native_title") or ""
                     lang = format_language_name(data.get("language", ""))
                     final_title = remove_diacritics(clean_title)
-                    if lang.lower() == "marathi":
+                    if lang in ("Marathi", "मराठी") or lang.lower() == "marathi":
                         final_native = native_title if (native_title and any("\u0900" <= c <= "\u097F" for c in native_title)) else iast_to_devanagari(native_title or clean_title)
                     else:
                         final_native = final_title
@@ -159,6 +159,11 @@ CRITICAL INSTRUCTION FOR BACK COVER & DESCRIPTION:
 - If only the front cover is provided, generate a concise, informative 2-3 sentence overview of the book's premise/subject for the "description" field.
 - Do NOT leave "description" empty.
 
+CRITICAL INSTRUCTION FOR ISBN:
+- STRICT REQUIREMENT: Only return an ISBN if an ISBN barcode or numerical ISBN (e.g. 978-...) is VISIBLY PRINTED on the uploaded photo(s).
+- If NO ISBN is visibly printed on the photo(s), you MUST return "" (empty string) for "isbn".
+- DO NOT pull, guess, or hallucinate an ISBN from your external knowledge base if it is not visible on the photo.
+
 Return ONLY a valid JSON object matching this schema:
 {
   "title": "Title of the book",
@@ -172,7 +177,7 @@ Return ONLY a valid JSON object matching this schema:
   "edition": "Edition details if visible",
   "categories": "Categories or genre",
   "coverUrl": "",
-  "isbn": "ISBN-10 or ISBN-13 barcode text if visible"
+  "isbn": "ISBN-10 or ISBN-13 barcode text ONLY if visible on the photo, else empty string \"\""
 }
 """
         contents.append(prompt)
@@ -203,27 +208,32 @@ Return ONLY a valid JSON object matching this schema:
                 if raw_title:
                     import re
                     clean_title = re.sub(r'\s*\([A-Za-z\s]+\)$', '', raw_title).strip()
+                    native_title = data.get("nativeTitle") or data.get("native_title") or ""
                     authors = data.get("authors") or data.get("author") or ""
                     lang = format_language_name(data.get("language", ""))
                     final_title = remove_diacritics(clean_title)
-                    if lang.lower() == "marathi":
+                    if lang in ("Marathi", "मराठी") or lang.lower() == "marathi":
                         final_native = native_title if (native_title and any("\u0900" <= c <= "\u097F" for c in native_title)) else iast_to_devanagari(native_title or clean_title)
                     else:
                         final_native = final_title
 
+                    raw_isbn = str(data.get("isbn") or "").strip()
+                    clean_isbn_digits = "".join(c for c in raw_isbn if c.isdigit() or c.upper() == 'X')
+                    final_isbn = clean_isbn_digits if len(clean_isbn_digits) in (10, 13) else ""
+
                     return {
                         "title": final_title,
-                        "nativeTitle": final_native,
-                        "authors": remove_diacritics(authors),
-                        "publisher": remove_diacritics(data.get("publisher", "")),
-                        "publishedDate": str(data.get("publishedDate") or data.get("published_date") or data.get("year") or ""),
-                        "description": remove_diacritics(data.get("description", "")),
-                        "pageCount": str(data.get("pageCount") or data.get("pages") or data.get("page_count") or ""),
-                        "language": lang,
-                        "edition": data.get("edition", "First edition"),
-                        "categories": data.get("categories", ""),
+                        "nativeTitle": final_native or "N/A",
+                        "authors": remove_diacritics(authors) or "N/A",
+                        "publisher": remove_diacritics(data.get("publisher", "")) or "N/A",
+                        "publishedDate": str(data.get("publishedDate") or data.get("published_date") or data.get("year") or "").strip() or "N/A",
+                        "description": remove_diacritics(data.get("description", "")) or "N/A",
+                        "pageCount": str(data.get("pageCount") or data.get("pages") or data.get("page_count") or "").strip() or "N/A",
+                        "language": lang or "N/A",
+                        "edition": str(data.get("edition") or "").strip() or "N/A",
+                        "categories": str(data.get("categories") or "").strip() or "N/A",
                         "coverUrl": data.get("coverUrl", ""),
-                        "isbn": str(data.get("isbn", ""))
+                        "isbn": final_isbn
                     }
     except Exception as e:
         logger.error(f"Gemini API photo lookup error: {e}")
