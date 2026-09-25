@@ -69,9 +69,39 @@ const getBookCoverUrl = (book: Book, numericId: number): string => {
   return getDefaultBookCover(numericId);
 };
 
+export const isMarathiBook = (book: Book): boolean => {
+  const lang = (book.language || '').toLowerCase().trim();
+  if (lang === 'marathi' || lang === 'मराठी' || lang === 'mr' || lang === 'mar') return true;
+  if (book.book_name_native_lang && /[\u0900-\u097F]/.test(book.book_name_native_lang)) return true;
+  if (book.native_title && /[\u0900-\u097F]/.test(book.native_title)) return true;
+  return false;
+};
+
+export const hasDevanagari = (text?: string | null): boolean => {
+  if (!text) return false;
+  return /[\u0900-\u097F]/.test(text);
+};
+
 const getBookSummaryData = (book: Book) => {
-  const title = book.book_name || 'Book';
-  const author = book.author || 'Author';
+  const isMarathi = isMarathiBook(book);
+  const title = isMarathi
+    ? (book.book_name_native_lang || book.native_title || book.book_name || 'पुस्तक')
+    : (book.book_name || 'Book');
+  const author = book.author || (isMarathi ? 'प्रसिद्ध लेखक' : 'Author');
+  const genre = book.genre || (isMarathi ? 'साहित्य' : 'General');
+
+  if (isMarathi) {
+    return {
+      overview: `'${title}' हे ${author} यांचे ${genre} विषयावरील एक महत्त्वपूर्ण व वाचनीय पुस्तक आहे. या पुस्तकात विषयाचे सखोल विश्लेषण, प्रभावी मांडणी आणि प्रेरणादायी विचार मांडण्यात आले आहेत. वाचकांना समृद्ध करणारा आणि नवीन दृष्टिकोन देणारा हा एक उत्कृष्ट ग्रंथ आहे.`,
+      keyThemes: [
+        'व्यक्तिमत्त्व विकास आणि जीवनमूल्ये',
+        'ज्ञान, चिकाटी आणि शोधक वृत्तीची ताकद',
+        'सामाजिक व मानवी नातेसंबंधांची समृद्ध मांडणी',
+        'संस्कृती, इतिहास आणि प्रेरणादायी विचार',
+      ],
+      whoShouldRead: `मराठी साहित्याची आवड असणारे वाचक, ${genre} विषयाचे अभ्यासक आणि ग्रंथालयाचे सर्व सन्माननीय सभासद.`,
+    };
+  }
 
   if (title.toLowerCase().includes('boy who harnessed')) {
     return {
@@ -885,11 +915,11 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
         {activeTab === 'Summary' && (
           <div className={styles.cardBox}>
             <div className={styles.cardHeader}>
-              <span className={styles.cardTitle}>Summary</span>
+              <span className={styles.cardTitle}>{isMarathiBook(currentBook) ? 'पुस्तकाचा सारांश (Summary)' : 'Summary'}</span>
             </div>
 
             <div className={styles.summaryBlock}>
-              <span className={styles.summaryBlockLabel}>Description</span>
+              <span className={styles.summaryBlockLabel}>{isMarathiBook(currentBook) ? 'वर्णन / सारांश (Description)' : 'Description'}</span>
               {isEditing ? (
                 <TextField
                   size="small"
@@ -898,12 +928,24 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
                   rows={4}
                   value={editDescription}
                   onChange={(e) => setEditDescription(e.target.value)}
-                  placeholder="Enter book description or summary from back cover..."
+                  placeholder={isMarathiBook(currentBook) ? "पुस्तकाचा सारांश किंवा माहिती येथे लिहा..." : "Enter book description or summary from back cover..."}
                   className={styles.editInputField}
                 />
               ) : (
                 <div className={styles.summaryTextBox}>
-                  {currentBook.description || editDescription || summaryData.overview || 'No description available for this book.'}
+                  {(() => {
+                    const isMarathi = isMarathiBook(currentBook);
+                    if (isMarathi) {
+                      if (currentBook.description && hasDevanagari(currentBook.description) && currentBook.description.trim() !== 'N/A') {
+                        return currentBook.description;
+                      }
+                      if (editDescription && hasDevanagari(editDescription)) {
+                        return editDescription;
+                      }
+                      return summaryData.overview;
+                    }
+                    return currentBook.description || editDescription || summaryData.overview || 'No description available for this book.';
+                  })()}
                 </div>
               )}
             </div>

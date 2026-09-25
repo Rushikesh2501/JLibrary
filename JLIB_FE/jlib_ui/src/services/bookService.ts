@@ -314,7 +314,10 @@ export async function fetchBookDetailsByIsbn(isbn: string): Promise<GoogleBookDe
             coverUrl = `https://covers.openlibrary.org/b/olid/${doc.cover_edition_key}-L.jpg`;
           }
 
-          return {
+          const isMarathi = langName.toLowerCase() === 'marathi' || langName === 'मराठी';
+          const hasDescDevanagari = /[\u0900-\u097F]/.test(subtitle || '');
+
+          const openLibResult = {
             title: cleanTitle,
             nativeTitle,
             authors: cleanDiacritics(authors),
@@ -328,6 +331,11 @@ export async function fetchBookDetailsByIsbn(isbn: string): Promise<GoogleBookDe
             coverUrl,
             isbn: cleanIsbn,
           };
+
+          if (!isMarathi || hasDescDevanagari) {
+            return openLibResult;
+          }
+          // If Marathi book has no Marathi summary in OpenLibrary, continue to Gemini backend
         }
       }
     }

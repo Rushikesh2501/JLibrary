@@ -7,6 +7,50 @@ from app.services.openlibrary_service import format_language_name, remove_diacri
 
 logger = logging.getLogger(__name__)
 
+def generate_marathi_summary_gemini(
+    client: genai.Client,
+    title: str,
+    author: str,
+    genre: str = "",
+    existing_desc: str = ""
+) -> str:
+    """
+    Generates or translates a concise 2-4 sentence summary in Marathi (Devanagari) for a Marathi book.
+    """
+    prompt = f"""Provide a concise, engaging, 2 to 4 sentence summary/overview of the following Marathi book entirely in Marathi (मराठी देवनागरी लिपी):
+Book Title: {title}
+Author: {author}
+Genre: {genre}
+Existing notes/overview: {existing_desc}
+
+Requirements:
+- The summary MUST be entirely in fluent, grammatically correct Marathi (मराठी).
+- Do not use English words or Latin alphabet.
+- Keep it engaging, clear, and informative (2-4 sentences).
+- Return ONLY the Marathi text summary, with no quotes, formatting, or preamble.
+"""
+    models_to_try = [
+        'gemini-flash-lite-latest',
+        'gemini-3.5-flash-lite',
+        'gemini-3.1-flash-lite',
+        'gemini-3.7-flash',
+        'gemini-3.5-flash',
+        'gemini-flash-latest',
+    ]
+    for model_name in models_to_try:
+        try:
+            res = client.models.generate_content(
+                model=model_name,
+                contents=prompt,
+            )
+            if res and res.text and any("\u0900" <= c <= "\u097F" for c in res.text):
+                return res.text.strip().strip('"').strip("'")
+        except Exception:
+            continue
+
+    return f"'{title}' हे {author or 'प्रसिद्ध लेखक'} यांचे {genre or 'साहित्य'} विषयावरील एक महत्त्वपूर्ण व वाचनीय पुस्तक आहे. या पुस्तकात विषयाचे सखोल विश्लेषण आणि विचारप्रवर्तक मांडणी करण्यात आली आहे."
+
+
 def lookup_book_by_isbn_gemini(isbn: str) -> dict | None:
     """
     Lookup book details using Google Gemini LLM API.
@@ -33,6 +77,10 @@ def lookup_book_by_isbn_gemini(isbn: str) -> dict | None:
         prompt = f"""
 Find and return the bibliographic details for the book with ISBN "{clean_isbn}" or ISBN-13 "{isbn13}".
 
+CRITICAL LANGUAGE INSTRUCTION FOR MARATHI BOOKS:
+- If the book language is Marathi (or if the title, author, or publisher is in Marathi / Devanagari script), the "description" field MUST ALWAYS BE WRITTEN IN MARATHI (मराठी देवनागरी लिपी).
+- Never return an English description or summary for a Marathi book.
+
 Return ONLY a valid JSON object matching this schema:
 {{
   "title": "Title of the book",
@@ -40,7 +88,7 @@ Return ONLY a valid JSON object matching this schema:
   "authors": "Author name(s)",
   "publisher": "Publisher name",
   "publishedDate": "Publication year",
-  "description": "Short description of the book",
+  "description": "Short description of the book (MUST be in Marathi if the book is in Marathi)",
   "pageCount": "Number of pages",
   "language": "Language",
   "edition": "Edition",
@@ -90,8 +138,13 @@ If the ISBN does not match any known book in your database, return an empty JSON
                     final_title = remove_diacritics(clean_title)
                     if lang in ("Marathi", "मराठी") or lang.lower() == "marathi":
                         final_native = native_title if (native_title and any("\u0900" <= c <= "\u097F" for c in native_title)) else iast_to_devanagari(native_title or clean_title)
+                        raw_desc = data.get("description", "") or ""
+                        if not any("\u0900" <= c <= "\u097F" for c in raw_desc):
+                            raw_desc = generate_marathi_summary_gemini(client, final_title, authors, data.get("categories", ""), raw_desc)
+                        final_desc = raw_desc.strip()
                     else:
                         final_native = final_title
+                        final_desc = remove_diacritics(data.get("description", ""))
 
                     return {
                         "title": final_title,
@@ -99,7 +152,7 @@ If the ISBN does not match any known book in your database, return an empty JSON
                         "authors": remove_diacritics(authors),
                         "publisher": remove_diacritics(data.get("publisher", "")),
                         "publishedDate": str(data.get("publishedDate") or data.get("published_date") or data.get("year") or ""),
-                        "description": remove_diacritics(data.get("description", "")),
+                        "description": final_desc,
                         "pageCount": str(data.get("pageCount") or data.get("pages") or data.get("page_count") or ""),
                         "language": lang,
                         "edition": data.get("edition", "First edition"),
@@ -168,6 +221,11 @@ CRITICAL INSTRUCTION FOR BACK COVER & DESCRIPTION:
 - If only the front cover is provided, generate a concise, informative 2-3 sentence overview of the book's premise/subject for the "description" field.
 - Do NOT leave "description" empty.
 
+CRITICAL LANGUAGE INSTRUCTION FOR MARATHI BOOKS:
+- If the book is in Marathi (or if the cover, title, or back cover blurb is in Marathi/Devanagari script), the "description" field MUST ALWAYS BE WRITTEN IN MARATHI (मराठी देवनागरी लिपी).
+- Even if the back cover text is in English or only front cover is provided, write/translate the synopsis/overview into authentic, fluent Marathi (मराठी).
+- Never return an English description or summary for a Marathi book.
+
 CRITICAL INSTRUCTION FOR ISBN:
 - STRICT REQUIREMENT: Only return an ISBN if an ISBN barcode or numerical ISBN (e.g. 978-...) is VISIBLY PRINTED on the uploaded photo(s).
 - If NO ISBN is visibly printed on the photo(s), you MUST return "" (empty string) for "isbn".
@@ -180,7 +238,7 @@ Return ONLY a valid JSON object matching this schema:
   "authors": "Author name(s)",
   "publisher": "Publisher name",
   "publishedDate": "Publication year",
-  "description": "Synopsis or summary extracted from the back cover text, or a concise book overview",
+  "description": "Synopsis or summary extracted from the back cover text, or a concise book overview (MUST be in Marathi if the book is in Marathi)",
   "pageCount": "Number of pages if visible else empty string",
   "language": "Language of the text",
   "edition": "Edition details if visible",
@@ -231,8 +289,13 @@ Return ONLY a valid JSON object matching this schema:
                     final_title = remove_diacritics(clean_title)
                     if lang in ("Marathi", "मराठी") or lang.lower() == "marathi":
                         final_native = native_title if (native_title and any("\u0900" <= c <= "\u097F" for c in native_title)) else iast_to_devanagari(native_title or clean_title)
+                        raw_desc = data.get("description", "") or ""
+                        if not any("\u0900" <= c <= "\u097F" for c in raw_desc):
+                            raw_desc = generate_marathi_summary_gemini(client, final_title, authors, data.get("categories", ""), raw_desc)
+                        final_desc = raw_desc.strip()
                     else:
                         final_native = final_title
+                        final_desc = remove_diacritics(data.get("description", "")) or "N/A"
 
                     raw_isbn = str(data.get("isbn") or "").strip()
                     clean_isbn_digits = "".join(c for c in raw_isbn if c.isdigit() or c.upper() == 'X')
@@ -244,7 +307,7 @@ Return ONLY a valid JSON object matching this schema:
                         "authors": remove_diacritics(authors) or "N/A",
                         "publisher": remove_diacritics(data.get("publisher", "")) or "N/A",
                         "publishedDate": str(data.get("publishedDate") or data.get("published_date") or data.get("year") or "").strip() or "N/A",
-                        "description": remove_diacritics(data.get("description", "")) or "N/A",
+                        "description": final_desc,
                         "pageCount": str(data.get("pageCount") or data.get("pages") or data.get("page_count") or "").strip() or "N/A",
                         "language": lang or "N/A",
                         "edition": str(data.get("edition") or "").strip() or "N/A",
