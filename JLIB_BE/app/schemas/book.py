@@ -1,5 +1,8 @@
-from datetime import date
-from pydantic import BaseModel, ConfigDict
+from datetime import date, datetime
+from zoneinfo import ZoneInfo
+from pydantic import BaseModel, ConfigDict, field_serializer
+
+IST = ZoneInfo("Asia/Kolkata")
 
 
 class BookResponse(BaseModel):
@@ -15,8 +18,8 @@ class BookResponse(BaseModel):
     availability_status: str
     borrowed_by: str | None = None
     number_of_times_borrowed: int | None = 0
-    date_added: date | None = None
-    date_modified: date | None = None
+    date_added: datetime | None = None
+    date_modified: datetime | None = None
     cover_url: str | None = None
     description: str | None = None
     isbn: str | None = None
@@ -26,6 +29,18 @@ class BookResponse(BaseModel):
     language: str | None = None
     pages: str | None = None
     reading_status: str | None = None
+
+    @field_serializer("date_added", "date_modified", when_used="json")
+    def serialize_dt_ist(self, dt: datetime | None) -> str | None:
+        if dt is None:
+            return None
+        if isinstance(dt, datetime):
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=IST)
+            else:
+                dt = dt.astimezone(IST)
+            return dt.isoformat()
+        return str(dt)
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -48,8 +63,8 @@ class BookCreate(BaseModel):
     availability_status: str = "Available"
     borrowed_by: str | None = None
     book_id: str | None = None  # If not provided, will be auto-generated with prefix (e.g. JL-1, JL-2, ...)
-    date_added: date | None = None
-    date_modified: date | None = None
+    date_added: datetime | date | None = None
+    date_modified: datetime | date | None = None
     cover_url: str | None = None
     description: str | None = None
     isbn: str | None = None
@@ -72,8 +87,8 @@ class BookUpdate(BaseModel):
     availability_status: str | None = None
     borrowed_by: str | None = None
     book_id: str | None = None
-    date_added: date | None = None
-    date_modified: date | None = None
+    date_added: datetime | date | None = None
+    date_modified: datetime | date | None = None
     cover_url: str | None = None
     description: str | None = None
     isbn: str | None = None

@@ -1,8 +1,23 @@
 import re
-from datetime import date
+from datetime import date, datetime
+from zoneinfo import ZoneInfo
 from sqlalchemy.orm import Session
 from app.models.book import Book
 from app.schemas.book import BookCreate, BookUpdate
+
+IST = ZoneInfo("Asia/Kolkata")
+
+
+def ensure_ist_datetime(val: datetime | date | None) -> datetime:
+    if val is None:
+        return datetime.now(IST)
+    if isinstance(val, datetime):
+        if val.tzinfo is None:
+            return val.replace(tzinfo=IST)
+        return val.astimezone(IST)
+    if isinstance(val, date):
+        return datetime(val.year, val.month, val.day, tzinfo=IST)
+    return datetime.now(IST)
 
 
 
@@ -89,8 +104,8 @@ def create_book(db: Session, book_in: BookCreate, prefix: str = "JL-") -> Book:
         availability_status=book_in.availability_status or "Available",
         borrowed_by=book_in.borrowed_by,
         number_of_times_borrowed=0,
-        date_added=book_in.date_added or date.today(),
-        date_modified=book_in.date_modified or date.today(),
+        date_added=ensure_ist_datetime(book_in.date_added),
+        date_modified=ensure_ist_datetime(book_in.date_modified),
         cover_url=cover_url,
         description=book_in.description,
         isbn=book_in.isbn,
@@ -129,6 +144,12 @@ def update_book(db: Session, book_id: str, book_update: BookUpdate) -> Book | No
     else:
         update_data.pop("year", None)
 
+    # Handle date_added and date_modified conversions if passed
+    if "date_added" in update_data and update_data["date_added"] is not None:
+        update_data["date_added"] = ensure_ist_datetime(update_data["date_added"])
+    if "date_modified" in update_data and update_data["date_modified"] is not None:
+        update_data["date_modified"] = ensure_ist_datetime(update_data["date_modified"])
+
     # Handle cover_url updates
     if "cover_url" in update_data:
         cover_val = update_data["cover_url"]
@@ -158,7 +179,7 @@ def update_book(db: Session, book_id: str, book_update: BookUpdate) -> Book | No
 
     # Always update date_modified on update unless explicitly set
     if "date_modified" not in update_data:
-        db_book.date_modified = date.today()
+        db_book.date_modified = datetime.now(IST)
 
     db.commit()
     db.refresh(db_book)
