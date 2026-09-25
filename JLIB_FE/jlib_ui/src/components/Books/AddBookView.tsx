@@ -814,11 +814,11 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
                   <Typography sx={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--primary-forest, #1b4332)' }}>
                     Front Cover Attached as Book Profile
                   </Typography>
-                  <Typography sx={{ fontSize: '0.78rem', color: '#57534e' }}>
-                    {croppedCoverUrl
-                      ? '✓ Cropped and ready for book profile'
-                      : 'Will prompt to crop & adjust when clicking "Add to library"'}
-                  </Typography>
+                  {croppedCoverUrl && (
+                    <Typography sx={{ fontSize: '0.78rem', color: '#2d6a4f', fontWeight: 500 }}>
+                      ✓ Cropped and ready for book profile
+                    </Typography>
+                  )}
                 </Box>
               </Box>
 
