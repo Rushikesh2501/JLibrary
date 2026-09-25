@@ -178,7 +178,7 @@ def update_book(db: Session, book_id: str, book_update: BookUpdate) -> Book | No
             setattr(db_book, field, value)
 
     # Always update date_modified on update unless explicitly set
-    if "date_modified" not in update_data:
+    if "date_modified" not in update_data or update_data["date_modified"] is None:
         db_book.date_modified = datetime.now(IST)
 
     db.commit()

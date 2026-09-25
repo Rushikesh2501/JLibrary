@@ -74,31 +74,29 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books: initialBooks }) => 
       });
     }
 
+    const parseTime = (val?: string | null): number => {
+      if (!val) return 0;
+      const t = new Date(val).getTime();
+      return isNaN(t) ? 0 : t;
+    };
+
     if (sortBy === 'DATE_ADDED') {
       return [...result].sort((a, b) => {
-        const timeA = a.created_at || a.date_added ? new Date(a.created_at || a.date_added!).getTime() : 0;
-        const timeB = b.created_at || b.date_added ? new Date(b.created_at || b.date_added!).getTime() : 0;
-        if (timeA && timeB && timeA !== timeB) return timeB - timeA;
+        const timeA = parseTime(a.date_added) || parseTime(a.created_at);
+        const timeB = parseTime(b.date_added) || parseTime(b.created_at);
+        if (timeA !== timeB) return timeB - timeA;
 
-        const numA = parseInt(String(a.book_id).replace(/\D/g, ''), 10) || 0;
-        const numB = parseInt(String(b.book_id).replace(/\D/g, ''), 10) || 0;
-        return numB - numA;
+        return String(b.book_id).localeCompare(String(a.book_id), undefined, { numeric: true, sensitivity: 'base' });
       });
     }
 
     if (sortBy === 'DATE_MODIFIED') {
       return [...result].sort((a, b) => {
-        const timeA = a.updated_at || a.date_modified || a.created_at || a.date_added
-          ? new Date(a.updated_at || a.date_modified || a.created_at || a.date_added!).getTime()
-          : 0;
-        const timeB = b.updated_at || b.date_modified || b.created_at || b.date_added
-          ? new Date(b.updated_at || b.date_modified || b.created_at || b.date_added!).getTime()
-          : 0;
-        if (timeA && timeB && timeA !== timeB) return timeB - timeA;
+        const timeA = parseTime(a.date_modified) || parseTime(a.updated_at) || parseTime(a.date_added) || parseTime(a.created_at);
+        const timeB = parseTime(b.date_modified) || parseTime(b.updated_at) || parseTime(b.date_added) || parseTime(b.created_at);
+        if (timeA !== timeB) return timeB - timeA;
 
-        const numA = parseInt(String(a.book_id).replace(/\D/g, ''), 10) || 0;
-        const numB = parseInt(String(b.book_id).replace(/\D/g, ''), 10) || 0;
-        return numB - numA;
+        return String(b.book_id).localeCompare(String(a.book_id), undefined, { numeric: true, sensitivity: 'base' });
       });
     }
 
@@ -171,8 +169,8 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books: initialBooks }) => 
     const now = new Date().toISOString();
     const bookWithTime: Book = {
       ...updatedBook,
-      updated_at: now,
-      date_modified: now,
+      date_modified: updatedBook.date_modified || now,
+      updated_at: updatedBook.updated_at || updatedBook.date_modified || now,
     };
     setBooksList((prev) =>
       prev.map((b) => (String(b.book_id) === String(updatedBook.book_id) ? bookWithTime : b))
