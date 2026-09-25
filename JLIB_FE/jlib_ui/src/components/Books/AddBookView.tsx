@@ -787,8 +787,8 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
             <Box
               sx={{
                 display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
+                flexDirection: 'column',
+                gap: 1.5,
                 p: 1.5,
                 px: 2,
                 mb: 2.5,
@@ -807,6 +807,7 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
                     objectFit: 'cover',
                     borderRadius: '6px',
                     border: '1px solid #d6cebf',
+                    flexShrink: 0,
                   }}
                 />
                 <Box>
@@ -823,6 +824,7 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
 
               <Button
                 type="button"
+                fullWidth
                 size="small"
                 variant="outlined"
                 startIcon={<CropIcon fontSize="small" />}
@@ -831,17 +833,19 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
                   setCropModalOpen(true);
                 }}
                 sx={{
+                  width: '100%',
                   textTransform: 'none',
                   fontWeight: 600,
-                  fontSize: '0.8rem',
+                  fontSize: '0.85rem',
                   borderRadius: '8px',
                   borderColor: 'var(--primary-forest, #1b4332)',
                   color: 'var(--primary-forest, #1b4332)',
                   bgcolor: '#ffffff',
+                  py: 0.65,
                   '&:hover': { bgcolor: '#f4efe6' },
                 }}
               >
-                {croppedCoverUrl ? 'Adjust Crop' : 'Crop Now'}
+                {croppedCoverUrl ? 'Adjust crop' : 'Crop now'}
               </Button>
             </Box>
           )}
