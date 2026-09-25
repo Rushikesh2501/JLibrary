@@ -915,11 +915,11 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
         {activeTab === 'Summary' && (
           <div className={styles.cardBox}>
             <div className={styles.cardHeader}>
-              <span className={styles.cardTitle}>{isMarathiBook(currentBook) ? 'पुस्तकाचा सारांश (Summary)' : 'Summary'}</span>
+              <span className={styles.cardTitle}>{'Summary'}</span>
             </div>
 
             <div className={styles.summaryBlock}>
-              <span className={styles.summaryBlockLabel}>{isMarathiBook(currentBook) ? 'वर्णन / सारांश (Description)' : 'Description'}</span>
+              <span className={styles.summaryBlockLabel}>{'Description'}</span>
               {isEditing ? (
                 <TextField
                   size="small"

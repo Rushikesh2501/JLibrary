@@ -43,6 +43,17 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books: initialBooks }) => 
     const result = booksList.filter((book) => {
       if (searchTerm.trim()) {
         const query = searchTerm.toLowerCase().trim();
+        const cleanQuery = query.startsWith('#') ? query.slice(1).trim() : query;
+        const normalizedQuery = query.replace(/[-_#\s]/g, '');
+
+        const bookIdStr = String(book.book_id || '').toLowerCase();
+        const normalizedBookId = bookIdStr.replace(/[-_#\s]/g, '');
+
+        const matchesId =
+          bookIdStr.includes(query) ||
+          (cleanQuery ? bookIdStr.includes(cleanQuery) : false) ||
+          (normalizedQuery ? normalizedBookId.includes(normalizedQuery) : false);
+
         const matchesName = book.book_name?.toLowerCase().includes(query);
         const matchesNativeTitle = (book.book_name_native_lang || book.native_title)?.toLowerCase().includes(query);
         const matchesAuthor = book.author?.toLowerCase().includes(query);
@@ -52,7 +63,7 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books: initialBooks }) => 
         const matchesSection = book.section?.toLowerCase().includes(query);
         const matchesIsbn = book.isbn?.toLowerCase().includes(query);
 
-        return matchesName || matchesNativeTitle || matchesAuthor || matchesGenre || matchesPub || matchesSection || matchesIsbn;
+        return matchesId || matchesName || matchesNativeTitle || matchesAuthor || matchesGenre || matchesPub || matchesSection || matchesIsbn;
       }
 
       return true;

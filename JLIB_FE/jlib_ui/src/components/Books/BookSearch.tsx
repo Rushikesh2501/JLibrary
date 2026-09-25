@@ -13,7 +13,7 @@ export const BookSearch: React.FC<BookSearchProps> = ({ searchTerm, onSearchChan
     <Box className={styles.searchBox}>
       <TextField
         fullWidth
-        placeholder="Search your library (title, author, genre, section)..."
+        placeholder="Search your library (title, book ID, author, genre)..."
         value={searchTerm}
         onChange={(e) => onSearchChange(e.target.value)}
         className={styles.searchField}
