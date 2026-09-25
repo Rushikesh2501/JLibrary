@@ -846,57 +846,6 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
             </Box>
           )}
 
-          {/* Shelf No & Auto-generated Book ID */}
-          <Grid container spacing={2} sx={{ mb: 1 }}>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <Box className={styles.fieldGroup}>
-                <Typography className={styles.fieldLabel}>
-                  Shelf No <span className={styles.requiredStar}>*</span>
-                </Typography>
-                <TextField
-                  fullWidth
-                  size="small"
-                  variant="outlined"
-                  placeholder='A/B/C'
-                  value={shelfNo}
-                  onChange={(e) => setShelfNo(e.target.value.toUpperCase())}
-                  required
-                  slotProps={{
-                    htmlInput: {
-                      style: { textTransform: 'uppercase', fontWeight: 600 },
-                    },
-                  }}
-                  className={styles.inputField}
-                />
-              </Box>
-            </Grid>
-
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <Box className={styles.fieldGroup}>
-                <Typography className={styles.fieldLabel}>
-                  Book ID (Auto-assigned)
-                </Typography>
-                <TextField
-                  fullWidth
-                  size="small"
-                  variant="outlined"
-                  value={
-                    shelfNo.trim()
-                      ? (isFetchingBookId ? 'Finding next ID...' : bookId)
-                      : ''
-                  }
-                  disabled
-                  slotProps={{
-                    htmlInput: {
-                      style: { fontWeight: 700, letterSpacing: '0.5px' },
-                    },
-                  }}
-                  className={styles.inputField}
-                />
-              </Box>
-            </Grid>
-          </Grid>
-
           {/* Title */}
           <Box className={styles.fieldGroup}>
             <Typography className={styles.fieldLabel}>
@@ -1106,6 +1055,58 @@ export const AddBookView: React.FC<AddBookViewProps> = ({
                   className={styles.inputField}
                 />
               </Box>
+            </Grid>
+
+
+            {/* Shelf No & Auto-generated Book ID */}
+            <Grid container spacing={2} sx={{ mb: 1 }} size={{ xs: 12 }}>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Box className={styles.fieldGroup}>
+                  <Typography className={styles.fieldLabel}>
+                    Shelf No <span className={styles.requiredStar}>*</span>
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    variant="outlined"
+                    placeholder='A/B/C'
+                    value={shelfNo}
+                    onChange={(e) => setShelfNo(e.target.value.toUpperCase())}
+                    required
+                    slotProps={{
+                      htmlInput: {
+                        style: { textTransform: 'uppercase', fontWeight: 600 },
+                      },
+                    }}
+                    className={styles.inputField}
+                  />
+                </Box>
+              </Grid>
+
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Box className={styles.fieldGroup}>
+                  <Typography className={styles.fieldLabel}>
+                    Book ID (Auto-assigned)
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    variant="outlined"
+                    value={
+                      shelfNo.trim()
+                        ? (isFetchingBookId ? 'Finding next ID...' : bookId)
+                        : ''
+                    }
+                    disabled
+                    slotProps={{
+                      htmlInput: {
+                        style: { fontWeight: 700, letterSpacing: '0.5px' },
+                      },
+                    }}
+                    className={styles.inputField}
+                  />
+                </Box>
+              </Grid>
             </Grid>
           </Grid>
 
