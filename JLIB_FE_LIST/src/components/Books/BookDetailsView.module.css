@@ -1,8 +1,10 @@
 .profileContainer {
   width: 100%;
+  max-width: 100%;
   padding: 0 0 36px 0;
   box-sizing: border-box;
   animation: fadeIn 0.25s ease-out;
+  overflow-x: hidden;
 }
 
 .backButtonRow {

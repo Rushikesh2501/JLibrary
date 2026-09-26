@@ -64,7 +64,10 @@
 
 html, body {
   width: 100%;
+  max-width: 100%;
   min-height: 100%;
+  overflow-x: hidden;
+  position: relative;
   background-color: var(--bg-app);
   color: var(--text-primary);
   font-family: var(--font-sans);

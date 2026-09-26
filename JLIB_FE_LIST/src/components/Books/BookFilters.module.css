@@ -9,6 +9,7 @@
   margin-bottom: 12px;
   box-sizing: border-box;
   width: 100%;
+  max-width: 100%;
 }
 
 .searchBox {
@@ -187,24 +188,56 @@
     align-items: stretch;
     gap: 10px;
     padding: 10px 12px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .searchBox {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .searchInput {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
   }
 
   .controlsGroup {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 8px;
     width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .selectWrapper {
     width: 100%;
+    max-width: 100%;
     min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .selectField {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    font-size: 0.82rem;
+    padding: 0 24px 0 10px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
   }
 
   .clearFiltersBtn {
     grid-column: 1 / -1;
     width: 100%;
+    max-width: 100%;
     height: 38px;
     min-height: 38px;
+    font-size: 0.82rem;
   }
 }

@@ -6,16 +6,21 @@
   position: sticky;
   top: 0;
   z-index: 50;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .inner {
   max-width: 1400px;
+  width: 100%;
   margin: 0 auto;
   padding: 0.9rem 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1.5rem;
+  box-sizing: border-box;
 }
 
 .brand {
@@ -103,25 +108,41 @@
   }
 
   .brand {
-    gap: 0.6rem;
+    gap: 0.55rem;
+    min-width: 0;
+    flex: 1;
+    overflow: hidden;
   }
 
   .brandLogo {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     border-radius: 8px;
+    flex-shrink: 0;
+  }
+
+  .brandInfo {
+    min-width: 0;
+    overflow: hidden;
   }
 
   .brandTitle {
-    font-size: 1.25rem;
+    font-size: 1.2rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .brandSubtitle {
     display: none;
   }
 
+  .headerRight {
+    flex-shrink: 0;
+  }
+
   .bookCountPill {
-    padding: 0.35rem 0.85rem;
-    font-size: 0.8rem;
+    padding: 0.32rem 0.75rem;
+    font-size: 0.78rem;
   }
 }

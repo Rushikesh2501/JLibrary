@@ -3,6 +3,10 @@
   display: flex;
   flex-direction: column;
   background-color: var(--bg-app);
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  position: relative;
 }
 
 .main {
@@ -11,6 +15,8 @@
   width: 100%;
   margin: 0 auto;
   padding: 1.25rem 1.5rem;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .topSection {
