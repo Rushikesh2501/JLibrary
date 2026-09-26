@@ -21,10 +21,15 @@ export const getApiBaseUrl = (): string => {
     ) {
       return `http://${hostname}:8000`;
     }
+
+    // If hosted on j-library-brown.vercel.app itself, use same-origin relative URLs
+    if (hostname === 'j-library-brown.vercel.app') {
+      return '';
+    }
   }
 
-  // Deployed production environment (e.g. Vercel) -> same-origin relative URLs
-  return '';
+  // Deployed on any separate public Vercel domain or custom domain -> connects to live backend
+  return 'https://j-library-brown.vercel.app';
 };
 
 export const API_BASE_URL = getApiBaseUrl();
