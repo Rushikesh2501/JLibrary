@@ -122,7 +122,14 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack }
           </div>
 
           <div className={styles.headerMainContent}>
-            {/* Title & Native Title (sits in the top dark green area) */}
+            {/* Mobile-only Book ID Badge centered under book cover */}
+            <div className={styles.mobileBookIdRow}>
+              <span className={styles.mobileBookIdChip}>
+                Book ID #{book.book_id}
+              </span>
+            </div>
+
+            {/* Title & Native Title */}
             <div className={styles.greenTitleRow}>
               <div className={styles.titleColumn}>
                 <span className={styles.bookTitleGreen}>
@@ -140,15 +147,16 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack }
             <div className={styles.whiteInfoSection}>
               <div className={styles.whiteInfoTopRow}>
                 <div className={styles.bookMetaSub}>
-                  {book.author || 'Unknown Author'} · {publishedYear} • Published by{' '}
-                  {book.publication && book.publication !== 'N/A' ? book.publication : 'N/A'}
+                  {book.author || 'Unknown Author'}
+                  {publishedYear ? ` · ${publishedYear}` : ''}
+                  {book.publication && book.publication !== 'N/A' ? ` • Published by ${book.publication}` : ''}
                 </div>
               </div>
 
               {/* Status Badges */}
               <div className={styles.headerBadgesRow}>
                 <span className={isAvailable ? styles.statusAvailPill : styles.statusBorrowedPill}>
-                  {book.availability_status || 'Available'}
+                  {book.availability_status || (isAvailable ? 'Available' : 'Borrowed')}
                 </span>
                 {!isAvailable && book.borrowed_by && (
                   <span className={styles.borrowedByPill}>
