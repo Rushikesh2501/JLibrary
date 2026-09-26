@@ -7,28 +7,6 @@
   min-width: 0;
 }
 
-.resultsHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0;
-  padding: 0 0.15rem;
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-.resultCount {
-  font-size: 0.88rem;
-  color: var(--text-muted);
-  font-weight: 500;
-}
-
-.highlightCount {
-  font-weight: 700;
-  color: var(--text-main);
-}
-
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));

@@ -91,14 +91,6 @@ export const BookGrid: React.FC<BookGridProps> = ({
 
   return (
     <div className={styles.container}>
-      <div className={styles.resultsHeader}>
-        <span className={styles.resultCount}>
-          Showing <span className={styles.highlightCount}>{startIndex + 1}</span>–
-          <span className={styles.highlightCount}>{endIndex}</span> of{' '}
-          <span className={styles.highlightCount}>{books.length}</span> titles
-        </span>
-      </div>
-
       {viewMode === 'grid' ? (
         <div className={styles.grid}>
           {currentBooks.map((book) => (
