@@ -17,6 +17,13 @@
       "config": {
         "distDir": "build"
       }
+    },
+    {
+      "src": "JLIB_FE_LIST/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
     }
   ],
   "rewrites": [
@@ -35,6 +42,18 @@
     {
       "source": "/health(.*)",
       "destination": "/api/index.py"
+    },
+    {
+      "source": "/list/assets/(.*)",
+      "destination": "/JLIB_FE_LIST/assets/$1"
+    },
+    {
+      "source": "/assets/(.*)",
+      "destination": "/JLIB_FE_LIST/assets/$1"
+    },
+    {
+      "source": "/list(.*)",
+      "destination": "/JLIB_FE_LIST/index.html"
     },
     {
       "source": "/(.*)",
