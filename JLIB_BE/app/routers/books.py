@@ -130,9 +130,11 @@ def get_book_cover(book_id: str, db: Session = Depends(get_db)):
     book = book_service.get_book_by_id(db, book_id=book_id)
     if not book:
         raise HTTPException(status_code=404, detail="Book not found")
+    cover_url = book.cover_url
+    db.close()
 
     # If book has base64 data url, decode and return it directly
-    if book.cover_url and book.cover_url.startswith("data:image"):
+    if cover_url and cover_url.startswith("data:image"):
         try:
             import base64
             header, b64 = book.cover_url.split(",", 1)
@@ -153,8 +155,8 @@ def get_book_cover(book_id: str, db: Session = Depends(get_db)):
 
     # If cover_url specifies a path in Book_profile, try that exact path first
     paths_to_try = []
-    if book.cover_url and "/Book_profile/" in book.cover_url:
-        exact_path = book.cover_url.split("/Book_profile/", 1)[1].split("?")[0]
+    if cover_url and "/Book_profile/" in cover_url:
+        exact_path = cover_url.split("/Book_profile/", 1)[1].split("?")[0]
         paths_to_try.append(exact_path)
 
     for filename in ["cover.jpg", "cover.png", "cover.webp", "cover.jpeg"]:

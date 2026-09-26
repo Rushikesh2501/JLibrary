@@ -1,0 +1,206 @@
+.toolbarPaper {
+  background-color: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-parchment, #e5dec9);
+  border-radius: 8px;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.searchBox {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  color: #9ca3af;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+}
+
+.searchInput {
+  width: 100%;
+  height: 40px;
+  padding: 0 34px 0 38px;
+  background-color: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-parchment, #e5dec9);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: var(--text-primary, #1c1917);
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.searchInput::placeholder {
+  color: #9ca3af;
+}
+
+.searchInput:hover {
+  border-color: var(--primary-forest-light, #2d5a27);
+}
+
+.searchInput:focus {
+  border-color: var(--primary-forest, #1b4332);
+  box-shadow: 0 0 0 2px rgba(27, 67, 50, 0.1);
+}
+
+.clearSearchBtn {
+  position: absolute;
+  right: 10px;
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 50%;
+  transition: color 0.15s ease;
+}
+
+.clearSearchBtn:hover {
+  color: var(--text-primary);
+}
+
+.controlsGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.selectWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 165px;
+}
+
+.floatingLabel {
+  position: absolute;
+  top: -8px;
+  left: 10px;
+  background-color: var(--bg-card, #ffffff);
+  padding: 0 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #78716c;
+  pointer-events: none;
+  z-index: 2;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  transition: color 0.2s ease;
+}
+
+.selectWrapper:focus-within .floatingLabel {
+  color: #1976d2;
+}
+
+.selectField {
+  width: 100%;
+  height: 40px;
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-parchment, #e5dec9);
+  border-radius: 8px;
+  padding: 0 32px 0 12px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text-primary, #1c1917);
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.selectField:hover {
+  border-color: var(--primary-forest-light, #2d5a27);
+}
+
+.selectField:focus {
+  border-color: #1976d2;
+  box-shadow: 0 0 0 1px #1976d2;
+}
+
+.selectChevron {
+  position: absolute;
+  right: 10px;
+  color: #6b7280;
+  pointer-events: none;
+}
+
+.clearFiltersBtn {
+  height: 40px;
+  min-height: 40px;
+  border-radius: 8px;
+  border: 1px solid var(--primary-forest, #1b4332);
+  background-color: var(--primary-forest, #1b4332);
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-family: inherit;
+  padding: 0 16px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(27, 67, 50, 0.2);
+  transition: all 0.2s ease;
+}
+
+.clearFiltersBtn:hover:not(:disabled) {
+  background-color: var(--primary-forest-light, #2d5a27);
+  border-color: var(--primary-forest-light, #2d5a27);
+  box-shadow: 0 4px 10px rgba(27, 67, 50, 0.3);
+}
+
+.clearFiltersBtn:disabled {
+  opacity: 0.45;
+  border-color: #52796f;
+  color: rgba(255, 255, 255, 0.75);
+  background-color: #52796f;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+@media (max-width: 900px) {
+  .toolbarPaper {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    padding: 14px 16px;
+  }
+
+  .controlsGroup {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    gap: 14px;
+  }
+
+  .selectWrapper {
+    width: 100%;
+  }
+
+  .clearFiltersBtn {
+    width: 100%;
+  }
+}

@@ -209,7 +209,7 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books: initialBooks }) => 
             Library Collection
           </Typography>
           <Typography variant="body1" className={styles.subtitle}>
-            Browse and discover books in your collection.
+            Browse and discover books in our collection.
           </Typography>
         </Box>
 

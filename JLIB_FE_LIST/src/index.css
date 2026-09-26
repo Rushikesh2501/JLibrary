@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Patrick+Hand&family=Architects+Daughter&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Exact JLIB_FE Forest Palette */
+  --primary-forest: #1b4332;
+  --primary-forest-dark: #122e22;
+  --primary-forest-light: #2d5a27;
+
+  --accent-walnut: #3d2b1f;
+  --accent-walnut-light: #594132;
+  --accent-gold: #c9a227;
+  --accent-gold-soft: #f4ea7a;
+
+  --bg-app: #f7f3ec;
+  --bg-header: #1b2e25;
+  --bg-sidebar: #1b2e25;
+  --bg-card: #ffffff;
+  --bg-paper: #f7f2e7;
+
+  --border-parchment: #e8ded0;
+  --border-dark: #2c4236;
+
+  --text-primary: #1c1917;
+  --text-secondary: #78716c;
+  --text-muted: #948a7e;
+  --text-on-dark: #f7f3eb;
+
+  /* Font Families from JLIB_FE */
+  --font-serif: 'Patrick Hand', 'Architects Daughter', cursive;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-devanagari: 'Noto Sans Devanagari', 'Plus Jakarta Sans', sans-serif;
+
+  /* Status Colors */
+  --status-available-border: #2e7d32;
+  --status-available-color: #2e7d32;
+  --status-available-bg: rgba(76, 197, 36, 0.08);
+
+  --status-borrowed-border: #d32f2f;
+  --status-borrowed-color: #d32f2f;
+  --status-borrowed-bg: rgba(201, 9, 9, 0.08);
+
+  --badge-lang-border: #e7e2d9;
+  --badge-lang-color: #4a443f;
+  --badge-lang-bg: #ffffff;
+
+  /* Radii */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.03);
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.07);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100%;
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #ede8dc;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c7beaf;
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a89f90;
+}

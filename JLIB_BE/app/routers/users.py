@@ -26,12 +26,14 @@ def get_user_avatar(user_id: str, db: Session = Depends(get_db)):
     user = user_service.get_user_by_id(db, user_id=user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    profile_pic_url = user.profile_pic_url
+    db.close()
 
     # If user has base64 data url, decode and return it directly
-    if user.profile_pic_url and user.profile_pic_url.startswith("data:image"):
+    if profile_pic_url and profile_pic_url.startswith("data:image"):
         try:
             import base64
-            header, b64 = user.profile_pic_url.split(",", 1)
+            header, b64 = profile_pic_url.split(",", 1)
             media_type = header.split(";")[0].replace("data:", "")
             return Response(
                 content=base64.b64decode(b64),

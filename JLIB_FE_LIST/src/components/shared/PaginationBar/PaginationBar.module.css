@@ -1,0 +1,130 @@
+.paginationWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 36px 0 24px 0;
+}
+
+.paginationContainer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background-color: #ffffff;
+  border: 1px solid var(--border-parchment, #e8ded0);
+  border-radius: 16px;
+  padding: 8px 18px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+  user-select: none;
+}
+
+.arrowButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: #78716c;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 8px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+}
+
+.arrowButton:not(:disabled):hover {
+  color: var(--primary-forest, #1b4332);
+  background-color: rgba(27, 67, 50, 0.06);
+}
+
+.arrowButton.prev:not(:disabled):hover {
+  transform: translateX(-2px);
+}
+
+.arrowButton.next:not(:disabled):hover {
+  transform: translateX(2px);
+}
+
+.arrowButton:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+.numbersList {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pageItem {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 4px;
+  background: transparent;
+  border: none;
+  font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif);
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: #78716c;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.pageItem:hover:not(.active) {
+  color: var(--primary-forest, #1b4332);
+  background-color: rgba(27, 67, 50, 0.06);
+}
+
+.pageItem.active {
+  background-color: var(--primary-forest, #1b4332);
+  color: #ffffff !important;
+  font-weight: 700;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(27, 67, 50, 0.28);
+  cursor: default;
+}
+
+.ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 32px;
+  font-size: 0.88rem;
+  color: #a8a29e;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 640px) {
+  .paginationWrapper {
+    margin: 24px 0 16px 0;
+  }
+
+  .paginationContainer {
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 14px;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .numbersList {
+    gap: 4px;
+  }
+
+  .pageItem {
+    min-width: 28px;
+    height: 28px;
+    font-size: 0.82rem;
+  }
+}
