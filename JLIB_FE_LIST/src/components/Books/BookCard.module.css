@@ -181,3 +181,41 @@
   line-height: 1;
   flex-shrink: 0;
 }
+
+@media (max-width: 480px) {
+  .bookCard {
+    padding: 10px 12px;
+    gap: 10px;
+    border-radius: 12px;
+  }
+
+  .coverWrapper {
+    width: 60px;
+    height: 82px;
+    border-radius: 8px;
+  }
+
+  .bookTitle {
+    font-size: 0.95rem;
+  }
+
+  .nativeTitleCard {
+    font-size: 0.82rem;
+  }
+
+  .authorYear {
+    font-size: 0.75rem;
+  }
+
+  .pillRow {
+    gap: 6px;
+    margin-top: 3px;
+  }
+
+  .langPill,
+  .shelfPill {
+    height: 22px;
+    padding: 0 8px;
+    font-size: 0.65rem;
+  }
+}
