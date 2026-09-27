@@ -235,6 +235,50 @@
   transition: color 0.2s ease;
 }
 
+.coverViewBtn {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50% !important;
+  background: rgba(27, 46, 37, 0.85) !important;
+  backdrop-filter: blur(6px);
+  border: 1.5px solid rgba(255, 255, 255, 0.85) !important;
+  color: #ffffff !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0;
+}
+
+.coverViewBtn:hover {
+  background: var(--primary-forest, #1b4332) !important;
+  border-color: #ffffff !important;
+  transform: scale(1.12);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45) !important;
+}
+
+.coverViewIcon {
+  font-size: 18px !important;
+  color: #ffffff !important;
+  transition: transform 0.2s ease;
+}
+
+.coverWrapperClickable {
+  cursor: pointer;
+}
+
+.coverWrapperClickable:hover .coverViewBtn {
+  background: var(--primary-forest, #1b4332) !important;
+  border-color: #ffffff !important;
+  transform: scale(1.08);
+}
+
 .headerMainContent {
   display: flex;
   flex-direction: column;
@@ -1021,4 +1065,113 @@
   color: #e57373 !important;
   background-color: #ffffff !important;
   cursor: not-allowed !important;
+}
+
+/* Photo Preview Modal Lightbox */
+.photoModalPaper {
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+  margin: 16px !important;
+  max-width: 90vw !important;
+  width: auto !important;
+}
+
+.photoModalContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 100%;
+}
+
+.photoModalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 580px;
+  margin-bottom: 12px;
+  padding: 0 4px;
+}
+
+.photoModalTitleWrap {
+  overflow: hidden;
+  padding-right: 16px;
+}
+
+.photoModalTitle {
+  font-family: var(--font-serif) !important;
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  line-height: 1.2 !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.photoModalAuthor {
+  color: rgba(255, 255, 255, 0.75) !important;
+  font-size: 0.82rem !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.photoModalActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.photoModalBtn {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.16) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  transition: all 0.2s ease !important;
+}
+
+.photoModalBtn:hover {
+  background-color: rgba(255, 255, 255, 0.32) !important;
+  transform: scale(1.05);
+}
+
+.photoModalImgWrap {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75);
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  background-color: #1b2e25;
+  max-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photoModalImg {
+  max-width: 85vw;
+  max-height: 80vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+@media (max-width: 600px) {
+  .photoModalTitle {
+    font-size: 1.05rem !important;
+  }
+  .photoModalImgWrap {
+    border-radius: 12px;
+    max-height: 75vh;
+  }
+  .photoModalImg {
+    max-width: 90vw;
+    max-height: 75vh;
+  }
 }

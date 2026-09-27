@@ -57,6 +57,7 @@ export const Header: React.FC<HeaderProps> = ({ title, onToggleMobileDrawer, boo
             onClick={handleCopy}
             startIcon={copied ? <CheckIcon fontSize="small" /> : <ContentCopyIcon fontSize="small" />}
             size="small"
+            aria-label={copied ? 'Catalogue link copied' : 'Copy catalogue link'}
           >
             <span className={styles.btnText}>{copied ? 'Copied' : 'Copy Link'}</span>
           </Button>
@@ -68,6 +69,7 @@ export const Header: React.FC<HeaderProps> = ({ title, onToggleMobileDrawer, boo
             onClick={handleOpen}
             endIcon={<OpenInNewIcon fontSize="small" />}
             size="small"
+            aria-label="Open catalogue in new tab"
           >
             <span className={styles.btnText}>Open Catalogue</span>
           </Button>

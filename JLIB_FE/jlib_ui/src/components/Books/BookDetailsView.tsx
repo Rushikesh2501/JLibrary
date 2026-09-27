@@ -23,6 +23,9 @@ import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import CropIcon from '@mui/icons-material/Crop';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import CloseIcon from '@mui/icons-material/Close';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { IBook as Book } from 'interfaces/book-interface/ibook';
 import { deleteBook, updateBook, deleteBookCover, getSafeBookCoverUrl } from '../../services/bookService';
 import { ImageCropModal } from '../common/ImageCropModal';
@@ -150,6 +153,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
 
   // Edit Mode & State
   const [isEditing, setIsEditing] = useState(false);
@@ -433,7 +437,7 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
         <div className={styles.profileHeader}>
           {/* Book Cover with Edit Option when editing is active */}
           <div
-            className={`${styles.coverWrapper} ${isEditing ? styles.coverWrapperEditing : ''}`}
+            className={`${styles.coverWrapper} ${isEditing ? styles.coverWrapperEditing : !isPlaceholder ? styles.coverWrapperClickable : ''}`}
             onClick={() => {
               if (isEditing) {
                 if (!isPlaceholder) {
@@ -442,10 +446,13 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
                 } else {
                   coverFileInputRef.current?.click();
                 }
+              } else if (!isPlaceholder) {
+                setIsPhotoModalOpen(true);
               }
             }}
-            role={isEditing ? 'button' : undefined}
-            tabIndex={isEditing ? 0 : undefined}
+            role={isEditing || !isPlaceholder ? 'button' : undefined}
+            tabIndex={isEditing || !isPlaceholder ? 0 : undefined}
+            aria-label={isEditing ? 'Change cover photo' : !isPlaceholder ? 'View book photo' : undefined}
           >
             {/* Fallback Cover with Book Icon (stays visible until cover image loads) */}
             <div
@@ -524,6 +531,23 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
                   aria-label="Remove photo"
                 >
                   <DeleteOutlineIcon className={styles.coverDeleteIcon} />
+                </button>
+              </Tooltip>
+            )}
+
+            {/* Small Eye Icon on Profile Cover to view photo */}
+            {!isEditing && !isPlaceholder && (
+              <Tooltip title="View book photo" arrow>
+                <button
+                  type="button"
+                  className={styles.coverViewBtn}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsPhotoModalOpen(true);
+                  }}
+                  aria-label="View book photo"
+                >
+                  <VisibilityIcon className={styles.coverViewIcon} />
                 </button>
               </Tooltip>
             )}
@@ -1054,6 +1078,74 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
             {isDeleting ? 'Deleting...' : 'Delete'}
           </Button>
         </DialogActions>
+      </Dialog>
+
+      {/* View Book Photo Modal */}
+      <Dialog
+        open={isPhotoModalOpen}
+        onClose={() => setIsPhotoModalOpen(false)}
+        maxWidth="md"
+        slotProps={{
+          paper: {
+            className: styles.photoModalPaper,
+          },
+          backdrop: {
+            sx: {
+              backgroundColor: 'rgba(15, 23, 20, 0.88)',
+              backdropFilter: 'blur(6px)',
+            },
+          },
+        }}
+      >
+        <div className={styles.photoModalContainer}>
+          {/* Header bar */}
+          <div className={styles.photoModalHeader}>
+            <div className={styles.photoModalTitleWrap}>
+              <Typography className={styles.photoModalTitle}>
+                {currentBook.book_name}
+              </Typography>
+              {currentBook.author && (
+                <Typography className={styles.photoModalAuthor}>
+                  {currentBook.author}
+                </Typography>
+              )}
+            </div>
+
+            <div className={styles.photoModalActions}>
+              {activeCoverUrl && (
+                <Tooltip title="Open full image in new tab" arrow>
+                  <IconButton
+                    className={styles.photoModalBtn}
+                    onClick={() => window.open(activeCoverUrl, '_blank', 'noopener,noreferrer')}
+                    aria-label="Open full image in new tab"
+                    size="small"
+                  >
+                    <OpenInNewIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              )}
+              <Tooltip title="Close (Esc)" arrow>
+                <IconButton
+                  className={styles.photoModalBtn}
+                  onClick={() => setIsPhotoModalOpen(false)}
+                  aria-label="Close photo preview"
+                  size="small"
+                >
+                  <CloseIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </div>
+          </div>
+
+          {/* Image Container */}
+          <div className={styles.photoModalImgWrap}>
+            <img
+              src={activeCoverUrl}
+              alt={currentBook.book_name}
+              className={styles.photoModalImg}
+            />
+          </div>
+        </div>
       </Dialog>
     </div>
   );

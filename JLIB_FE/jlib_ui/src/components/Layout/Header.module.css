@@ -85,42 +85,58 @@
   white-space: nowrap;
 }
 
-@media (max-width: 640px) {
-  .headerBar {
-    padding: 8px 12px !important;
-  }
-  .rightSection {
-    gap: 8px;
-  }
-  .copyLinkBtn,
-  .openCatalogueBtn {
-    padding: 4px 10px !important;
-    font-size: 0.78rem !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .pageTitle {
-    font-size: 1rem !important;
-  }
-  .copyLinkBtn,
-  .openCatalogueBtn {
-    padding: 4px 8px !important;
-    min-width: unset !important;
-  }
-}
-
-@media (max-width: 380px) {
+/* Other than desktop (< 900px, where mobile navigation / drawer takes over): icons only */
+@media (max-width: 899.95px) {
   .btnText {
-    display: none;
+    display: none !important;
   }
+
   .copyLinkBtn,
   .openCatalogueBtn {
-    padding: 6px !important;
-    min-width: 32px !important;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    padding: 0 !important;
+    border-radius: 8px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
+
   .copyLinkBtn :global(.MuiButton-startIcon),
   .openCatalogueBtn :global(.MuiButton-endIcon) {
     margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .copyLinkBtn :global(.MuiButton-startIcon > svg),
+  .openCatalogueBtn :global(.MuiButton-endIcon > svg) {
+    font-size: 1.15rem !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .headerBar {
+    padding: 8px 12px !important;
+  }
+
+  .rightSection {
+    gap: 8px;
+  }
+}
+
+@media (max-width: 360px) {
+  .copyLinkBtn,
+  .openCatalogueBtn {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+  }
+
+  .copyLinkBtn :global(.MuiButton-startIcon > svg),
+  .openCatalogueBtn :global(.MuiButton-endIcon > svg) {
+    font-size: 1.05rem !important;
   }
 }

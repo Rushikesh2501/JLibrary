@@ -1,0 +1,15 @@
+{
+  "short_name": "JLibrary",
+  "name": "JLibrary Management System",
+  "icons": [
+    {
+      "src": "assets/icon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#1b382b",
+  "background_color": "#ffffff"
+}
