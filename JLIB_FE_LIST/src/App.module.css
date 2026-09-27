@@ -5,7 +5,7 @@
   background-color: var(--bg-app);
   width: 100%;
   max-width: 100%;
-  overflow-x: hidden;
+  overflow-x: clip;
   position: relative;
 }
 
@@ -16,7 +16,11 @@
   margin: 0 auto;
   padding: 1.25rem 1.5rem;
   box-sizing: border-box;
-  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+.detailsMain {
+  padding-top: 0.5rem;
 }
 
 .topSection {
@@ -99,6 +103,9 @@
 @media (max-width: 640px) {
   .main {
     padding: 0.85rem 0.75rem;
+  }
+  .detailsMain {
+    padding-top: 0.25rem;
   }
   .collectionTitle {
     font-size: 1.6rem;

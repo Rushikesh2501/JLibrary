@@ -182,7 +182,9 @@ export const App: React.FC = () => {
 
   const handleSelectBook = (book: Book) => {
     setSelectedBook(book);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
     const url = new URL(window.location.href);
     url.searchParams.set('book', book.book_id);
     window.history.pushState({ bookId: book.book_id }, '', url.toString());
@@ -190,7 +192,9 @@ export const App: React.FC = () => {
 
   const handleBackToList = () => {
     setSelectedBook(null);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
     const url = new URL(window.location.href);
     url.searchParams.delete('book');
     window.history.pushState({}, '', url.toString());
@@ -200,7 +204,7 @@ export const App: React.FC = () => {
     <div className={styles.app}>
       <Header totalBooks={books.length} />
 
-      <main className={styles.main}>
+      <main className={`${styles.main} ${selectedBook ? styles.detailsMain : ''}`}>
         {selectedBook ? (
           /* Full In-Page Details View (Opens like a page with Back button, exactly matching JLIB_FE) */
           <BookDetailsView

@@ -8,12 +8,9 @@
 }
 
 .backButtonRow {
-  position: sticky;
-  top: 70px;
-  z-index: 40;
   background-color: var(--bg-app);
-  padding: 12px 0 16px 0;
-  margin-bottom: 16px;
+  padding: 4px 0 14px 0;
+  margin-bottom: 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -455,15 +452,14 @@
   }
 }
 
-/* Mobile Responsiveness */
-@media (max-width: 650px) {
+/* Mobile & Tablet Responsiveness */
+@media (max-width: 900px) {
   .profileContainer {
-    padding: 0 0 24px 0;
+    padding: 0 0 20px 0;
   }
 
   .backButtonRow {
-    top: 52px;
-    padding: 8px 0 10px 0;
+    padding: 2px 0 10px 0;
     margin-bottom: 12px;
   }
 
