@@ -1087,7 +1087,8 @@
 .photoModalHeader {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 12px;
   width: 100%;
   max-width: 580px;
   margin-bottom: 12px;
@@ -1096,7 +1097,8 @@
 
 .photoModalTitleWrap {
   overflow: hidden;
-  padding-right: 16px;
+  flex: 1;
+  min-width: 0;
 }
 
 .photoModalTitle {
@@ -1118,13 +1120,6 @@
   text-overflow: ellipsis;
 }
 
-.photoModalActions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
 .photoModalBtn {
   color: #ffffff !important;
   background-color: rgba(255, 255, 255, 0.16) !important;
@@ -1133,6 +1128,10 @@
   height: 36px !important;
   border-radius: 50% !important;
   transition: all 0.2s ease !important;
+  flex-shrink: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 .photoModalBtn:hover {

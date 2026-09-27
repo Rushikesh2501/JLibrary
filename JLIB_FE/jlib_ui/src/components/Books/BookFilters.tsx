@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, FormControl, InputLabel, Select, MenuItem, Button } from '@mui/material';
 import FilterAltOffIcon from '@mui/icons-material/FilterAltOff';
+import { AuthorSelectDropdown, AuthorItem } from './AuthorSelectDropdown';
 import styles from './BookFilters.module.css';
 
 interface BookFiltersProps {
@@ -8,6 +9,10 @@ interface BookFiltersProps {
   isFilterActive: boolean;
   onSortChange: (sortBy: string) => void;
   onClearFilters: () => void;
+  selectedAuthor: string;
+  onAuthorChange: (author: string) => void;
+  authorsList: AuthorItem[];
+  totalBooksCount?: number;
 }
 
 export const BookFilters: React.FC<BookFiltersProps> = ({
@@ -15,9 +20,21 @@ export const BookFilters: React.FC<BookFiltersProps> = ({
   isFilterActive,
   onSortChange,
   onClearFilters,
+  selectedAuthor,
+  onAuthorChange,
+  authorsList,
+  totalBooksCount,
 }) => {
   return (
     <Box className={styles.filterContainer}>
+      {/* Searchable Author Dropdown with multilingual & semantic matching */}
+      <AuthorSelectDropdown
+        authors={authorsList}
+        selectedAuthor={selectedAuthor}
+        onSelectAuthor={onAuthorChange}
+        totalBooksCount={totalBooksCount}
+      />
+
       <FormControl size="small" className={styles.formControl}>
         <InputLabel id="sort-filter-label" sx={{ color: 'var(--text-muted)' }}>
           Sort By

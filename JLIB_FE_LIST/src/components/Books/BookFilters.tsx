@@ -1,14 +1,16 @@
 import React from 'react';
 import { Search, X, ChevronDown, FilterX } from 'lucide-react';
 import type { SortOption } from '../../interfaces/book.interface';
+import { AuthorSelectDropdown, type AuthorItem } from './AuthorSelectDropdown';
 import styles from './BookFilters.module.css';
 
 interface BookFiltersProps {
   searchQuery: string;
   onSearchChange: (q: string) => void;
-  selectedLanguage: string;
-  onLanguageChange: (lang: string) => void;
-  languagesList: string[];
+  selectedAuthor: string;
+  onAuthorChange: (author: string) => void;
+  authorsList: AuthorItem[];
+  totalBooksCount?: number;
   sortOption: SortOption;
   onSortChange: (sort: SortOption) => void;
   onResetFilters: () => void;
@@ -18,9 +20,10 @@ interface BookFiltersProps {
 export const BookFilters: React.FC<BookFiltersProps> = ({
   searchQuery,
   onSearchChange,
-  selectedLanguage,
-  onLanguageChange,
-  languagesList,
+  selectedAuthor,
+  onAuthorChange,
+  authorsList,
+  totalBooksCount,
   sortOption,
   onSortChange,
   onResetFilters,
@@ -53,25 +56,15 @@ export const BookFilters: React.FC<BookFiltersProps> = ({
         )}
       </div>
 
-      {/* 2. Controls Group (Language Dropdown, Sort By Dropdown, Clear Filters Button) */}
+      {/* 2. Controls Group (Author Dropdown, Sort By Dropdown, Clear Filters Button) */}
       <div className={styles.controlsGroup}>
-        {/* Language Dropdown with floating label */}
-        <div className={styles.selectWrapper}>
-          <label className={styles.floatingLabel}>Language</label>
-          <select
-            className={styles.selectField}
-            value={selectedLanguage}
-            onChange={(e) => onLanguageChange(e.target.value)}
-          >
-            <option value="all">All Languages</option>
-            {languagesList.map((lang) => (
-              <option key={lang} value={lang}>
-                {lang}
-              </option>
-            ))}
-          </select>
-          <ChevronDown size={16} className={styles.selectChevron} />
-        </div>
+        {/* Author Searchable Dropdown with inside search bar & semantic matching */}
+        <AuthorSelectDropdown
+          authors={authorsList}
+          selectedAuthor={selectedAuthor}
+          onSelectAuthor={onAuthorChange}
+          totalBooksCount={totalBooksCount}
+        />
 
         {/* Sort By Dropdown with floating label */}
         <div className={styles.selectWrapper}>

@@ -21,6 +21,7 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books: initialBooks }) => 
   const [booksList, setBooksList] = useState<Book[]>(initialBooks);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('ASCENDING');
+  const [selectedAuthor, setSelectedAuthor] = useState('all');
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [isAddBookViewActive, setIsAddBookViewActive] = useState(false);
 
@@ -28,19 +29,39 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books: initialBooks }) => 
   const ITEMS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Reset pagination when search or sort criteria change
+  // Reset pagination when search, sort, or author criteria change
   React.useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, sortBy]);
+  }, [searchTerm, sortBy, selectedAuthor]);
 
   // Sync state if prop changes
   React.useEffect(() => {
     setBooksList(initialBooks);
   }, [initialBooks]);
 
+  // Compute distinct authors with book counts
+  const authorsList = useMemo(() => {
+    const counts = new Map<string, number>();
+    booksList.forEach((b) => {
+      const author = b.author?.trim();
+      if (author && author !== 'N/A') {
+        counts.set(author, (counts.get(author) || 0) + 1);
+      }
+    });
+    return Array.from(counts.entries())
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+  }, [booksList]);
+
   // Filter and sort books locally in real-time
   const filteredBooks = useMemo(() => {
     const result = booksList.filter((book) => {
+      // 1. Author Filter
+      if (selectedAuthor !== 'all' && book.author?.trim() !== selectedAuthor) {
+        return false;
+      }
+
+      // 2. Search Term Filter
       if (searchTerm.trim()) {
         const query = searchTerm.toLowerCase().trim();
         const cleanQuery = query.startsWith('#') ? query.slice(1).trim() : query;
@@ -112,7 +133,7 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books: initialBooks }) => 
     }
 
     return result;
-  }, [booksList, searchTerm, sortBy]);
+  }, [booksList, searchTerm, sortBy, selectedAuthor]);
 
   const totalPages = Math.ceil(filteredBooks.length / ITEMS_PER_PAGE);
 
@@ -126,11 +147,12 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books: initialBooks }) => 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const isFilterActive = sortBy !== 'ASCENDING' || searchTerm.trim() !== '';
+  const isFilterActive = sortBy !== 'ASCENDING' || searchTerm.trim() !== '' || selectedAuthor !== 'all';
 
   const handleClearFilters = () => {
     setSortBy('ASCENDING');
     setSearchTerm('');
+    setSelectedAuthor('all');
   };
 
   const handleAddNewBook = async (newBookData: any) => {
@@ -205,16 +227,21 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books: initialBooks }) => 
     <Box className={styles.container}>
       <Box className={styles.headerSection}>
         <Box className={styles.headerLeft}>
-          <Typography variant="h4" className={styles.title}>
-            Library Collection
-          </Typography>
+          <Box className={styles.titleRow}>
+            <Typography variant="h4" className={styles.title}>
+              Library Collection
+            </Typography>
+            <div className={`${styles.totalBookBadge} ${styles.mobileBookBadge}`}>
+              {booksList.length} {booksList.length === 1 ? 'Book' : 'Books'}
+            </div>
+          </Box>
           <Typography variant="body1" className={styles.subtitle}>
             Browse and discover books in our collection.
           </Typography>
         </Box>
 
         <Box className={styles.headerRight}>
-          <div className={styles.totalBookBadge}>
+          <div className={`${styles.totalBookBadge} ${styles.desktopBookBadge}`}>
             {booksList.length} {booksList.length === 1 ? 'Book' : 'Books'}
           </div>
           <Button
@@ -241,6 +268,10 @@ export const BooksPage: React.FC<BooksPageProps> = ({ books: initialBooks }) => 
               isFilterActive={isFilterActive}
               onSortChange={(val) => setSortBy(val === 'DEFAULT' ? 'ASCENDING' : val)}
               onClearFilters={handleClearFilters}
+              selectedAuthor={selectedAuthor}
+              onAuthorChange={setSelectedAuthor}
+              authorsList={authorsList}
+              totalBooksCount={booksList.length}
             />
           </Box>
         </Paper>

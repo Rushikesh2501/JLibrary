@@ -17,7 +17,7 @@ export const App: React.FC = () => {
 
   // Filters & Controls State
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedLanguage, setSelectedLanguage] = useState<string>('all');
+  const [selectedAuthor, setSelectedAuthor] = useState<string>('all');
   const [sortOption, setSortOption] = useState<SortOption>('title-asc');
   const viewMode: ViewMode = 'grid';
 
@@ -74,14 +74,18 @@ export const App: React.FC = () => {
     return () => window.removeEventListener('popstate', onPopState);
   }, [books]);
 
-  const languagesList = useMemo(() => {
-    const set = new Set<string>();
+  // Compute distinct authors with book counts
+  const authorsList = useMemo(() => {
+    const counts = new Map<string, number>();
     books.forEach((b) => {
-      if (b.language && b.language.trim() && b.language !== 'N/A') {
-        set.add(b.language.trim());
+      const author = b.author?.trim();
+      if (author && author !== 'N/A') {
+        counts.set(author, (counts.get(author) || 0) + 1);
       }
     });
-    return Array.from(set).sort();
+    return Array.from(counts.entries())
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
   }, [books]);
 
   // Filter and sort books
@@ -114,8 +118,8 @@ export const App: React.FC = () => {
         }
       }
 
-      // 2. Language filter
-      if (selectedLanguage !== 'all' && book.language !== selectedLanguage) {
+      // 2. Author filter
+      if (selectedAuthor !== 'all' && book.author?.trim() !== selectedAuthor) {
         return false;
       }
 
@@ -166,17 +170,17 @@ export const App: React.FC = () => {
   }, [
     books,
     searchQuery,
-    selectedLanguage,
+    selectedAuthor,
     sortOption,
   ]);
 
   const hasActiveFilters =
-    searchQuery !== '' ||
-    selectedLanguage !== 'all';
+    searchQuery.trim() !== '' ||
+    selectedAuthor !== 'all';
 
   const handleResetFilters = () => {
     setSearchQuery('');
-    setSelectedLanguage('all');
+    setSelectedAuthor('all');
     setSortOption('title-asc');
   };
 
@@ -246,9 +250,10 @@ export const App: React.FC = () => {
             <BookFilters
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
-              selectedLanguage={selectedLanguage}
-              onLanguageChange={setSelectedLanguage}
-              languagesList={languagesList}
+              selectedAuthor={selectedAuthor}
+              onAuthorChange={setSelectedAuthor}
+              authorsList={authorsList}
+              totalBooksCount={books.length}
               sortOption={sortOption}
               onSortChange={setSortOption}
               onResetFilters={handleResetFilters}

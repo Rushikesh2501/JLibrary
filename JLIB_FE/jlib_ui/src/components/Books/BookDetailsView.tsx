@@ -25,7 +25,6 @@ import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import CloseIcon from '@mui/icons-material/Close';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { IBook as Book } from 'interfaces/book-interface/ibook';
 import { deleteBook, updateBook, deleteBookCover, getSafeBookCoverUrl } from '../../services/bookService';
 import { ImageCropModal } from '../common/ImageCropModal';
@@ -1100,6 +1099,17 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
         <div className={styles.photoModalContainer}>
           {/* Header bar */}
           <div className={styles.photoModalHeader}>
+            <Tooltip title="Close (Esc)" arrow>
+              <IconButton
+                className={styles.photoModalBtn}
+                onClick={() => setIsPhotoModalOpen(false)}
+                aria-label="Close photo preview"
+                size="small"
+              >
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+
             <div className={styles.photoModalTitleWrap}>
               <Typography className={styles.photoModalTitle}>
                 {currentBook.book_name}
@@ -1109,31 +1119,6 @@ export const BookDetailsView: React.FC<BookDetailsViewProps> = ({ book, onBack, 
                   {currentBook.author}
                 </Typography>
               )}
-            </div>
-
-            <div className={styles.photoModalActions}>
-              {activeCoverUrl && (
-                <Tooltip title="Open full image in new tab" arrow>
-                  <IconButton
-                    className={styles.photoModalBtn}
-                    onClick={() => window.open(activeCoverUrl, '_blank', 'noopener,noreferrer')}
-                    aria-label="Open full image in new tab"
-                    size="small"
-                  >
-                    <OpenInNewIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-              )}
-              <Tooltip title="Close (Esc)" arrow>
-                <IconButton
-                  className={styles.photoModalBtn}
-                  onClick={() => setIsPhotoModalOpen(false)}
-                  aria-label="Close photo preview"
-                  size="small"
-                >
-                  <CloseIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
             </div>
           </div>
 
