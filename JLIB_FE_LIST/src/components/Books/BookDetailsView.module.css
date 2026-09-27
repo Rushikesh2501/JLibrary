@@ -9,7 +9,7 @@
 
 .backButtonRow {
   background-color: var(--bg-app);
-  padding: 4px 0 14px 0;
+  padding: 7px 0 7px 0;
   margin-bottom: 14px;
   display: flex;
   align-items: center;
@@ -446,6 +446,7 @@
     opacity: 0;
     transform: translateY(8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -459,7 +460,7 @@
   }
 
   .backButtonRow {
-    padding: 2px 0 10px 0;
+    padding: 2px 0 8px 0;
     margin-bottom: 12px;
   }
 
